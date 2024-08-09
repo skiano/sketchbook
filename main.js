@@ -3,6 +3,13 @@ import p5 from 'p5';
 
 const app = document.getElementById('app');
 
+function linearGradient(p, x0, y0, x1, y1, stops) {
+  let grad = p.drawingContext.createLinearGradient(x0, y0, x1, y1);
+  stops.forEach(([amt, color]) => grad.addColorStop(amt, color));
+  p.drawingContext.fillStyle = grad;
+  return grad;
+}
+
 function run() {
   new p5((p) => {
 
@@ -19,16 +26,18 @@ function run() {
       g1 = p.createGraphics(w, h);
       g1.background('blue');
       g1.textAlign(p.CENTER, p.CENTER);
-      g1.fill('red');
+      g1.fill('yellow');
 
       g1.drawingContext.font = '300 500px citizen';
       g1.text('4', p.width / 2, p.height / 2);
       g1.canvas.style.display = 'block'; // < TEMP
   
       g2 = p.createGraphics(w, h);
-      g2.background('yellow');
+      g2.noStroke();
+      linearGradient(g2, 100, 0, 100, g2.height, [[0, 'blue'], [0.5, 'red'], [1, 'yellow']]);
+      g2.circle(g2.width / 2, g2.height / 2, g2.width, g2.height);
       g2.textAlign(p.CENTER, p.CENTER);
-      g2.fill('blue');
+      g2.fill('#ff0044');
       g2.drawingContext.font = '700 200px ohno-blazeface';
       g2.text('p5.js', p.width / 2, p.height / 2);
       g2.canvas.style.display = 'block'; // < TEMP
@@ -47,9 +56,9 @@ function run() {
   
       p.push();
       p.blendMode(p.EXCLUSION);
-      p.image(g1, -100, 100);
+      p.image(g1, 0, 0);
       p.image(g2, 0, 0);
-      p.image(g3, 100, -100);
+      p.image(g3, 0, 0);
       p.pop();
 
       p.textAlign(p.CENTER, p.CENTER);
@@ -69,6 +78,8 @@ function run() {
   
   }, app);
 }
+
+// SOME HACKY CRAP HAVING TO DO WITH ENSURING ADOBE FONTS RENDER...
 
 const fonts = [
   ['citizen', 300],
@@ -91,7 +102,7 @@ const t = setTimeout(() => {
 }, 500);
 
 document.fonts.onloadingdone = function (evt) {
-  if (evt.fontfaces.length !== fonts.length) return
+  if (evt.fontfaces.length !== fonts.length) return;
   console.log('FONTS:\n\n' + evt.fontfaces.map(f => `${f.family} ${f.weight}`).join('\n'))
   clearTimeout(t);
   run();
