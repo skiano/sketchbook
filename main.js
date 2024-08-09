@@ -28,19 +28,19 @@ function run() {
       g1.textAlign(p.CENTER, p.CENTER);
       g1.fill('yellow');
 
-      g1.drawingContext.font = '300 500px citizen';
+      g1.drawingContext.font = '300 600px citizen';
       g1.text('4', p.width / 2, p.height / 2);
-      g1.canvas.style.display = 'block'; // < TEMP
+      // g1.canvas.style.display = 'block'; // < TEMP
   
       g2 = p.createGraphics(w, h);
       g2.noStroke();
       linearGradient(g2, 100, 0, 100, g2.height, [[0, 'blue'], [0.5, 'red'], [1, 'yellow']]);
       g2.circle(g2.width / 2, g2.height / 2, g2.width, g2.height);
       g2.textAlign(p.CENTER, p.CENTER);
-      g2.fill('#ff0044');
+      g2.fill('#ff0077');
       g2.drawingContext.font = '700 200px ohno-blazeface';
       g2.text('p5.js', p.width / 2, p.height / 2);
-      g2.canvas.style.display = 'block'; // < TEMP
+      // g2.canvas.style.display = 'block'; // < TEMP
   
       g3 = p.createGraphics(w, h);
       g3.background('red');
@@ -48,7 +48,7 @@ function run() {
       g3.fill('yellow');
       g3.drawingContext.font = '125px elfreth';
       g3.text('Designers', p.width / 2, p.height / 2);
-      g3.canvas.style.display = 'block'; // < TEMP
+      // g3.canvas.style.display = 'block'; // < TEMP
     }
   
     p.draw = () => {
@@ -58,6 +58,8 @@ function run() {
       p.blendMode(p.EXCLUSION);
       p.image(g1, 0, 0);
       p.image(g2, 0, 0);
+      // p.translate(p.width, 0)
+      // p.rotate(p.TAU / 4)
       p.image(g3, 0, 0);
       p.pop();
 
