@@ -28,16 +28,16 @@ function run() {
       g1.textAlign(p.CENTER, p.CENTER);
       g1.fill('yellow');
 
-      g1.drawingContext.font = '300 600px citizen';
+      g1.drawingContext.font = '300 550px citizen';
       g1.text('4', p.width / 2, p.height / 2);
       // g1.canvas.style.display = 'block'; // < TEMP
   
       g2 = p.createGraphics(w, h);
       g2.noStroke();
       linearGradient(g2, 100, 0, 100, g2.height, [[0, 'blue'], [0.5, 'red'], [1, 'yellow']]);
-      g2.circle(g2.width / 2, g2.height / 2, g2.width, g2.height);
+      g2.rect(0, 0, g2.width, g2.height);
       g2.textAlign(p.CENTER, p.CENTER);
-      g2.fill('#ff0077');
+      g2.fill('black');
       g2.drawingContext.font = '700 200px ohno-blazeface';
       g2.text('p5.js', p.width / 2, p.height / 2);
       // g2.canvas.style.display = 'block'; // < TEMP
@@ -45,37 +45,54 @@ function run() {
       g3 = p.createGraphics(w, h);
       g3.background('red');
       g3.textAlign(p.CENTER, p.CENTER);
-      g3.fill('yellow');
+      g3.fill('blue');
       g3.drawingContext.font = '125px elfreth';
       g3.text('Designers', p.width / 2, p.height / 2);
       // g3.canvas.style.display = 'block'; // < TEMP
     }
   
+    let x1 = 10;
+    let y1 = 10;
+    let vx1 = 1.5;
+    let vy1 = 0.5;
+
+    let x2 = 60;
+    let y2 = 60;
+    let vx2 = -0.5;
+    let vy2 = -1.5;
+
+    let x3 = 120;
+    let y3 = 120;
+    let vx3 = 1.0;
+    let vy3 = -1.5;
+
     p.draw = () => {
-      p.background('white');
+      p.background('black');
   
       p.push();
       p.blendMode(p.EXCLUSION);
-      p.image(g1, 0, 0);
-      p.image(g2, 0, 0);
-      // p.translate(p.width, 0)
-      // p.rotate(p.TAU / 4)
-      p.image(g3, 0, 0);
+      p.image(g2, x1, y1, 400, 400);
+      p.image(g1, x2, y2, 400, 400);
+      p.image(g3, x3, y3, 400, 400);
       p.pop();
 
       p.textAlign(p.CENTER, p.CENTER);
+      
+      x1 = x1 + vx1;
+      y1 = y1 + vy1;
+      if (x1 >= p.width - 400 - 10 || x1 <= 10) vx1 = -vx1;
+      if (y1 >= p.height - 400 - 10 || y1 <= 10) vy1 = -vy1;
 
-      // p.fill('blue');
-      // p.textSize(200);
-      // p.text('p5.js', p.width / 2, p.height / 2);
-  
-      // p.fill('red');
-      // p.textSize(460);
-      // p.text('4', p.width / 2, p.height / 2);
-  
-      // p.fill('yellow');
-      // p.textSize(120);
-      // p.text('designers', p.width / 2, p.height / 2);
+      x2 = x2 + vx2;
+      y2 = y2 + vy2;
+      if (x2 >= p.width - 400 - 10 || x2 <= 10) vx2 = -vx2;
+      if (y2 >= p.height - 400 - 10 || y2 <= 10) vy2 = -vy2;
+
+      x3 = x3 + vx3;
+      y3 = y3 + vy3;
+      if (x3 >= p.width - 400 - 10 || x3 <= 10) vx3 = -vx3;
+      if (y3 >= p.height - 400 - 10 || y3 <= 10) vy3 = -vy3;
+
     }
   
   }, app);
