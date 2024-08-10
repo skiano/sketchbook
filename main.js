@@ -131,11 +131,11 @@ function run() {
       p.frameRate(30);
 
       graphics.push(bouncyGraphic({
-        width: 350,
-        height: 350,
+        width: 390,
+        height: 390,
         loopFrames: loopFrames,
-        initialX: 60,
-        initialY: 300,
+        initialX: 260,
+        initialY: 70,
         lapsX: -2,
         lapsY: -1,
         display: true,
@@ -152,64 +152,64 @@ function run() {
       }));
 
       graphics.push(bouncyGraphic({
-        width: 140,
-        height: 140,
+        width: 160,
+        height: 160,
         loopFrames: loopFrames,
-        initialX: 284,
-        initialY: 205,
+        initialX: 184,
+        initialY: 465,
         lapsX: 1,
-        lapsY: -1,
+        lapsY: 1,
         display: true,
         render: (g) => {
           g.background('#0000aa');
           g.textAlign(p.CENTER, p.CENTER);
           g.fill('pink');
-          g.drawingContext.font = '300 90px citizen';
+          g.drawingContext.font = '300 100px citizen';
           g.text('4', g.width / 2, g.height / 2);
         },
       }));
 
-      graphics.push(bouncyGraphic({
-        width: 170,
-        height: 170,
-        loopFrames: loopFrames,
-        initialX: p.random(0, p.width),
-        initialY: p.random(0, p.height),
-        lapsX: p.random([-1, 1]),
-        lapsY: p.random([-2, 2]),
-        display: false,
-        render: (g) => {
-          linearGradient(g, 0, 0, 0, g.height, [[0, 'darkblue'], [1, 'blue']]);
-          g.rect(0, 0, g.width, g.height);
-        },
-      }));
+      // graphics.push(bouncyGraphic({
+      //   width: 170,
+      //   height: 170,
+      //   loopFrames: loopFrames,
+      //   initialX: p.random(0, p.width),
+      //   initialY: p.random(0, p.height),
+      //   lapsX: p.random([-1, 1]),
+      //   lapsY: p.random([-2, 2]),
+      //   display: false,
+      //   render: (g) => {
+      //     linearGradient(g, 0, 0, 0, g.height, [[0, 'darkblue'], [1, 'blue']]);
+      //     g.rect(0, 0, g.width, g.height);
+      //   },
+      // }));
 
       graphics.push(bouncyGraphic({
-        width: 370,
-        height: 220,
+        width: 390,
+        height: 240,
         loopFrames: loopFrames,
-        initialX: 140,
-        initialY: 245,
-        lapsX: -2,
-        lapsY: 1,
+        initialX: 100,
+        initialY: 585,
+        lapsX: 1,
+        lapsY: -1,
         display: true,
         render: (g) => {
           g.background('#dd0022');
           g.textAlign(p.CENTER, p.CENTER);
           g.fill('gold');
-          g.drawingContext.font = '80px elfreth';
+          g.drawingContext.font = '86px elfreth';
           g.text('Designers', g.width / 2, g.height / 2);
         },
       }));
 
       graphics.push(bouncyGraphic({
-        width: 300,
-        height: 300,
+        width: 320,
+        height: 320,
         loopFrames: loopFrames,
         initialX: 30,
-        initialY: 50,
-        lapsX: 1,
-        lapsY: -1,
+        initialY: 183,
+        lapsX: -2,
+        lapsY: 1,
         display: true,
         render: (g) => {
           g.noStroke();
@@ -217,26 +217,28 @@ function run() {
           g.rect(0, 0, g.width, g.height);
           g.textAlign(p.CENTER, p.CENTER);
           g.fill('black');
-          g.drawingContext.font = '700 110px ohno-blazeface';
+          g.drawingContext.font = '700 114px ohno-blazeface';
           g.text('p5.js', g.width / 2, g.height / 2);
         },
       }));
 
-      graphics.push(bouncyGraphic({
-        width: 100,
-        height: 100,
-        loopFrames: loopFrames,
-        initialX: p.random(0, p.width),
-        initialY: p.random(0, p.height),
-        lapsX: p.random([-1, 1]),
-        lapsY: p.random([-1, 1]),
-        display: false,
-        render: (g) => {
-          linearGradient(g, 0, 0, g.width, g.height, [[0, 'blue'], [1, 'red']]);
-          g.rect(0, 0, g.width, g.height);
-        },
-      }));
+      // graphics.push(bouncyGraphic({
+      //   width: 100,
+      //   height: 100,
+      //   loopFrames: loopFrames,
+      //   initialX: p.random(0, p.width),
+      //   initialY: p.random(0, p.height),
+      //   lapsX: p.random([-1, 1]),
+      //   lapsY: p.random([-1, 1]),
+      //   display: false,
+      //   render: (g) => {
+      //     linearGradient(g, 0, 0, g.width, g.height, [[0, 'blue'], [1, 'red']]);
+      //     g.rect(0, 0, g.width, g.height);
+      //   },
+      // }));
     }
+
+    // p.noLoop();
 
     p.draw = () => {
       let currentLoopFrame = p.frameCount % loopFrames;
@@ -251,8 +253,8 @@ function run() {
       p.imageMode(p.CENTER);
       // this makes the periodicity loopable...
       let scaleX = loopFrames / p.TAU;
-      let x = p.width / 2 + (p.sin(currentLoopFrame / scaleX) * 200);
-      let y = p.height / 2 + (p.sin(currentLoopFrame / (scaleX / 2)) * 100);
+      let x = p.width / 2 + (p.sin(currentLoopFrame / (scaleX / 2)) * 140);
+      let y = p.height / 2 + (p.sin(currentLoopFrame / (scaleX)) * 300);
       // this adds a loopable jank to the position to make it feel more "natural"
       let [dx, dy] = getNaturalLoopShift(currentLoopFrame);
       p.image(cursorImg, x + dx, y + dy, 32, 32, 0, 0, cursorImg.width, cursorImg.height, p.CONTAIN);

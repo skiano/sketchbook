@@ -53,5 +53,6 @@ body {
 
 #app {
   width: 540px;
-  height: 540px;
+  /* height: 540px; */
+  height: 960px;
 }
