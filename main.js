@@ -3,96 +3,119 @@ import p5 from 'p5';
 
 const app = document.getElementById('app');
 
-function linearGradient(p, x0, y0, x1, y1, stops) {
-  let grad = p.drawingContext.createLinearGradient(x0, y0, x1, y1);
-  stops.forEach(([amt, color]) => grad.addColorStop(amt, color));
-  p.drawingContext.fillStyle = grad;
-  return grad;
-}
-
 function run() {
   new p5((p) => {
+    const margin = 10;
+    const loopFrames = 30 * 6;
 
-    let g1;
-    let g2;
-    let g3;
+    function linearGradient(g, x0, y0, x1, y1, stops) {
+      let grad = g.drawingContext.createLinearGradient(x0, y0, x1, y1);
+      stops.forEach(([amt, color]) => grad.addColorStop(amt, color));
+      g.drawingContext.fillStyle = grad;
+      return grad;
+    }
+
+    const bouncyGraphic = ({
+      width,
+      height,
+      loopFrames,
+      initialX,
+      initialY,
+      lapsX,
+      lapsY,
+      mode = p.EXCLUSION,
+      preview,
+      render,
+    }) => {
+      const g = p.createGraphics(width, height);
+      render(g);
+      if (preview) g.canvas.style.display = 'block';
+
+      let x = initialX;
+      let y = initialY;
+
+      return {
+        draw: () => {
+          p.push();
+          p.blendMode(mode);
+          p.image(g, x, y, width, height);
+          p.pop();
+
+          // x1 = x1 + vx1;
+          // y1 = y1 + vy1;
+          // if (x1 >= p.width - size - 10 || x1 <= 10) vx1 = -vx1;
+          // if (y1 >= p.height - size - 10 || y1 <= 10) vy1 = -vy1;
+
+        },
+        reset: () => {
+
+        },
+      }
+    };
+
+    const graphics = [
+      bouncyGraphic({
+        width: 250,
+        height: 250,
+        loopFrames: loopFrames,
+        initialX: 100,
+        initialY: 100,
+        lapsX: 2,
+        lapsY: 2,
+        render: (g) => {
+          g.noStroke();
+          linearGradient(g, 0, 0, 0, g.height, [[0, 'blue'], [0.5, 'red'], [1, 'yellow']]);
+          g.rect(0, 0, g.width, g.height);
+          g.textAlign(p.CENTER, p.CENTER);
+          g.fill('black');
+          g.drawingContext.font = '700 100px ohno-blazeface';
+          g.text('p5.js', g.width / 2, g.height / 2);
+        },
+      }),
+      bouncyGraphic({
+        width: 170,
+        height: 170,
+        loopFrames: loopFrames,
+        initialX: 100,
+        initialY: 100,
+        lapsX: 2,
+        lapsY: 2,
+        render: (g) => {
+          g.background('blue');
+          g.textAlign(p.CENTER, p.CENTER);
+          g.fill('orange');
+          g.drawingContext.font = '300 150px citizen';
+          g.text('4', g.width / 2, g.height / 2);
+        },
+      }),
+      bouncyGraphic({
+        width: 350,
+        height: 350,
+        loopFrames: loopFrames,
+        initialX: 100,
+        initialY: 100,
+        lapsX: 2,
+        lapsY: 2,
+        render: (g) => {
+          g.background('red');
+          g.textAlign(p.CENTER, p.CENTER);
+          g.fill('yellow');
+          g.drawingContext.font = '80px elfreth';
+          g.text('Designers', g.width / 2, g.height / 2);
+        },
+      }),
+    ];
   
     p.setup = () => {
       let s = p.drawingContext.canvas.parentNode;
       let w = s.offsetWidth;
       let h = s.offsetHeight;
       p.createCanvas(w, h);
-  
-      g1 = p.createGraphics(w, h);
-      g1.background('blue');
-      g1.textAlign(p.CENTER, p.CENTER);
-      g1.fill('yellow');
-
-      g1.drawingContext.font = '300 550px citizen';
-      g1.text('4', p.width / 2, p.height / 2);
-      // g1.canvas.style.display = 'block'; // < TEMP
-  
-      g2 = p.createGraphics(w, h);
-      g2.noStroke();
-      linearGradient(g2, 100, 0, 100, g2.height, [[0, 'blue'], [0.5, 'red'], [1, 'yellow']]);
-      g2.rect(0, 0, g2.width, g2.height);
-      g2.textAlign(p.CENTER, p.CENTER);
-      g2.fill('black');
-      g2.drawingContext.font = '700 200px ohno-blazeface';
-      g2.text('p5.js', p.width / 2, p.height / 2);
-      // g2.canvas.style.display = 'block'; // < TEMP
-  
-      g3 = p.createGraphics(w, h);
-      g3.background('red');
-      g3.textAlign(p.CENTER, p.CENTER);
-      g3.fill('blue');
-      g3.drawingContext.font = '125px elfreth';
-      g3.text('Designers', p.width / 2, p.height / 2);
-      // g3.canvas.style.display = 'block'; // < TEMP
     }
   
-    let x1 = 10;
-    let y1 = 10;
-    let vx1 = 1.5;
-    let vy1 = 0.5;
-
-    let x2 = 60;
-    let y2 = 60;
-    let vx2 = -0.5;
-    let vy2 = -1.5;
-
-    let x3 = 120;
-    let y3 = 120;
-    let vx3 = 1.0;
-    let vy3 = -1.5;
-
     p.draw = () => {
       p.background('black');
-  
-      p.push();
-      p.blendMode(p.EXCLUSION);
-      p.image(g2, x1, y1, 400, 400);
-      p.image(g1, x2, y2, 400, 400);
-      p.image(g3, x3, y3, 400, 400);
-      p.pop();
-
-      p.textAlign(p.CENTER, p.CENTER);
-      
-      x1 = x1 + vx1;
-      y1 = y1 + vy1;
-      if (x1 >= p.width - 400 - 10 || x1 <= 10) vx1 = -vx1;
-      if (y1 >= p.height - 400 - 10 || y1 <= 10) vy1 = -vy1;
-
-      x2 = x2 + vx2;
-      y2 = y2 + vy2;
-      if (x2 >= p.width - 400 - 10 || x2 <= 10) vx2 = -vx2;
-      if (y2 >= p.height - 400 - 10 || y2 <= 10) vy2 = -vy2;
-
-      x3 = x3 + vx3;
-      y3 = y3 + vy3;
-      if (x3 >= p.width - 400 - 10 || x3 <= 10) vx3 = -vx3;
-      if (y3 >= p.height - 400 - 10 || y3 <= 10) vy3 = -vy3;
-
+      graphics.forEach(g => g.draw());
     }
   
   }, app);
