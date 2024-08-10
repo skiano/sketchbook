@@ -116,8 +116,8 @@ function run() {
         width: 140,
         height: 140,
         loopFrames: loopFrames,
-        initialX: 280,
-        initialY: 200,
+        initialX: 284,
+        initialY: 205,
         lapsX: 1,
         lapsY: -1,
         display: true,
@@ -149,8 +149,8 @@ function run() {
         width: 370,
         height: 220,
         loopFrames: loopFrames,
-        initialX: 120,
-        initialY: 230,
+        initialX: 140,
+        initialY: 245,
         lapsX: -2,
         lapsY: 1,
         display: true,
@@ -198,6 +198,8 @@ function run() {
         },
       }));
     }
+
+    // p.noLoop();
 
     p.draw = () => {
       p.background('black');
