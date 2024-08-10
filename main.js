@@ -10,12 +10,51 @@ function run() {
     const margin = 10;
     const loopFrames = 30 * 6;
     const graphics = [];
+    const noiseLevel = 255;
+    const noiseScale = 0.006;
+    const noiseLoopRad = 120;
+    const noiseLoopInc = p.TAU / loopFrames;
 
-    function linearGradient(g, x0, y0, x1, y1, stops) {
+    const linearGradient = (g, x0, y0, x1, y1, stops) => {
       let grad = g.drawingContext.createLinearGradient(x0, y0, x1, y1);
       stops.forEach(([amt, color]) => grad.addColorStop(amt, color));
       g.drawingContext.fillStyle = grad;
       return grad;
+    }
+
+    const previewNoise = () => {
+      const s = noiseLoopRad * 2;
+      const g = p.createGraphics(s, s);
+      for (let y = 0; y < s; y += 1) {
+        for (let x = 0; x < s; x += 1) {
+          // Scale the input coordinates.
+          let nx = noiseScale * x;
+          let ny = noiseScale * y;
+          let c = noiseLevel * p.noise(nx, ny);
+          g.stroke(c);
+          g.point(x, y);
+        }
+      }
+      g.stroke('red');
+      g.strokeWeight(2)
+      for (let i = 0; i < loopFrames; i++) {
+        let valX = s / 2 + p.cos(noiseLoopInc * i) * noiseLoopRad;
+        let valY = s / 2 + p.sin(noiseLoopInc * i) * noiseLoopRad;
+        g.point(valX, valY);
+      }
+      g.canvas.style.display = 'block';
+    }
+
+    const getNaturalLoopShift = (currentLoopFrame) => {
+      let x1 = noiseLoopRad + p.cos(noiseLoopInc * currentLoopFrame) * noiseLoopRad;
+      let y1 = noiseLoopRad + p.sin(noiseLoopInc * currentLoopFrame) * noiseLoopRad;
+      let x2 = p.cos(noiseLoopInc * currentLoopFrame) * noiseLoopRad;
+      let y2 = p.sin(noiseLoopInc * currentLoopFrame) * noiseLoopRad;
+      let dx = p.noise(x1 * noiseScale, y1 * noiseScale);
+      let dy = p.noise(x2 * noiseScale, y2 * noiseScale);
+      dx = p.map(dx, 0, 1, -120, 120);
+      dy = p.map(dy, 0, 1, -120, 120);
+      return [dx, dy];
     }
 
     const bouncyGraphic = ({
@@ -199,18 +238,27 @@ function run() {
       }));
     }
 
-    // p.noLoop();
-
     p.draw = () => {
+      let currentLoopFrame = p.frameCount % loopFrames;
+
       p.background('black');
+
+      // draw the main elements
       graphics.forEach(g => g.draw());
+      
+      // draw the cursor
       p.push();
       p.imageMode(p.CENTER);
-      let x = p.width / 2 + (p.sin(p.frameCount / 20) * 200);;
-      let y = p.height / 2 + (p.sin(p.frameCount / 10) * 100);
-      p.image(cursorImg, x, y, 32, 32, 0, 0, cursorImg.width, cursorImg.height, p.CONTAIN);
+      // this makes the periodicity loopable...
+      let scaleX = loopFrames / p.TAU;
+      let x = p.width / 2 + (p.sin(currentLoopFrame / scaleX) * 200);
+      let y = p.height / 2 + (p.sin(currentLoopFrame / (scaleX / 2)) * 100);
+      // this adds a loopable jank to the position to make it feel more "natural"
+      let [dx, dy] = getNaturalLoopShift(currentLoopFrame);
+      p.image(cursorImg, x + dx, y + dy, 32, 32, 0, 0, cursorImg.width, cursorImg.height, p.CONTAIN);
       p.pop();
-      if (p.frameCount % loopFrames === 0) {
+      
+      if (currentLoopFrame === 0) {
         // TODO: end video recording...
         console.log('loop')
         graphics.forEach(g => g.reset());
