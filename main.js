@@ -1,8 +1,11 @@
 import './style.css';
 import cursorUrl from './public/cursor.png';
 import p5 from 'p5';
+import addRecorder from './recorder';
 
 const app = document.getElementById('app');
+
+addRecorder(p5);
 
 function run() {
   new p5((p) => {
@@ -129,6 +132,8 @@ function run() {
       let h = s.offsetHeight;
       p.createCanvas(w, h);
       p.frameRate(30);
+      p.startRecorder();
+      
       // p.noiseSeed(1302);
       p.noiseSeed(200734)
 
@@ -263,9 +268,12 @@ function run() {
       p.pop();
       
       if (currentLoopFrame === 0) {
-        // TODO: end video recording...
-        console.log('loop')
         graphics.forEach(g => g.reset());
+      }
+
+      // getting the loop to feel good when uplaoded is porving tricky...
+      if (p.frameCount > 2 && (p.frameCount / 2) % loopFrames === 1) {
+        p.stopRecorder('p5-2x-extra');
       }
     }
   }, app);
