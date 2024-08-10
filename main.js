@@ -6,7 +6,8 @@ const app = document.getElementById('app');
 function run() {
   new p5((p) => {
     const margin = 10;
-    const loopFrames = 30 * 6;
+    const loopFrames = 30 * 8;
+    const graphics = [];
 
     function linearGradient(g, x0, y0, x1, y1, stops) {
       let grad = g.drawingContext.createLinearGradient(x0, y0, x1, y1);
@@ -19,10 +20,10 @@ function run() {
       width,
       height,
       loopFrames,
-      initialX,
-      initialY,
-      lapsX,
-      lapsY,
+      initialX = 0,
+      initialY = 0,
+      lapsX = 1,
+      lapsY = 1,
       mode = p.EXCLUSION,
       preview,
       render,
@@ -30,94 +31,145 @@ function run() {
       const g = p.createGraphics(width, height);
       render(g);
       if (preview) g.canvas.style.display = 'block';
-
-      let x = initialX;
-      let y = initialY;
-
+      let xLoopDistance = (p.width - width - (2 * margin)) * 2;
+      let yLoopDistance = (p.height - height - (2 * margin)) * 2;
+      let x;
+      let y;
+      let vx;
+      let vy;
+      const reset = () => {
+        x = p.constrain(initialX, margin + 1, p.width - width - margin - 1);
+        y = p.constrain(initialY, margin + 1, p.height - height - margin - 1);
+        vx = xLoopDistance / (loopFrames / lapsX);
+        vy = yLoopDistance / (loopFrames / lapsY);
+      }
+      reset();
       return {
+        reset,
         draw: () => {
           p.push();
           p.blendMode(mode);
           p.image(g, x, y, width, height);
           p.pop();
-
-          // x1 = x1 + vx1;
-          // y1 = y1 + vy1;
-          // if (x1 >= p.width - size - 10 || x1 <= 10) vx1 = -vx1;
-          // if (y1 >= p.height - size - 10 || y1 <= 10) vy1 = -vy1;
-
-        },
-        reset: () => {
-
+          x = x + vx;
+          y = y + vy;
+          if (x >= p.width - width - margin || x <= margin) vx = -vx;
+          if (y >= p.height - height - margin || y <= margin) vy = -vy;
         },
       }
     };
 
-    const graphics = [
-      bouncyGraphic({
-        width: 250,
-        height: 250,
+    p.setup = () => {
+      let s = p.drawingContext.canvas.parentNode;
+      let w = s.offsetWidth;
+      let h = s.offsetHeight;
+      p.createCanvas(w, h);
+      p.frameRate(30);
+
+      graphics.push(bouncyGraphic({
+        width: 160,
+        height: 160,
         loopFrames: loopFrames,
-        initialX: 100,
-        initialY: 100,
-        lapsX: 2,
-        lapsY: 2,
+        initialX: p.random(0, p.width),
+        initialY: p.random(0, p.height),
+        lapsX: p.random([-1, 1]),
+        lapsY: p.random([-1, 1]),
+        render: (g) => {
+          g.background('blue');
+          g.textAlign(p.CENTER, p.CENTER);
+          g.fill('orange');
+          g.drawingContext.font = '300 120px citizen';
+          g.text('4', g.width / 2, g.height / 2);
+        },
+      }));
+
+      graphics.push(bouncyGraphic({
+        width: 170,
+        height: 170,
+        loopFrames: loopFrames,
+        initialX: p.random(0, p.width),
+        initialY: p.random(0, p.height),
+        lapsX: p.random([-1, 1]),
+        lapsY: p.random([-2, 2]),
+        render: (g) => {
+          linearGradient(g, 0, 0, 0, g.height, [[0, 'darkblue'], [1, 'blue']]);
+          g.rect(0, 0, g.width, g.height);
+        },
+      }));
+
+      graphics.push(bouncyGraphic({
+        width: 370,
+        height: 220,
+        loopFrames: loopFrames,
+        initialX: p.random(0, p.width),
+        initialY: p.random(0, p.height),
+        lapsX: p.random([-2, -1, 1, 2]),
+        lapsY: p.random([-2, -1, 1, 2]),
+        render: (g) => {
+          g.background('red');
+          g.textAlign(p.CENTER, p.CENTER);
+          g.fill('gold');
+          g.drawingContext.font = '80px elfreth';
+          g.text('Designers', g.width / 2, g.height / 2);
+        },
+      }));
+
+      graphics.push(bouncyGraphic({
+        width: 300,
+        height: 300,
+        loopFrames: loopFrames,
+        initialX: p.random(0, p.width),
+        initialY: p.random(0, p.height),
+        lapsX: p.random([-2, -1, 1, 2]),
+        lapsY: p.random([-2, -1, 1, 2]),
         render: (g) => {
           g.noStroke();
           linearGradient(g, 0, 0, 0, g.height, [[0, 'blue'], [0.5, 'red'], [1, 'yellow']]);
           g.rect(0, 0, g.width, g.height);
           g.textAlign(p.CENTER, p.CENTER);
           g.fill('black');
-          g.drawingContext.font = '700 100px ohno-blazeface';
+          g.drawingContext.font = '700 110px ohno-blazeface';
           g.text('p5.js', g.width / 2, g.height / 2);
         },
-      }),
-      bouncyGraphic({
-        width: 170,
-        height: 170,
+      }));
+      
+      graphics.push(bouncyGraphic({
+        width: 400,
+        height: 300,
         loopFrames: loopFrames,
-        initialX: 100,
-        initialY: 100,
-        lapsX: 2,
-        lapsY: 2,
+        initialX: p.random(0, p.width),
+        initialY: p.random(0, p.height),
+        lapsX: p.random([-2, 2]),
+        lapsY: p.random([-1, 1]),
         render: (g) => {
-          g.background('blue');
-          g.textAlign(p.CENTER, p.CENTER);
-          g.fill('orange');
-          g.drawingContext.font = '300 150px citizen';
-          g.text('4', g.width / 2, g.height / 2);
+          linearGradient(g, 0, 0, g.width, 0, [[0, 'blue'], [1, 'magenta']]);
+          g.rect(0, 0, g.width, g.height);
         },
-      }),
-      bouncyGraphic({
-        width: 350,
-        height: 350,
+      }));
+
+      graphics.push(bouncyGraphic({
+        width: 100,
+        height: 100,
         loopFrames: loopFrames,
-        initialX: 100,
-        initialY: 100,
-        lapsX: 2,
-        lapsY: 2,
+        initialX: p.random(0, p.width),
+        initialY: p.random(0, p.height),
+        lapsX: p.random([-1, 1]),
+        lapsY: p.random([-1, 1]),
         render: (g) => {
-          g.background('red');
-          g.textAlign(p.CENTER, p.CENTER);
-          g.fill('yellow');
-          g.drawingContext.font = '80px elfreth';
-          g.text('Designers', g.width / 2, g.height / 2);
+          linearGradient(g, 0, 0, g.width, g.height, [[0, 'blue'], [1, 'red']]);
+          g.rect(0, 0, g.width, g.height);
         },
-      }),
-    ];
-  
-    p.setup = () => {
-      let s = p.drawingContext.canvas.parentNode;
-      let w = s.offsetWidth;
-      let h = s.offsetHeight;
-      p.createCanvas(w, h);
+      }));
     }
-  
+
     p.draw = () => {
       p.background('black');
       graphics.forEach(g => g.draw());
+      if (p.frameCount % loopFrames === 0) {
+        console.log('loop')
+        graphics.forEach(g => g.reset());
+      }
     }
-  
   }, app);
 }
 
