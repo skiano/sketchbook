@@ -26,6 +26,7 @@ function run() {
       lapsY = 1,
       mode = p.EXCLUSION,
       preview,
+      display = true,
       render,
     }) => {
       const g = p.createGraphics(width, height);
@@ -47,10 +48,12 @@ function run() {
       return {
         reset,
         draw: () => {
-          p.push();
-          p.blendMode(mode);
-          p.image(g, x, y, width, height);
-          p.pop();
+          if (display) {
+            p.push();
+            p.blendMode(mode);
+            p.image(g, x, y, width, height);
+            p.pop();
+          }
           x = x + vx;
           y = y + vy;
           if (x >= p.width - width - margin || x <= margin) vx = -vx;
@@ -70,15 +73,16 @@ function run() {
         width: 160,
         height: 160,
         loopFrames: loopFrames,
-        initialX: p.random(0, p.width),
-        initialY: p.random(0, p.height),
-        lapsX: p.random([-1, 1]),
-        lapsY: p.random([-1, 1]),
+        initialX: 180,
+        initialY: 200,
+        lapsX: 1,
+        lapsY: 1,
+        display: true,
         render: (g) => {
           g.background('blue');
           g.textAlign(p.CENTER, p.CENTER);
-          g.fill('orange');
-          g.drawingContext.font = '300 120px citizen';
+          g.fill('gold');
+          g.drawingContext.font = '300 90px citizen';
           g.text('4', g.width / 2, g.height / 2);
         },
       }));
@@ -91,6 +95,7 @@ function run() {
         initialY: p.random(0, p.height),
         lapsX: p.random([-1, 1]),
         lapsY: p.random([-2, 2]),
+        display: false,
         render: (g) => {
           linearGradient(g, 0, 0, 0, g.height, [[0, 'darkblue'], [1, 'blue']]);
           g.rect(0, 0, g.width, g.height);
@@ -101,10 +106,11 @@ function run() {
         width: 370,
         height: 220,
         loopFrames: loopFrames,
-        initialX: p.random(0, p.width),
-        initialY: p.random(0, p.height),
-        lapsX: p.random([-2, -1, 1, 2]),
-        lapsY: p.random([-2, -1, 1, 2]),
+        initialX: 120,
+        initialY: 230,
+        lapsX: -2,
+        lapsY: 1,
+        display: true,
         render: (g) => {
           g.background('red');
           g.textAlign(p.CENTER, p.CENTER);
@@ -118,10 +124,11 @@ function run() {
         width: 300,
         height: 300,
         loopFrames: loopFrames,
-        initialX: p.random(0, p.width),
-        initialY: p.random(0, p.height),
-        lapsX: p.random([-2, -1, 1, 2]),
-        lapsY: p.random([-2, -1, 1, 2]),
+        initialX: 30,
+        initialY: 50,
+        lapsX: 1,
+        lapsY: -1,
+        display: true,
         render: (g) => {
           g.noStroke();
           linearGradient(g, 0, 0, 0, g.height, [[0, 'blue'], [0.5, 'red'], [1, 'yellow']]);
@@ -141,6 +148,7 @@ function run() {
         initialY: p.random(0, p.height),
         lapsX: p.random([-2, 2]),
         lapsY: p.random([-1, 1]),
+        display: false,
         render: (g) => {
           linearGradient(g, 0, 0, g.width, 0, [[0, 'blue'], [1, 'magenta']]);
           g.rect(0, 0, g.width, g.height);
@@ -155,6 +163,7 @@ function run() {
         initialY: p.random(0, p.height),
         lapsX: p.random([-1, 1]),
         lapsY: p.random([-1, 1]),
+        display: false,
         render: (g) => {
           linearGradient(g, 0, 0, g.width, g.height, [[0, 'blue'], [1, 'red']]);
           g.rect(0, 0, g.width, g.height);
