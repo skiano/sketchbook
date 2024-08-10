@@ -22,28 +22,28 @@ function run() {
       return grad;
     }
 
-    const previewNoise = () => {
-      const s = noiseLoopRad * 2;
-      const g = p.createGraphics(s, s);
-      for (let y = 0; y < s; y += 1) {
-        for (let x = 0; x < s; x += 1) {
-          // Scale the input coordinates.
-          let nx = noiseScale * x;
-          let ny = noiseScale * y;
-          let c = noiseLevel * p.noise(nx, ny);
-          g.stroke(c);
-          g.point(x, y);
-        }
-      }
-      g.stroke('red');
-      g.strokeWeight(2)
-      for (let i = 0; i < loopFrames; i++) {
-        let valX = s / 2 + p.cos(noiseLoopInc * i) * noiseLoopRad;
-        let valY = s / 2 + p.sin(noiseLoopInc * i) * noiseLoopRad;
-        g.point(valX, valY);
-      }
-      g.canvas.style.display = 'block';
-    }
+    // const previewNoise = () => {
+    //   const s = noiseLoopRad * 2;
+    //   const g = p.createGraphics(s, s);
+    //   for (let y = 0; y < s; y += 1) {
+    //     for (let x = 0; x < s; x += 1) {
+    //       // Scale the input coordinates.
+    //       let nx = noiseScale * x;
+    //       let ny = noiseScale * y;
+    //       let c = noiseLevel * p.noise(nx, ny);
+    //       g.stroke(c);
+    //       g.point(x, y);
+    //     }
+    //   }
+    //   g.stroke('red');
+    //   g.strokeWeight(2)
+    //   for (let i = 0; i < loopFrames; i++) {
+    //     let valX = s / 2 + p.cos(noiseLoopInc * i) * noiseLoopRad;
+    //     let valY = s / 2 + p.sin(noiseLoopInc * i) * noiseLoopRad;
+    //     g.point(valX, valY);
+    //   }
+    //   g.canvas.style.display = 'block';
+    // }
 
     const getNaturalLoopShift = (currentLoopFrame) => {
       let x1 = noiseLoopRad + p.cos(noiseLoopInc * currentLoopFrame) * noiseLoopRad;
@@ -129,13 +129,15 @@ function run() {
       let h = s.offsetHeight;
       p.createCanvas(w, h);
       p.frameRate(30);
+      // p.noiseSeed(1302);
+      p.noiseSeed(200734)
 
       graphics.push(bouncyGraphic({
         width: 390,
         height: 390,
         loopFrames: loopFrames,
         initialX: 260,
-        initialY: 70,
+        initialY: 60,
         lapsX: -2,
         lapsY: -1,
         display: true,
@@ -156,7 +158,7 @@ function run() {
         height: 160,
         loopFrames: loopFrames,
         initialX: 184,
-        initialY: 465,
+        initialY: 455,
         lapsX: 1,
         lapsY: 1,
         display: true,
@@ -189,7 +191,7 @@ function run() {
         height: 240,
         loopFrames: loopFrames,
         initialX: 100,
-        initialY: 585,
+        initialY: 575,
         lapsX: 1,
         lapsY: -1,
         display: true,
@@ -207,7 +209,7 @@ function run() {
         height: 320,
         loopFrames: loopFrames,
         initialX: 30,
-        initialY: 183,
+        initialY: 173,
         lapsX: -2,
         lapsY: 1,
         display: true,
