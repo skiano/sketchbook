@@ -141,17 +141,17 @@ function run() {
       }));
       
       graphics.push(bouncyGraphic({
-        width: 400,
-        height: 300,
+        width: 350,
+        height: 350,
         loopFrames: loopFrames,
-        initialX: p.random(0, p.width),
-        initialY: p.random(0, p.height),
-        lapsX: p.random([-2, 2]),
-        lapsY: p.random([-1, 1]),
-        display: false,
+        initialX: 300,
+        initialY: 100,
+        lapsX: -2,
+        lapsY: -1,
+        display: true,
         render: (g) => {
           linearGradient(g, 0, 0, g.width, 0, [[0, 'blue'], [1, 'magenta']]);
-          g.rect(0, 0, g.width, g.height);
+          g.circle(g.width / 2, g.height / 2, g.width, g.height);
         },
       }));
 
