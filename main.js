@@ -34,6 +34,8 @@ function run() {
       if (preview) g.canvas.style.display = 'block';
       let xLoopDistance = (p.width - width - (2 * margin)) * 2;
       let yLoopDistance = (p.height - height - (2 * margin)) * 2;
+      let rightBound = p.width - width - margin;
+      let bottomBound = p.height - height - margin;
       let x;
       let y;
       let vx;
@@ -56,8 +58,22 @@ function run() {
           }
           x = x + vx;
           y = y + vy;
-          if (x >= p.width - width - margin || x <= margin) vx = -vx;
-          if (y >= p.height - height - margin || y <= margin) vy = -vy;
+          if (x >= rightBound) {
+            vx = -vx;
+            x = rightBound - Math.abs(x - rightBound); // FUSSY CORRECTION TO MAKE LOOP MORE SEAMLESS
+          }
+          if (x <= margin) {
+            vx = -vx;
+            x = margin + Math.abs(x - margin); // FUSSY CORRECTION TO MAKE LOOP MORE SEAMLESS
+          }
+          if (y >= bottomBound) {
+            vy = -vy;
+            y = bottomBound - Math.abs(y - bottomBound); // FUSSY CORRECTION TO MAKE LOOP MORE SEAMLESS
+          }
+          if (y <= margin) {
+            vy = -vy;
+            y = margin + Math.abs(y - margin); // FUSSY CORRECTION TO MAKE LOOP MORE SEAMLESS
+          }
         },
       }
     };
@@ -70,18 +86,39 @@ function run() {
       p.frameRate(30);
 
       graphics.push(bouncyGraphic({
-        width: 160,
-        height: 160,
+        width: 350,
+        height: 350,
         loopFrames: loopFrames,
-        initialX: 180,
-        initialY: 200,
-        lapsX: 1,
-        lapsY: 1,
+        initialX: 60,
+        initialY: 300,
+        lapsX: -2,
+        lapsY: -1,
         display: true,
         render: (g) => {
-          g.background('blue');
+          linearGradient(g, 0, 0, g.width, 0, [[0, 'purple'], [1, 'yellow']]);
+          g.circle(g.width / 2, g.height / 2, g.width, g.height);
+          g.blendMode(p.EXCLUSION)
+          linearGradient(g, 0, 0, g.width,  g.height, [[0, 'red'], [1, 'black']]);
+          g.circle(g.width / 2, g.height / 2, g.width, g.height);
+          g.blendMode(p.MULTIPLY)
+          linearGradient(g, 0, 0, 100,  g.height, [[0, 'black'], [1, 'white']]);
+          g.circle(g.width / 2, g.height / 2, g.width, g.height);
+        },
+      }));
+
+      graphics.push(bouncyGraphic({
+        width: 140,
+        height: 140,
+        loopFrames: loopFrames,
+        initialX: 280,
+        initialY: 200,
+        lapsX: 1,
+        lapsY: -1,
+        display: true,
+        render: (g) => {
+          g.background('#0000aa');
           g.textAlign(p.CENTER, p.CENTER);
-          g.fill('gold');
+          g.fill('pink');
           g.drawingContext.font = '300 90px citizen';
           g.text('4', g.width / 2, g.height / 2);
         },
@@ -112,7 +149,7 @@ function run() {
         lapsY: 1,
         display: true,
         render: (g) => {
-          g.background('red');
+          g.background('#dd0022');
           g.textAlign(p.CENTER, p.CENTER);
           g.fill('gold');
           g.drawingContext.font = '80px elfreth';
@@ -137,21 +174,6 @@ function run() {
           g.fill('black');
           g.drawingContext.font = '700 110px ohno-blazeface';
           g.text('p5.js', g.width / 2, g.height / 2);
-        },
-      }));
-      
-      graphics.push(bouncyGraphic({
-        width: 350,
-        height: 350,
-        loopFrames: loopFrames,
-        initialX: 300,
-        initialY: 100,
-        lapsX: -2,
-        lapsY: -1,
-        display: true,
-        render: (g) => {
-          linearGradient(g, 0, 0, g.width, 0, [[0, 'blue'], [1, 'magenta']]);
-          g.circle(g.width / 2, g.height / 2, g.width, g.height);
         },
       }));
 
