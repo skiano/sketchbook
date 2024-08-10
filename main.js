@@ -1,12 +1,14 @@
 import './style.css';
+import cursorUrl from './public/cursor.png';
 import p5 from 'p5';
 
 const app = document.getElementById('app');
 
 function run() {
   new p5((p) => {
+    let cursorImg;
     const margin = 10;
-    const loopFrames = 30 * 8;
+    const loopFrames = 30 * 6;
     const graphics = [];
 
     function linearGradient(g, x0, y0, x1, y1, stops) {
@@ -77,6 +79,10 @@ function run() {
         },
       }
     };
+
+    p.preload = () => {
+      cursorImg = p.loadImage(cursorUrl);
+    }
 
     p.setup = () => {
       let s = p.drawingContext.canvas.parentNode;
@@ -196,7 +202,14 @@ function run() {
     p.draw = () => {
       p.background('black');
       graphics.forEach(g => g.draw());
+      p.push();
+      p.imageMode(p.CENTER);
+      let x = p.width / 2 + (p.sin(p.frameCount / 20) * 200);;
+      let y = p.height / 2 + (p.sin(p.frameCount / 10) * 100);
+      p.image(cursorImg, x, y, 32, 32, 0, 0, cursorImg.width, cursorImg.height, p.CONTAIN);
+      p.pop();
       if (p.frameCount % loopFrames === 0) {
+        // TODO: end video recording...
         console.log('loop')
         graphics.forEach(g => g.reset());
       }
