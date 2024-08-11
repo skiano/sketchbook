@@ -1,0 +1,42 @@
+/**************************************************************************/
+/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
+/* But I deleted any tags I'm not gonna use for this page                 */
+/**************************************************************************/
+/*
+
+/**
+ * 1. Correct the line height in all browsers.
+ * 2. Prevent adjustments of font size after orientation changes in iOS.
+ */
+ html {
+  line-height: 1.15; /* 1 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+
+body {
+  margin: 0;
+}
+
+/*************************************************************/
+/* BOX MODEL                                                 */
+/* https://www.paulirish.com/2012/box-sizing-border-box-ftw/ */
+/*************************************************************/
+
+html {
+  box-sizing: border-box;
+  font-family: 'Times New Roman', Times, serif;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+/***************/
+/* MAIN STYLES */
+/***************/
+
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
