@@ -1,7 +1,7 @@
 import './style.css';
 import cursorUrl from './public/cursor.png';
 import p5 from 'p5';
-import addRecorder from './recorder';
+import addRecorder from '../shared/recorder';
 
 const app = document.getElementById('app');
 

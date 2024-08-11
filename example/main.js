@@ -1,8 +1,32 @@
 import p5 from 'p5';
-import other from './other.js';
-import glfx from 'glfx';
+import fx from 'glfx';
 
-console.log('p5 1', p5);
-console.log(other);
-console.log(glfx);
-console.log('hi!');
+function getImg(src) {
+  const img = new Image();
+  img.src = src;
+  return new Promise((resolve, reject) => {
+    img.addEventListener('error', reject);
+    img.addEventListener('load', () => {
+      resolve(img);
+    });
+  });
+}
+
+const img = await getImg('../images/selfie.jpg');
+const canvas = fx.canvas();
+const texture = canvas.texture(img);
+
+canvas.style.width = '540px';
+document.body.append(canvas);
+
+let i = 0;
+(function loop() {
+  canvas
+    .draw(texture)
+    // .triangleBlur(10)
+    .hueSaturation(0, Math.cos(i / 20))
+    .brightnessContrast(0, Math.sin(i / 10) * 0.8)
+    .update();
+  i++;
+  requestAnimationFrame(loop);
+})();
