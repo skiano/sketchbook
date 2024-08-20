@@ -39,31 +39,31 @@ new p5((p) => {
 
 }, c1);
 
-const c2 = document.createElement('div');
-app.append(c2);
+// const c2 = document.createElement('div');
+// app.append(c2);
 
-new p5((p) => {
-  let birdStrip;
-  let fw = 74;
-  let fh = 120;
+// new p5((p) => {
+//   let birdStrip;
+//   let fw = 74;
+//   let fh = 120;
 
-  p.preload = () => {
-    birdStrip = p.loadImage('./bird-strip-2.jpg');
-  }
+//   p.preload = () => {
+//     birdStrip = p.loadImage('./bird-strip-2.jpg');
+//   }
 
-  p.setup = () => {
-    p.createCanvas(300, 300);
-    p.frameRate(20);
-  }
+//   p.setup = () => {
+//     p.createCanvas(300, 300);
+//     p.frameRate(20);
+//   }
 
-  p.draw = () => {
-    let f = p.frameCount % 12;
-    let rx = f * fw;
-    p.background('#333');
-    p.image(birdStrip, p.width / 2 - fw / 2, p.height / 2 - fh / 2, fw, fh, rx, 0,fw, fh,);
-  };
+//   p.draw = () => {
+//     let f = p.frameCount % 12;
+//     let rx = f * fw;
+//     p.background('#333');
+//     p.image(birdStrip, p.width / 2 - fw / 2, p.height / 2 - fh / 2, fw, fh, rx, 0,fw, fh,);
+//   };
 
-}, c2);
+// }, c2);
 
 
 
@@ -89,6 +89,12 @@ new p5((p) => {
     let f = p.frameCount % 7;
     let rx = f * fw;
     p.image(birdStrip, p.width / 2 - fw / 2, p.height / 2 - fh / 2, fw, fh, rx, 0,fw, fh,);
+
+    p.push();
+    p.blendMode(p.LIGHTEST);
+    p.fill('#8ba574');
+    p.rect(0, 0, p.width, p.height);
+    p.pop();
   };
 
 }, c3);
@@ -129,6 +135,12 @@ new p5((p) => {
     drawBird(p.width -  (((p.frameCount + 100) * 8) % (p.width + 70)), 140, 1);
     drawBird(p.width -  (((p.frameCount + 20) * 11) % (p.width + 70)), 190, 3);
     drawBird(p.width -  (((p.frameCount + 0) * 11.5) % (p.width + 70)), 230, 6);
+    p.pop();
+
+    p.push();
+    p.blendMode(p.LIGHTEST);
+    p.fill('#241a0e');
+    p.rect(0, 0, p.width, p.height);
     p.pop();
   };
 
@@ -181,3 +193,28 @@ new p5((p) => {
 
 }, c5);
 
+const c6 = document.createElement('div');
+app.append(c6);
+
+new p5((p) => {
+  let birdStrip;
+  let fw = 200;
+  let fh = 200;
+
+  p.preload = () => {
+    birdStrip = p.loadImage('./bird-strip-4.jpg');
+  }
+
+  p.setup = () => {
+    p.createCanvas(300, 300);
+    p.frameRate(10);
+  }
+
+  p.draw = () => {
+    let f = p.frameCount % 7;
+    let rx = f * fw;
+    p.background('#fff696');
+    p.image(birdStrip, p.width / 2 - fw / 2, p.height / 2 - fh / 2, fw, fh, rx, 0,fw, fh,);
+  };
+
+}, c6);
