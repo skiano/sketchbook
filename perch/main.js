@@ -17,7 +17,6 @@ new p5((p) => {
   p.setup = () => {
     p.createCanvas(300, 300);
     p.frameRate(15);
-    console.log('preload', birdStrip);
   }
 
   p.draw = () => {
@@ -55,7 +54,6 @@ new p5((p) => {
   p.setup = () => {
     p.createCanvas(300, 300);
     p.frameRate(20);
-    console.log('preload', birdStrip);
   }
 
   p.draw = () => {
@@ -84,7 +82,6 @@ new p5((p) => {
   p.setup = () => {
     p.createCanvas(300, 300);
     p.frameRate(20);
-    console.log('preload', birdStrip);
   }
 
   p.draw = () => {
@@ -114,7 +111,6 @@ new p5((p) => {
   p.setup = () => {
     p.createCanvas(300, 300);
     p.frameRate(20);
-    console.log('preload', birdStrip);
   }
 
   function drawBird(x, y, offset = 0) {
@@ -137,4 +133,51 @@ new p5((p) => {
   };
 
 }, c4);
+
+
+const c5 = document.createElement('div');
+app.append(c5);
+
+new p5((p) => {
+  let birdStrip;
+  let fw = 74;
+  let fh = 120;
+
+  p.preload = () => {
+    birdStrip = p.loadImage('./bird-strip-3.jpg');
+  }
+
+  p.setup = () => {
+    p.createCanvas(300, 300);
+    p.frameRate(20);
+  }
+
+  function drawBird(x, y, offset = 0) {
+    let f0 = (p.frameCount + offset) % 7;
+    let rx0 = f0 * fw;
+
+    let f = (p.frameCount + offset + 1) % 7;    
+    let rx = f * fw;
+
+    p.push();
+    p.tint(255, 90);
+    p.image(birdStrip, x - fw / 2, y - fh / 2, fw, fh, rx0, 0,fw, fh);
+    p.pop();
+    p.image(birdStrip, x - fw / 2, y - fh / 2, fw, fh, rx, 0,fw, fh);
+  }
+
+  p.draw = () => {
+    p.background('#000');
+    p.push();
+    p.blendMode(p.SCREEN);
+    drawBird(p.width - ((p.frameCount * 8) % (p.width + 100)), 40);
+    drawBird(p.width -  ((p.frameCount * 10) % (p.width + 100)), 60, 2);
+    drawBird(p.width -  (((p.frameCount + 100) * 10) % (p.width + 100)), 100, 4);
+    drawBird(p.width -  (((p.frameCount + 100) * 8) % (p.width + 70)), 140, 1);
+    drawBird(p.width -  (((p.frameCount + 20) * 11) % (p.width + 70)), 190, 3);
+    drawBird(p.width -  (((p.frameCount + 0) * 11.5) % (p.width + 70)), 230, 6);
+    p.pop();
+  };
+
+}, c5);
 
