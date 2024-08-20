@@ -23,7 +23,7 @@ new p5((p) => {
     let f = p.frameCount % 12;
     let rx = f * fw;
 
-    p.background('#333');
+    p.background('#ff8559');
     p.image(
       birdStrip,
       p.width / 2 - fw / 2, // x-coordinate of the top-left corner of the imag
@@ -167,7 +167,7 @@ new p5((p) => {
   }
 
   p.draw = () => {
-    p.background('#000');
+    p.background('#7c847a');
     p.push();
     p.blendMode(p.SCREEN);
     drawBird(p.width - ((p.frameCount * 8) % (p.width + 100)), 40);
