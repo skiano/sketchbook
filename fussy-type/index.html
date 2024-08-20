@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Example 1</title>
+    <link rel="stylesheet" href="https://use.typekit.net/uza1rik.css">
+    <link rel="stylesheet" href="../shared/reset.css">
+    <link rel="stylesheet" href="../shared/base.css">
+
+
+    <style>
+      body {
+        font-family: balto, sans-serif;
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      .example {
+        margin: 10px;
+        font-size: 150px;
+        outline: 1px solid rgba(0, 100, 200, 0.4);
+        background: rgba(200, 0, 200, 0.3);
+        display: inline-block;
+      }
+
+      .example > span {
+        outline: 1px solid rgba(255, 0, 0, 0.4);
+      }
+
+      .example > span:nth-child(2n) {
+        background: rgba(0, 200, 200, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+
+    <div>
+      <div class="example">
+        AVIATOR x
+      </div>
+    </div>
+    <div>
+      <div class="example">
+        AVIATOR x
+      </div>
+    </div>
+    <div>
+      <div class="example">
+        <span>A</span><span>V</span><span>I</span><span>A</span><span>T</span><span>O</span><span>R</span><span> </span><span>x</span>
+      </div>
+    </div>
+
+    
+
+    <script type="importmap">
+      {
+        "imports": {
+          "p5": "https://esm.run/p5"
+        }
+      }
+    </script>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-import p5 from 'p5';
+// import p5 from 'p5';
 import fx from 'glfx';
 
 function getImg(src) {
@@ -25,7 +25,7 @@ let i = 0;
     .draw(texture)
     // .triangleBlur(10)
     .hueSaturation(0, Math.cos(i / 20))
-    .brightnessContrast(0, Math.sin(i / 10) * 0.8)
+    .brightnessContrast(0, Math.sin(i / 13) * 0.8)
     .update();
   i++;
   requestAnimationFrame(loop);
