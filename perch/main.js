@@ -539,9 +539,9 @@ new p5((p) => {
     }
   }
 
-  let sparrow1 = createSparrow(0.4);
-  let sparrow2 = createSparrow(0.4);
-  let sparrow3 = createSparrow(0.4);
+  let sparrow1 = createSparrow(0.34);
+  let sparrow2 = createSparrow(0.41);
+  let sparrow3 = createSparrow(0.35);
 
   p.draw = () => {
     p.background('#f4f1ea');
@@ -611,13 +611,13 @@ new p5((p) => {
 
   function createTwitch() {
     let timeout = 0;
-    let wait = p.round(p.random(3, 16));
+    let wait = p.round(p.random(3, 8));
     let frame = p.round(p.random(0, 9));
     return () => {
       let rx = frame;
       if (timeout > wait) {
         timeout = 0;
-        wait = p.round(p.random(3, 16));
+        wait = p.round(p.random(3, 8));
         frame = p.round(p.random(0, 9));
       }
       timeout += 1;
@@ -629,7 +629,7 @@ new p5((p) => {
     let w = fw * scale;
     let h = fh * scale;
     let offset = 56 * scale;
-    let hopSpeed = 14 * scale;
+    let hopSpeed = 18 * scale;
 
     let x = 150;
     let dir = 0;
@@ -652,13 +652,13 @@ new p5((p) => {
           img = hopRight;
           r = p.frameCount % 5;
           rx = r * fw;
-          x += r === 0 ? 0 : hopSpeed;
+          x += (r === 0 || r === 4) ? 0 : hopSpeed;
           break;
         case -1:
           img = hopLeft;
           r = p.frameCount % 5
           rx = r * fw;
-          x -= r === 0 ? 0 : hopSpeed;
+          x -= (r === 0 || r === 4) ? 0 : hopSpeed;
           break;
       }
 
