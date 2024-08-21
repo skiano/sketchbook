@@ -581,3 +581,32 @@ new p5((p) => {
     sparrow3(p.width / 2 + 80, p.height / 2);
   };
 }, c16);
+
+
+const c17 = document.createElement('div');
+app.append(c17);
+
+new p5((p) => {
+  let birdStrip;
+  let fw = 200;
+  let fh = 200;
+
+  p.preload = () => {
+    birdStrip = p.loadImage('./bird-strip-16.png');
+  }
+
+  p.setup = () => {
+    p.createCanvas(300, 300);
+    p.frameRate(12);
+  }
+
+  p.draw = () => {
+    let f = p.frameCount % 5;
+    let rx = f * fw;
+    p.background('#7c847a');
+    p.push();
+    p.blendMode(p.REMOVE);
+    p.image(birdStrip, p.width / 2 - fw / 2, p.height / 2 - fh / 2, fw, fh, rx, 0, fw, fh);
+    p.pop();
+  };
+}, c17);
