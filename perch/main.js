@@ -460,3 +460,120 @@ new p5((p) => {
   };
 
 }, c13);
+
+const c14 = document.createElement('div');
+app.append(c14);
+
+new p5((p) => {
+  let birdStrip;
+  let fw = 200;
+  let fh = 200;
+
+  p.preload = () => {
+    birdStrip = p.loadImage('./landing-strip-01.jpg');
+  }
+
+  p.setup = () => {
+    p.createCanvas(300, 300);
+    p.frameRate(15);
+  }
+
+  p.draw = () => {
+    let f = p.frameCount % 14;
+    let rx = p.constrain(f, 0, 6) * fw;
+    p.background('#cca77d');
+    p.push();
+    // p.blendMode(p.DARKEST);
+    p.image(birdStrip, p.width / 2 - fw / 2, p.height / 2 - fh / 2, fw, fh, rx, 0, fw, fh);
+    p.pop();
+  };
+
+}, c14);
+
+const c15 = document.createElement('div');
+app.append(c15);
+
+new p5((p) => {
+  let birdStrip;
+  let fw = 200;
+  let fh = 200;
+
+  p.preload = () => {
+    birdStrip = p.loadImage('./bird-strip-15.png');
+  }
+
+  p.setup = () => {
+    p.createCanvas(300, 300);
+    p.frameRate(30);
+  }
+
+  let timeout = 0;
+  let wait = p.round(p.random(20, 36));
+  let frame = p.round(p.random(0, 9));
+
+  p.draw = () => {
+    // let f = p.frameCount % 10;
+    let f = frame;
+    let rx = f * fw;
+    p.background('#241a0e');
+    p.push();
+    p.image(birdStrip, p.width / 2 - fw / 2, p.height / 2 - fh / 2, fw, fh, rx, 0, fw, fh);
+    p.pop();
+
+    timeout += 1;
+    if (timeout > wait) {
+      timeout = 0;
+      wait = p.round(p.random(7, 36));
+      frame = p.round(p.random(0, 9));
+    }
+  };
+}, c15);
+
+const c16 = document.createElement('div');
+app.append(c16);
+
+new p5((p) => {
+  let birdStrip;
+  let fw = 200;
+  let fh = 200;
+
+  p.preload = () => {
+    birdStrip = p.loadImage('./bird-strip-15.png');
+  }
+
+  p.setup = () => {
+    p.createCanvas(300, 300);
+    p.frameRate(30);
+  }
+
+  function createSparrow(scale = 0.5) {
+    let timeout = 0;
+    let wait = p.round(p.random(20, 36));
+    let frame = p.round(p.random(0, 9));
+    return (x, y) => {
+      let rx = frame * fw;
+      let w = fw * scale;
+      let h = fh * scale;
+      p.push();
+      p.image(birdStrip, x - w / 2, y - h / 2, w, h, rx, 0, fw, fh);
+      p.pop();
+      timeout += 1;
+      if (timeout > wait) {
+        timeout = 0;
+        wait = p.round(p.random(7, 36));
+        frame = p.round(p.random(0, 9));
+      }
+    }
+  }
+
+  let sparrow1 = createSparrow(0.4);
+  let sparrow2 = createSparrow(0.4);
+  let sparrow3 = createSparrow(0.4);
+
+  p.draw = () => {
+    p.background('#f4f1ea');
+    sparrow1(p.width / 2 - 80, p.height / 2);
+    sparrow2(p.width / 2, p.height / 2);
+    sparrow3(p.width / 2 + 80, p.height / 2);
+  };
+}, c16);
