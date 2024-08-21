@@ -554,8 +554,9 @@ new p5((p) => {
       let rx = frame * fw;
       let w = fw * scale;
       let h = fh * scale;
+      let yoffset = 56 * scale;
       p.push();
-      p.image(birdStrip, x - w / 2, y - h / 2, w, h, rx, 0, fw, fh);
+      p.image(birdStrip, x - w / 2, (y - h / 2) - yoffset, w, h, rx, 0, fw, fh);
       p.pop();
       timeout += 1;
       if (timeout > wait) {
@@ -572,6 +573,9 @@ new p5((p) => {
 
   p.draw = () => {
     p.background('#f4f1ea');
+    p.noStroke();
+    p.fill('#e8ceb3')
+    p.rect(0, p.height / 2, p.width, p.height / 2);
     sparrow1(p.width / 2 - 80, p.height / 2);
     sparrow2(p.width / 2, p.height / 2);
     sparrow3(p.width / 2 + 80, p.height / 2);
