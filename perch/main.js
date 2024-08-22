@@ -80,12 +80,18 @@ addCanvas((p) => {
   }
 
   p.draw = () => {
-    let wire = p.height * 2 / 3;
     p.background('#7c847a');
+
+    // render the wire
+    let wire = p.height * 2 / 3;
     p.noFill();
     p.stroke('white');
     p.line(0, wire, p.width, wire)
-    sparrow.moveTo(p.mouseX, p.mouseY);
+
+    // render the sparrow
+    let x = p.constrain(p.mouseX, 50, p.width - 50);
+    let y = p.constrain(p.mouseY, 50, p.height - 50);
+    sparrow.moveTo(x, y);
     sparrow.render();
   };
 }, {
