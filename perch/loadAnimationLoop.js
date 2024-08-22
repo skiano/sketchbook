@@ -111,5 +111,18 @@ export default function loadAnimationLoop(p5) {
     return result;
   }
 
+  // Tell P5 this is a loader
   p5.prototype.registerPreloadMethod('loadAnimationLoop', p5.prototype);
+
+  // A helpful function for loading a bunch of loops
+  p5.prototype.loadAnimationLoopMap = function(map, sharedOpt) {
+    let loops = {};
+    Object.entries(map).forEach(([key, opt]) => {
+      loops[key] = this.loadAnimationLoop(opt.file, {
+        ...opt,
+        ...sharedOpt,
+      });
+    });
+    return loops;
+  }
 }

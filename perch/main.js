@@ -1,7 +1,34 @@
 import p5 from 'p5';
-import loadAnimationLoop from './loadAnimationLoop.js';
+import addAnimationLoops from './loadAnimationLoop.js';
 
-loadAnimationLoop(p5);
+addAnimationLoops(p5);
+
+const loopConfig = {
+  stand: {
+    file: './bird-strip-15.png',
+    anchor: [0, -58],
+    pivot: [0, 58],
+    fill: 'purple',
+  },
+  hop: {
+    file: './bird-strip-16.png',
+    anchor: [0, -58],
+    pivot: [6, 15],
+    fill: 'blue',
+  },
+  fly: {
+    file: './bird-strip-17.png',
+    anchor: [-30, -69],
+    pivot: [22, 4],
+    fill: 'red',
+  },
+  hover: {
+    file: './bird-strip-18.png',
+    anchor: [-20, -58],
+    pivot: [17, -12],
+    fill: 'green',
+  }
+}
 
 const app = document.getElementById('app');
 
@@ -436,7 +463,6 @@ new p5((p) => {
   };
 }, c22);
 
-
 const c23 = document.createElement('div');
 app.append(c23);
 
@@ -447,16 +473,16 @@ new p5((p) => {
   let fh = 200;
 
   let hoverCycle;
+  let loops;
 
   p.preload = () => {
     fly = p.loadImage('./bird-strip-17.png');
     hover = p.loadImage('./bird-strip-18.png');
 
-    hoverCycle = p.loadAnimationLoop('./bird-strip-16.png', {
-      debug: true,
-      anchor: [0, -58],
-      pivot: [0, 58],
+    loops = p.loadAnimationLoopMap(loopConfig, {
       scale: 0.7,
+      // fill: 'darkgreen',
+      debug: true,
     });
   }
 
@@ -526,7 +552,9 @@ new p5((p) => {
     }
     if (y > p.height + 30) y = -30;
 
-    hoverCycle.render(150, 150, p.frameCount * 5)
-    // hoverCycle.render(150, 150, 0)
+    loops.hover.render(150, 150, 0);
+    loops.fly.render(150, 150, 0);
+    loops.hop.render(150, 150, 0);
+    loops.stand.render(150, 150, 0);
   };
 }, c23);
