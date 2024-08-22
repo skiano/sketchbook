@@ -547,10 +547,10 @@ new p5((p) => {
     p.background('#f4f1ea');
     p.noStroke();
     p.fill('#e8ceb3')
-    p.rect(0, 100, p.width, 200);
-    sparrow1(p.width / 2 - 80, 100);
-    sparrow2(p.width / 2, 100);
-    sparrow3(p.width / 2 + 80, 100);
+    p.rect(0, 150, p.width, 150);
+    sparrow1(p.width / 2 - 80, 150);
+    sparrow2(p.width / 2, 150);
+    sparrow3(p.width / 2 + 80, 150);
   };
 }, c16);
 
@@ -699,8 +699,8 @@ new p5((p) => {
     p.background('#fffbcc');
     p.noStroke();
     p.fill('#fff696');
-    p.rect(0, 200, 300, 100);
-    sparrow(200);
+    p.rect(0, 150, 300, 150);
+    sparrow(150);
   };
 }, c18);
 
