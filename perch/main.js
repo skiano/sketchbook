@@ -526,7 +526,7 @@ new p5((p) => {
       let rx = frame * fw;
       let w = fw * scale;
       let h = fh * scale;
-      let yoffset = 56 * scale;
+      let yoffset = 58 * scale;
       p.push();
       p.image(birdStrip, x - w / 2, (y - h / 2) - yoffset, w, h, rx, 0, fw, fh);
       p.pop();
@@ -544,10 +544,13 @@ new p5((p) => {
   let sparrow3 = createSparrow(0.47);
 
   p.draw = () => {
-    p.background('#f4f1ea');
+    p.background('#f4efe6');
     p.noStroke();
     p.fill('#e8ceb3')
-    p.rect(0, 150, p.width, 150);
+    // p.rect(0, 150, p.width, 150);
+    p.stroke('#ff8559');
+    p.strokeWeight(1)
+    p.line(0, 150, 300, 150);
     sparrow1(p.width / 2 - 80, 150);
     sparrow2(p.width / 2, 150);
     sparrow3(p.width / 2 + 80, 150);
