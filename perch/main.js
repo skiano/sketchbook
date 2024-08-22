@@ -539,9 +539,9 @@ new p5((p) => {
     }
   }
 
-  let sparrow1 = createSparrow(0.34);
-  let sparrow2 = createSparrow(0.41);
-  let sparrow3 = createSparrow(0.35);
+  let sparrow1 = createSparrow(0.45);
+  let sparrow2 = createSparrow(0.5);
+  let sparrow3 = createSparrow(0.47);
 
   p.draw = () => {
     p.background('#f4f1ea');
@@ -732,8 +732,57 @@ new p5((p) => {
       p.push();
       p.blendMode(p.DARKEST);
       p.fill('#fffbcc');
+      p.noStroke();
       p.rect(0, 0, p.width, p.height);
       p.pop();
     p.pop();
   };
 }, c19);
+
+
+const c20 = document.createElement('div');
+app.append(c20);
+
+new p5((p) => {
+  let birdStrip;
+  let fw = 200;
+  let fh = 200;
+
+  p.preload = () => {
+    birdStrip = p.loadImage('./bird-strip-17.png');
+  }
+
+  p.setup = () => {
+    p.createCanvas(300, 300);
+    p.frameRate(12);
+  }
+
+  function createSparrow(scale = 0.5, velocity = 14, xOffset) {
+    let w = scale * fw;
+    let h = scale * fh;
+    let buffer = 40;
+    let frameOffset = Math.round(p.random(0, 7));
+    xOffset = xOffset || Math.round(p.random(0, 600));
+    return (y = 150) => {
+      let f = (p.frameCount + frameOffset) % 7;
+      let rx = f * fw;
+      let x = ((p.frameCount * velocity + xOffset) % (p.width + buffer * 2)) - buffer;
+      p.push();
+      p.image(birdStrip, x - w / 2, y - h / 2, w, h, rx, 0, fw, fh);
+      p.pop();
+    }
+  }
+
+  let sparrow1 = createSparrow(0.4, 14, 2);
+  let sparrow2 = createSparrow(0.5, 17, 170);
+  let sparrow3 = createSparrow(0.45, 16, 70);
+  let sparrow4 = createSparrow(0.36, 15, 200);
+
+  p.draw = () => {
+    p.background('#f4efe6');
+    sparrow1(60);
+    sparrow4(100);
+    sparrow2(160);
+    sparrow3(230);
+  };
+}, c20);
