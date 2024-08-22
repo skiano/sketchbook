@@ -1,4 +1,7 @@
 import p5 from 'p5';
+import loadAnimationLoop from './loadAnimationLoop.js';
+
+loadAnimationLoop(p5);
 
 const app = document.getElementById('app');
 
@@ -369,65 +372,14 @@ new p5((p) => {
   let fw = 200;
   let fh = 200;
 
-  function createCycle(img, opt) {
-    // default options
-    opt = {
-      fill: 'black',
-      scale: 1,
-      debug: false,
-      ...opt,
-    }
-
-    // create a graphic with the color applied
-    let gfx = p.createGraphics(img.width, img.height);
-    let fill = p.color(opt.fill);
-    gfx.image(img, 0, 0);
-    gfx.loadPixels();
-    let d = gfx.pixelDensity();
-    let totalpx = 4 * (d * gfx.width) * (d * gfx.height);
-    for (let i = 0; i < totalpx; i += 4) {
-      gfx.pixels[i] = fill.levels[0];
-      gfx.pixels[i + 1] = fill.levels[1];
-      gfx.pixels[i + 2] = fill.levels[2];
-    }
-    gfx.updatePixels();
-
-    // set up some variables to track
-    let totalFrames = gfx.width / gfx.height >> 0;
-    let frame = 0;
-    let scale = opt.scale;
-    let debug = opt.debug;
-
-    // the main function to render a frame
-    const renderFrame = (i, x, y, rotation = 0) => {
-      console.log(i);
-    }
-
-    // the public interface
-    return {
-      renderFrame,
-      debug: (d) => { debug = !!d; },
-      scale: (s) => { scale = s; },
-      setFrame: (i) => { frame = i; },
-      render: (x, y, scale, rotation, debug) => {
-        renderFrame(frame, x, y, scale = 1, rotation = 0, debug = false)
-        frame += 1;
-        if (frame >= totalFrames) frame = 0;
-      },
-    }
-  }
-
   p.preload = () => {
     fly = p.loadImage('./bird-strip-17.png');
     hover = p.loadImage('./bird-strip-18.png');
-
   }
 
   p.setup = () => {
     p.createCanvas(300, 300);
     p.frameRate(15);
-
-    let c = createCycle(fly);
   }
 
   let x = 10;
@@ -494,9 +446,13 @@ new p5((p) => {
   let fw = 200;
   let fh = 200;
 
+  let hoverCycle;
+
   p.preload = () => {
     fly = p.loadImage('./bird-strip-17.png');
     hover = p.loadImage('./bird-strip-18.png');
+
+    hoverCycle = p.loadAnimationLoop('./bird-strip-17.png', { debug: true });
   }
 
   p.setup = () => {
@@ -564,5 +520,7 @@ new p5((p) => {
       y = 80;
     }
     if (y > p.height + 30) y = -30;
+
+    hoverCycle.render(150, 150)
   };
 }, c23);
