@@ -1,8 +1,10 @@
 import p5 from 'p5';
 import addAnimationLoops from './loadAnimationLoop.js';
 
+// install plugins
 addAnimationLoops(p5);
 
+// configure all animation loops
 const loopConfig = {
   stand: {
     file: './bird-strip-15.png',
@@ -15,52 +17,61 @@ const loopConfig = {
     anchor: [0, -58],
     pivot: [6, 15],
     fill: '#cca77d',
+    mirror: true,
   },
   fly: {
     file: './bird-strip-17.png',
-    anchor: [-30, -69],
+    anchor: [-20, -69],
     pivot: [22, 4],
     fill: '#7c847a',
+    mirror: true,
   },
   hover: {
     file: './bird-strip-18.png',
-    anchor: [-20, -58],
+    anchor: [-10, -58],
     pivot: [17, -12],
     fill: '#8ba574',
+    mirror: true,
   }
+}
+
+function addCanvas(fn, opt) {
+  opt = {
+    fps: 15,
+    width: 300,
+    height: 300,
+    rootId: 'app',
+    ...opt,
+  }
+  const c = document.createElement('div');
+  document.getElementById(opt.rootId).append(c);
+  new p5((p) => {
+    p.setup = () => {
+      p.createCanvas(opt.width, opt.height);
+      p.frameRate(opt.fps);
+    }
+    fn(p);
+  }, c);
 }
 
 const app = document.getElementById('app');
 
-const c15 = document.createElement('div');
-app.append(c15);
-
-new p5((p) => {
-  let birdStrip;
-  let fw = 200;
-  let fh = 200;
-
-  p.preload = () => {
-    birdStrip = p.loadImage('./bird-strip-15.png');
-  }
-
-  p.setup = () => {
-    p.createCanvas(300, 300);
-    p.frameRate(30);
-  }
-
+addCanvas((p) => {
+  let standing;
   let timeout = 0;
   let wait = p.round(p.random(20, 36));
   let frame = p.round(p.random(0, 9));
 
+  p.preload = () => {
+    standing = p.loadAnimationLoop(loopConfig.stand.file, {
+      ...loopConfig.stand,
+      fill: '#ff8559',
+    });
+  }
+
   p.draw = () => {
-    // let f = p.frameCount % 10;
-    let f = frame;
-    let rx = f * fw;
     p.background('#241a0e');
-    p.push();
-    p.image(birdStrip, p.width / 2 - fw / 2, p.height / 2 - fh / 2, fw, fh, rx, 0, fw, fh);
-    p.pop();
+    standing.renderFrame(frame, 150, 190);
 
     timeout += 1;
     if (timeout > wait) {
@@ -69,7 +80,7 @@ new p5((p) => {
       frame = p.round(p.random(0, 9));
     }
   };
-}, c15);
+});
 
 const c16 = document.createElement('div');
 app.append(c16);
@@ -463,10 +474,9 @@ new p5((p) => {
   };
 }, c22);
 
-const c23 = document.createElement('div');
-app.append(c23);
+// more resolved things...
 
-new p5((p) => {
+addCanvas((p) => {
   let loops;
 
   p.preload = () => {
@@ -476,15 +486,10 @@ new p5((p) => {
     });
   }
 
-  p.setup = () => {
-    p.createCanvas(300, 300);
-    p.frameRate(15);
-  }
-
   p.draw = () => {
     p.background('#f4f1ea')
-    let loopKeys = ['fly', 'hover', 'hop', 'stand', 'hop', 'hover'];
+    let loopKeys = ['flyRight', 'hoverRight', 'hopRight', 'stand', 'hopRight', 'hopLeft', 'flyLeft', 'hoverLeft', 'hopLeft', 'stand'];
     let whichLoop = ((p.frameCount / 15) >> 0) % loopKeys.length;
     loops[loopKeys[whichLoop]].render(155, 180, 0);
   };
-}, c23);
+});

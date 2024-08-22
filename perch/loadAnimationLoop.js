@@ -13,7 +13,18 @@ export default function loadAnimationLoop(p5) {
       debug: false,
       anchor: [0, 0], // where to register 
       pivot: [0, 0],
+      mirror: false,
       ...opt,
+    }
+
+    // make sure these are not currupted by reference
+    opt.anchor = [...opt.anchor];
+    opt.pivot = [...opt.pivot];
+
+    if (opt.mirror) {
+      console.log('reflecting', opt.key)
+      opt.anchor[0] = opt.anchor[0] * -1;
+      opt.pivot[0] = opt.pivot[0] * -1;
     }
 
     // holds the eventual public interface...
@@ -23,7 +34,16 @@ export default function loadAnimationLoop(p5) {
       // create a graphic with the color applied
       // TODO: maybe don't clutter this plugin with this thing (since it only makes sense for solid shapes...)
       let gfx = this.createGraphics(img.width, img.height);
-      gfx.image(img, 0, 0);
+      
+      gfx.push();
+      if (opt.mirror) {
+        gfx.scale(-1, 1);
+        gfx.image(img, -img.width, 0);
+      } else {
+        gfx.image(img, 0, 0);
+      }
+      gfx.pop();
+      
       gfx.loadPixels();
       result.setColor = (fill) => {
         fill = this.color(fill);
@@ -95,7 +115,6 @@ export default function loadAnimationLoop(p5) {
       // expose some public stuff
       result.debug = (d) => { debug = !!d; };
       result.scale = (s) => { scale = s; };
-      result.anchor = (a) => { anchor = a; };
       result.getFrame = () => frame;
       result.setFrame = (i) => { frame = i; };
       result.render = (x, y, r) => {
@@ -121,7 +140,18 @@ export default function loadAnimationLoop(p5) {
       loops[key] = this.loadAnimationLoop(opt.file, {
         ...opt,
         ...sharedOpt,
+        mirror: false,
+        key,
       });
+      if (opt.mirror) {
+        loops[`${key}Right`] = loops[key];
+        loops[`${key}Left`] = this.loadAnimationLoop(opt.file, {
+          ...opt,
+          ...sharedOpt,
+          mirror: true,
+          key,
+        });
+      }
     });
     return loops;
   }
