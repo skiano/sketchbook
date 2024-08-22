@@ -757,11 +757,11 @@ new p5((p) => {
     p.frameRate(12);
   }
 
-  function createSparrow(scale = 0.5, velocity = 14, xOffset) {
+  function createSparrow(scale = 0.5, velocity = 14, xOffset, frameOffset) {
     let w = scale * fw;
     let h = scale * fh;
     let buffer = 40;
-    let frameOffset = Math.round(p.random(0, 7));
+    frameOffset = frameOffset || Math.round(p.random(0, 7));
     xOffset = xOffset || Math.round(p.random(0, 600));
     return (y = 150) => {
       let f = (p.frameCount + frameOffset) % 7;
@@ -773,13 +773,13 @@ new p5((p) => {
     }
   }
 
-  let sparrow1 = createSparrow(0.4, 14, 2);
-  let sparrow2 = createSparrow(0.5, 17, 170);
-  let sparrow3 = createSparrow(0.45, 16, 70);
-  let sparrow4 = createSparrow(0.36, 15, 200);
+  let sparrow1 = createSparrow(0.4, 14, 2, 1);
+  let sparrow2 = createSparrow(0.5, 17, 170, 6);
+  let sparrow3 = createSparrow(0.45, 16, 70, 3);
+  let sparrow4 = createSparrow(0.36, 15, 200, 2);
 
   p.draw = () => {
-    p.background('#f4efe6');
+    p.background('#241a0e');
     sparrow1(60);
     sparrow4(100);
     sparrow2(160);
