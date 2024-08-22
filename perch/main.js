@@ -433,35 +433,6 @@ const app = document.getElementById('app');
 
 // }, c13);
 
-// const c14 = document.createElement('div');
-// app.append(c14);
-
-// new p5((p) => {
-//   let birdStrip;
-//   let fw = 200;
-//   let fh = 200;
-
-//   p.preload = () => {
-//     birdStrip = p.loadImage('./landing-strip-01.jpg');
-//   }
-
-//   p.setup = () => {
-//     p.createCanvas(300, 300);
-//     p.frameRate(15);
-//   }
-
-//   p.draw = () => {
-//     let f = p.frameCount % 14;
-//     let rx = p.constrain(f, 0, 6) * fw;
-//     p.background('#cca77d');
-//     p.push();
-//     // p.blendMode(p.DARKEST);
-//     p.image(birdStrip, p.width / 2 - fw / 2, p.height / 2 - fh / 2, fw, fh, rx, 0, fw, fh);
-//     p.pop();
-//   };
-
-// }, c14);
-
 const c15 = document.createElement('div');
 app.append(c15);
 
