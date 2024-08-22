@@ -699,10 +699,11 @@ new p5((p) => {
 
   p.draw = () => {
     let f = p.frameCount % 5;
-    p.background('#fffbcc');
+    // p.background('#fffbcc');
+    p.background('#fff696');
     p.noStroke();
-    p.fill('#fff696');
-    p.rect(0, 150, 300, 150);
+    // p.fill('#fff696');
+    // p.rect(0, 150, 300, 150);
     sparrow(150);
   };
 }, c18);
