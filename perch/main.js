@@ -781,12 +781,85 @@ new p5((p) => {
   }
 
   p.draw = () => {
-    let f = p.frameCount % 7;
+    let offset = 3;
+    let f = (p.frameCount + offset) % 7;
     let rx = f * fw;
-    p.background('#8ba574');
+    p.background('#f4f1ea');
     p.push();
-    p.blendMode(p.REMOVE);
     p.image(birdStrip, p.width / 2 - fw / 2, p.height / 2 - fh / 2, fw, fh, rx, 0, fw, fh);
     p.pop();
   };
 }, c21);
+
+const c22 = document.createElement('div');
+app.append(c22);
+
+new p5((p) => {
+  let fly;
+  let hover;
+  let fw = 200;
+  let fh = 200;
+
+  p.preload = () => {
+    fly = p.loadImage('./bird-strip-17.png');
+    hover = p.loadImage('./bird-strip-18.png');
+  }
+
+  p.setup = () => {
+    p.createCanvas(300, 300);
+    p.frameRate(15);
+  }
+
+  let x = 10;
+  let y = 80;
+  let vx = 1;
+  let vy = 2.5;
+
+  p.draw = () => {
+    let offset = 4;
+    let scale = 0.5;
+    let f = (p.frameCount + offset) % 7;
+    let rx = f * fw;
+
+    let w = scale * fw;
+    let h = scale * fh;
+
+    let movement;
+    let anchorX = 0;
+    let anchorY = 0;
+    let shouldHover = (x > 130 && x < 180);
+
+    if (shouldHover) {
+      vx = p.max(vx * 0.7, 1);
+      vy = 0.6 * vy;
+      movement = hover;
+      anchorY = 6;
+    } else {
+      vx = 24 * scale;
+      vy = x < p.width / 2 ? 15 * scale : -6 * scale;
+      anchorX = -7;
+      anchorY = -4;
+      movement = fly;
+    }
+
+    p.background('#8ba574');
+    p.push();
+    p.blendMode(p.REMOVE);
+    p.image(movement, x + anchorX - w / 2, y + anchorY - h / 2, w, h, rx, 0, fw, fh);
+    p.pop();
+
+    // p.push();
+    // p.noStroke();
+    // p.fill('red');
+    // p.circle(x, y, 6);
+    // p.pop();
+
+    x += vx;
+    y += vy;
+    if (x > p.width + 30) {
+      x = -30;
+      y = 80;
+    }
+    if (y > p.height + 30) y = -30;
+  };
+}, c22);
