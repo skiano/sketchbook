@@ -11,7 +11,8 @@ export default function loadAnimationLoop(p5) {
       fill: 'black',
       scale: 1,
       debug: false,
-      anchor: [0, 0],
+      anchor: [0, 0], // where to register 
+      pivot: [0, 0],
       ...opt,
     }
 
@@ -20,6 +21,7 @@ export default function loadAnimationLoop(p5) {
 
     this.loadImage(filename, (img) => {
       // create a graphic with the color applied
+      // TODO: maybe don't clutter this plugin with this thing (since it only makes sense for solid shapes...)
       let gfx = this.createGraphics(img.width, img.height);
       gfx.image(img, 0, 0);
       gfx.loadPixels();
@@ -46,19 +48,36 @@ export default function loadAnimationLoop(p5) {
       let anchor = opt.anchor;
 
       // the main function to render a frame
+      // TODO: should there be two different anchors? one for rotation and one for translation?
       result.renderFrame = (i, x, y, rotation = 0) => {
         let w = scale * fw;
         let h = scale * fh;
         let rx = i * fw;
-        this.image(gfx, x + anchor[0] - w / 2, y + anchor[1] - h / 2, w, h, rx, 0, fw, fh);
-        if (debug) {
-          this.push();
-          this.strokeWeight(3);
-          this.stroke('purple');
-          this.fill('cyan');
-          this.circle(x, y, 8);
-          this.pop();
-        }
+
+        this.push(); // start: first translation
+          this.angleMode(this.DEGREES);
+          this.rectMode(this.CENTER);
+          this.imageMode(this.CENTER);
+
+          this.translate(x, y);
+          this.push(); // start: second translation
+            this.rotate(rotation);
+            this.translate(anchor[0] * scale, anchor[1] * scale);
+            this.image(gfx, 0, 0, w, h, rx, 0, fw, fh);
+            if (debug) {
+              this.strokeWeight(1.5);
+              this.noFill();
+              this.stroke('cyan');
+              this.rect(0, 0, w, h);
+            }
+          this.pop(); // end: second translation
+          if (debug) {
+            this.strokeWeight(3);
+            this.stroke('purple');
+            this.fill('cyan');
+            this.circle(0, 0, 8); // TODO: draw a target to show rotation?
+          }
+        this.pop(); // end: first translation
       }
 
       // expose some public stuff
