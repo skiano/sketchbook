@@ -22,7 +22,6 @@ export default function loadAnimationLoop(p5) {
     opt.pivot = [...opt.pivot];
 
     if (opt.mirror) {
-      console.log('reflecting', opt.key)
       opt.anchor[0] = opt.anchor[0] * -1;
       opt.pivot[0] = opt.pivot[0] * -1;
     }
@@ -70,17 +69,16 @@ export default function loadAnimationLoop(p5) {
 
       // the main function to render a frame
       // TODO: should there be two different anchors? one for rotation and one for translation?
-      result.renderFrame = (i, x, y, rotation = 0) => {
-        let w = scale * fw;
-        let h = scale * fh;
-        let anchorX = anchor[0] * scale;
-        let anchorY = anchor[1] * scale;
-        let pivotX = pivot[0] * scale;
-        let pivotY = pivot[1] * scale;
+      result.renderFrame = (i, x, y, rotation = 0, s = scale) => {
+        let w = s * fw;
+        let h = s * fh;
+        let anchorX = anchor[0] * s;
+        let anchorY = anchor[1] * s;
+        let pivotX = pivot[0] * s;
+        let pivotY = pivot[1] * s;
         let rx = i * fw;
 
         this.push(); // start: first translation
-          this.angleMode(this.DEGREES);
           this.rectMode(this.CENTER);
           this.imageMode(this.CENTER);
 
@@ -115,12 +113,12 @@ export default function loadAnimationLoop(p5) {
       // expose some public stuff
       result.debug = (d) => { debug = !!d; };
       result.scale = (s) => { scale = s; };
-      result.getFrame = () => frame;
       result.setFrame = (i) => { frame = i; };
-      result.render = (x, y, r) => {
-        result.renderFrame(frame, x, y, r);
-        frame += 1;
-        if (frame >= totalFrames) frame = 0;
+      result.getFrame = () => frame;
+      result.getLength = () => totalFrames;
+      result.render = (x, y, r, s) => {
+        result.renderFrame(frame, x, y, r, s);
+        frame = (frame + 1) % totalFrames;
       }
 
       // tell p5 this is ready...
