@@ -455,7 +455,7 @@ new p5((p) => {
     hoverCycle = p.loadAnimationLoop('./bird-strip-16.png', {
       debug: true,
       anchor: [0, -58],
-      pivot: [50, 40],
+      pivot: [0, 58],
       scale: 0.7,
     });
   }
