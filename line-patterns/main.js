@@ -139,7 +139,16 @@ addCanvas((p) => {
 
 addCanvas((p) => {
   p.draw = () => {
-    p.background('#666');
+    p.background('#444');
+
+    renderPattern(p, TINY_EXES_LINES_01, {
+      x: p.frameCount,
+      y: p.frameCount * 1,
+      stroke: '#111',
+      weight: 23,
+      mask: [0, 1, 3, 5],
+    });
+
     renderPattern(p, TINY_EXES_LINES_01, {
       x: p.frameCount,
       y: p.frameCount * 1,
