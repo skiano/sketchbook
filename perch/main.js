@@ -452,10 +452,10 @@ new p5((p) => {
     fly = p.loadImage('./bird-strip-17.png');
     hover = p.loadImage('./bird-strip-18.png');
 
-    hoverCycle = p.loadAnimationLoop('./bird-strip-15.png', {
+    hoverCycle = p.loadAnimationLoop('./bird-strip-16.png', {
       debug: true,
       anchor: [0, -58],
-      pivot: [0, 0],
+      pivot: [50, 40],
       scale: 0.7,
     });
   }
@@ -526,7 +526,7 @@ new p5((p) => {
     }
     if (y > p.height + 30) y = -30;
 
-    // hoverCycle.render(150, 150, p.frameCount * 5)
-    hoverCycle.render(150, 150)
+    hoverCycle.render(150, 150, p.frameCount * 5)
+    // hoverCycle.render(150, 150, 0)
   };
 }, c23);

@@ -46,12 +46,17 @@ export default function loadAnimationLoop(p5) {
       let scale = opt.scale;
       let debug = opt.debug;
       let anchor = opt.anchor;
+      let pivot = opt.pivot;
 
       // the main function to render a frame
       // TODO: should there be two different anchors? one for rotation and one for translation?
       result.renderFrame = (i, x, y, rotation = 0) => {
         let w = scale * fw;
         let h = scale * fh;
+        let anchorX = anchor[0] * scale;
+        let anchorY = anchor[1] * scale;
+        let pivotX = pivot[0] * scale;
+        let pivotY = pivot[1] * scale;
         let rx = i * fw;
 
         this.push(); // start: first translation
@@ -59,25 +64,32 @@ export default function loadAnimationLoop(p5) {
           this.rectMode(this.CENTER);
           this.imageMode(this.CENTER);
 
-          this.translate(x, y);
+          // NOTE: the relation between pivoting and anchoring is
+          // super narly... tread lightly...
+
+          this.translate(x + anchorX + pivotX, y + anchorY + pivotY);
+          this.rotate(rotation);
           this.push(); // start: second translation
-            this.rotate(rotation);
-            this.translate(anchor[0] * scale, anchor[1] * scale);
+            this.translate(-pivotX, -pivotY);
+            // this.translate(anchorX , anchorY);
             this.image(gfx, 0, 0, w, h, rx, 0, fw, fh);
             if (debug) {
               this.strokeWeight(1.5);
               this.noFill();
               this.stroke('cyan');
               this.rect(0, 0, w, h);
+              this.circle(anchorX, anchorY, 12);
+              this.line(pivotX - 10, pivotY, pivotX + 10, pivotY);
+              this.line(pivotX, pivotY - 10, pivotX, pivotY + 10);
             }
           this.pop(); // end: second translation
-          if (debug) {
-            this.strokeWeight(3);
-            this.stroke('purple');
-            this.fill('cyan');
-            this.circle(0, 0, 8); // TODO: draw a target to show rotation?
-          }
         this.pop(); // end: first translation
+
+        if (debug) {
+          this.noStroke();
+          this.fill('cyan');
+          this.circle(x, y, 7);
+        }
       }
 
       // expose some public stuff
