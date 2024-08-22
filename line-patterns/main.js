@@ -43,11 +43,16 @@ function renderPattern(ctx, pattern, opt) {
     ...opt,
   }
 
+  // instead of using scale to "fit", think of scale as a multiple of a fixed unit
+  // this will be, i think, easier to map to real fabric...
+  // the strokes should also scale this way (with an optical adjustment???)
+
   opt.x = opt.x % opt.width; // TODO: subtle problem with dropping fractions??
   opt.y = opt.y % opt.height; // TODO: subtle problem with dropping fractions??
 
   // TODO: negotiate squishing...?? or allow it...
 
+  // TODO: still not getting the right number of renders on edges...
   let cols = Math.ceil((ctx.width + opt.x) / opt.width);
   let rows = Math.ceil((ctx.width + opt.x) / opt.width + opt.y);
   let scaleX = opt.width / pattern.width;
