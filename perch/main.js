@@ -631,7 +631,7 @@ new p5((p) => {
   function createSparrow(scale = 0.5) {
     let w = fw * scale;
     let h = fh * scale;
-    let offset = 56 * scale;
+    let offset = 58 * scale;
     let hopSpeed = 18 * scale;
 
     let x = 150;
