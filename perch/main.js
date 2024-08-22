@@ -8,25 +8,25 @@ const loopConfig = {
     file: './bird-strip-15.png',
     anchor: [0, -58],
     pivot: [0, 58],
-    fill: 'purple',
+    fill: '#ff8559',
   },
   hop: {
     file: './bird-strip-16.png',
     anchor: [0, -58],
     pivot: [6, 15],
-    fill: 'blue',
+    fill: '#cca77d',
   },
   fly: {
     file: './bird-strip-17.png',
     anchor: [-30, -69],
     pivot: [22, 4],
-    fill: 'red',
+    fill: '#7c847a',
   },
   hover: {
     file: './bird-strip-18.png',
     anchor: [-20, -58],
     pivot: [17, -12],
-    fill: 'green',
+    fill: '#8ba574',
   }
 }
 
@@ -467,21 +467,11 @@ const c23 = document.createElement('div');
 app.append(c23);
 
 new p5((p) => {
-  let fly;
-  let hover;
-  let fw = 200;
-  let fh = 200;
-
-  let hoverCycle;
   let loops;
 
   p.preload = () => {
-    fly = p.loadImage('./bird-strip-17.png');
-    hover = p.loadImage('./bird-strip-18.png');
-
     loops = p.loadAnimationLoopMap(loopConfig, {
       scale: 0.7,
-      // fill: 'darkgreen',
       debug: true,
     });
   }
@@ -491,70 +481,10 @@ new p5((p) => {
     p.frameRate(15);
   }
 
-  let x = 10;
-  let y = 80;
-  let vx = 1;
-  let vy = 2.5;
-  let landingX = 220;
-  let landingY = 220;
-
   p.draw = () => {
-    let offset = 1;
-    let scale = 0.5;
-    let f = (p.frameCount + offset) % 7;
-    let rx = f * fw;
-
-    let w = scale * fw;
-    let h = scale * fh;
-
-    let movement;
-    let anchorX = 0;
-    let anchorY = 0;
-    let shouldHover = (x > 130 && x < 180);
-
-    if (shouldHover) {
-      vx = p.max(vx * 0.7, 1);
-      vy = 0.6 * vy;
-      movement = hover;
-      anchorY = 10 * scale;
-    } else {
-      vx = 24 * scale;
-      vy = x < p.width / 2 ? 15 * scale : -6 * scale;
-      anchorX = -14 * scale;
-      anchorY = -8 * scale;
-      movement = fly;
-    }
-
-    p.background('#fff696');
-    p.push();
-    p.image(movement, x + anchorX - w / 2, y + anchorY - h / 2, w, h, rx, 0, fw, fh);
-    p.pop();
-
-    p.push();
-    p.noFill();
-    p.stroke('#ff8559');
-    p.line(0, landingY, p.width, landingY);
-    p.strokeWeight(6)
-    p.point(landingX, landingY)
-    p.pop();
-
-    p.push();
-    p.noStroke();
-    p.fill('black');
-    p.circle(x, y, 6);
-    p.pop();
-
-    x += vx;
-    y += vy;
-    if (x > p.width + 30) {
-      x = -30;
-      y = 80;
-    }
-    if (y > p.height + 30) y = -30;
-
-    loops.hover.render(150, 150, 0);
-    loops.fly.render(150, 150, 0);
-    loops.hop.render(150, 150, 0);
-    loops.stand.render(150, 150, 0);
+    p.background('#f4f1ea')
+    let loopKeys = ['fly', 'hover', 'hop', 'stand', 'hop', 'hover'];
+    let whichLoop = ((p.frameCount / 15) >> 0) % loopKeys.length;
+    loops[loopKeys[whichLoop]].render(155, 180, 0);
   };
 }, c23);
