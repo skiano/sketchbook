@@ -576,7 +576,7 @@ new p5((p) => {
   }
 
   p.draw = () => {
-    let f = p.frameCount % 5;
+    let f = p.constrain(p.frameCount % 8, 0, 4);
     let rx = f * fw;
     p.background('#7c847a');
     p.push();
@@ -789,3 +789,32 @@ new p5((p) => {
     sparrow3(230);
   };
 }, c20);
+
+
+const c21 = document.createElement('div');
+app.append(c21);
+
+new p5((p) => {
+  let birdStrip;
+  let fw = 200;
+  let fh = 200;
+
+  p.preload = () => {
+    birdStrip = p.loadImage('./bird-strip-18.png');
+  }
+
+  p.setup = () => {
+    p.createCanvas(300, 300);
+    p.frameRate(12);
+  }
+
+  p.draw = () => {
+    let f = p.frameCount % 7;
+    let rx = f * fw;
+    p.background('#8ba574');
+    p.push();
+    p.blendMode(p.REMOVE);
+    p.image(birdStrip, p.width / 2 - fw / 2, p.height / 2 - fh / 2, fw, fh, rx, 0, fw, fh);
+    p.pop();
+  };
+}, c21);
