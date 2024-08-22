@@ -37,6 +37,8 @@ function renderPattern(ctx, pattern, opt) {
     stroke: 'black',
     weight: 3,
     mask: null,
+    renderFills: true,
+    renderSegments: true,
     // mask???
     ...opt,
   }
@@ -61,21 +63,22 @@ function renderPattern(ctx, pattern, opt) {
 
       // TODO: render fills...
 
-      // render segments
-      ctx.push();
-      ctx.noFill();
-      ctx.stroke(opt.stroke);
-      ctx.strokeCap(ctx.ROUND);
-      ctx.strokeWeight(opt.weight);
-      pattern.segments.forEach((seg, i) => {
-        if (opt.mask && !opt.mask.includes(i)) return;
-        ctx.line(...seg.map(
-          v => v % 2
-            ? v * scaleY
-            : v * scaleX
-        ));
-      });
-      ctx.pop();
+      if (opt.renderSegments) {
+        ctx.push();
+        ctx.noFill();
+        ctx.stroke(opt.stroke);
+        ctx.strokeCap(ctx.ROUND);
+        ctx.strokeWeight(opt.weight);
+        pattern.segments.forEach((seg, i) => {
+          if (opt.mask && !opt.mask.includes(i)) return;
+          ctx.line(...seg.map(
+            v => v % 2
+              ? v * scaleY
+              : v * scaleX
+          ));
+        });
+        ctx.pop();
+      }
 
       ctx.translate(opt.width, 0);
     }
@@ -136,12 +139,29 @@ addCanvas((p) => {
 
 addCanvas((p) => {
   p.draw = () => {
-    p.background('#eee');
+    p.background('#666');
     renderPattern(p, TINY_EXES_LINES_01, {
       x: p.frameCount,
       y: p.frameCount * 1,
       stroke: '#333',
-      mask: [0, 1, 3, 4],
+      weight: 15,
+      mask: [0, 1, 3, 5],
+    });
+
+    renderPattern(p, TINY_EXES_LINES_01, {
+      x: p.frameCount,
+      y: p.frameCount * 1,
+      stroke: '#fff',
+      weight: 1,
+      mask: [0, 1],
+    });
+
+    renderPattern(p, TINY_EXES_LINES_01, {
+      x: p.frameCount,
+      y: p.frameCount * 1,
+      stroke: 'tomato',
+      weight: 1,
+      mask: [3, 5],
     });
   };
 });
