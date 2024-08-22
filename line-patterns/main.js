@@ -62,7 +62,6 @@ function renderPattern(ctx, pattern, opt) {
     for (let row = 0; row < rows; row += 1) {
 
       // TODO: render fills...
-
       if (opt.renderSegments) {
         ctx.push();
         ctx.noFill();
@@ -71,6 +70,7 @@ function renderPattern(ctx, pattern, opt) {
         ctx.strokeWeight(opt.weight);
         pattern.segments.forEach((seg, i) => {
           if (opt.mask && !opt.mask.includes(i)) return;
+          // TODO: if seg.length === 2 treat it as a dot
           ctx.line(...seg.map(
             v => v % 2
               ? v * scaleY
