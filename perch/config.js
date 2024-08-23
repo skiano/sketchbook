@@ -30,4 +30,4 @@ export default {
     fill: '#8ba574',
     mirror: true,
   }
-}
+};

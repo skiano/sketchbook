@@ -23,13 +23,13 @@ addCanvas((p) => {
   p.setup = () => {
     sparrow = createSparrow({
       render: loops,
-      x: -50,
-      y: 100,
+      x: p.width + 50,
+      y: 30,
     });
     sparrow.addPerch(130, 200, 70);
     sparrow.addPerch(200, 300, 190);
     sparrow.addPerch(90, 380, 120);
-    homeBase = [175, 200];
+    homeBase = [325, 185];
   }
 
   p.draw = () => {
