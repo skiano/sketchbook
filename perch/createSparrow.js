@@ -57,7 +57,7 @@ export default function createSparrow(opt) {
   }
 
   return new Proxy({
-    addPerch(x, y, w, magnet = 20) {
+    addPerch(x, y, w, magnet = 16) {
       perches.push([x, y, w, magnet]);
     },
     eachPerch(fn) {
@@ -81,7 +81,7 @@ export default function createSparrow(opt) {
           return (
             nx > perch[0] && 
             nx < perch[0] + perch[2] &&
-            ny < perch[1] &&
+            ny < perch[1] + perch[3] &&
             ny > perch[1] - perch[3]
           );
         });

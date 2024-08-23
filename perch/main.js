@@ -89,6 +89,7 @@ addCanvas((p) => {
       p.line(x, y, x + w, y);
       p.stroke('cyan');
       p.line(x, y - magnet, x + w, y - magnet);
+      p.line(x, y + magnet, x + w, y + magnet);
     });
 
     // render the sparrow
