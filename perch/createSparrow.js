@@ -45,6 +45,8 @@ export default function createSparrow(opt) {
   let r = opt.r;
   let x = opt.x;
   let y = opt.y;
+  let nx = x;
+  let ny = y;
   let scale = opt.scale;
   let isAirborn = true;
   let isLanding = false;
@@ -63,10 +65,15 @@ export default function createSparrow(opt) {
     eachPerch(fn) {
       perches.forEach(p => fn(...p));
     },
-    moveTo(nx, ny) {
+    moveTo(targetX, targetY) {
+      nx = targetX;
+      ny = targetY;
+    },
+    render() {
       let dx = nx - x;
       let dy = ny - y;
       let angle = Math.atan2(dy, dx);
+      
       // LANDING
       if (isLanding) {
         if (opt.render[loop].getFrame() === 1) { // stop when hop gets back to this frame
@@ -95,7 +102,11 @@ export default function createSparrow(opt) {
             isLanding = true;
           } else {
             r = 0;
-            changeLoop(nx > x ? 'hoverRight' : 'hoverLeft');
+            changeLoop(
+              Math.abs(dx) + Math.abs(dy) < 23
+                ? (nx > x ? 'hoverRight' : 'hoverLeft')
+                : (nx > x ? 'flyRight' : 'flyLeft')
+            );
           }
         } else {
           if (Math.abs(dx) + Math.abs(dy) < 23) {
@@ -117,8 +128,8 @@ export default function createSparrow(opt) {
         // start the ground behavior
         opt.render[loop].setFrame(opt.render[loop].getFrame() - 1)
       }
-    },
-    render() {
+
+      // render the actual frame...
       opt.render[loop].render(x, y, r, scale);
     },
   }, {
