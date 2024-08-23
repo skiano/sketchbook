@@ -123,6 +123,16 @@ export default function createSparrow(opt) {
       let dist = Math.abs(dx) + Math.abs(dy); // manhattan distance
       let angle = Math.atan2(dy, dx);
       let rightward = nx > x;
+
+      let isEscaping = (
+        activePerch
+        && (
+          ny < activePerch[1] - activePerch[3] || 
+          ny > activePerch[1] + activePerch[3] || 
+          nx < activePerch[0] ||
+          nx > activePerch[0] + activePerch[2]
+        )
+      )
       
       // LANDING
       if (isLanding) {
@@ -163,18 +173,15 @@ export default function createSparrow(opt) {
           hopTarget = Math.abs(dx) > maxHopDistance
             ? (rightward ? x + maxHopDistance : x - maxHopDistance)
             : nx;
+        } else if (isEscaping) {
+          isTakingOff = true;
+          isHopping = false;
+          changeLoop(rightward ? HOP_RIGHT : HOP_LEFT, 0); // reset the loop to beginning for a full hop
         } else if (f === 4) {
           if (dx < 3) {
             isHopping = false;
             changeLoop(STAND);
           }
-        } else if (
-          f === 2 &&
-          (ny < activePerch[1] - activePerch[3] || ny > activePerch[1] + activePerch[3])
-        ) {
-          isTakingOff = true;
-          isHopping = false;
-          changeLoop(rightward ? HOP_RIGHT : HOP_LEFT, 0); // reset the loop to beginning for a full hop
         } else {
           x = x + ((hopTarget - x) / 2) * f
         }
@@ -222,7 +229,7 @@ export default function createSparrow(opt) {
       }
       // ON THE GROUND
       else {
-        if (ny < activePerch[1] - activePerch[3] || ny > activePerch[1] + activePerch[3]) {
+        if (isEscaping) {
           isTakingOff = true;
           changeLoop(rightward ? HOP_RIGHT : HOP_LEFT, 0); // reset the loop to beginning for a full hop
         } else if (loop === STAND) {
