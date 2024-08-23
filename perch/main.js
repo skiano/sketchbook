@@ -23,8 +23,9 @@ addCanvas((p, opt) => {
     sparrow = createSparrow({ render: loops });
     let margin = 100;
     console.log(p.width)
-    sparrow.addPerch(margin, 360, opt.width - margin * 2);
+    sparrow.addPerch(margin, 320, opt.width - margin * 2);
     sparrow.addPerch(margin, 140, 30);
+    sparrow.addPerch(opt.width - margin - 30, 140, 30);
   }
 
   p.draw = () => {
@@ -36,8 +37,8 @@ addCanvas((p, opt) => {
       p.stroke('white');
       p.line(x, y, x + w, y);
       p.stroke('cyan');
-      p.line(x, y - magnet, x + w, y - magnet);
-      p.line(x, y + magnet, x + w, y + magnet);
+      // p.line(x, y - magnet, x + w, y - magnet);
+      // p.line(x, y + magnet, x + w, y + magnet);
     });
 
     // render the sparrow

@@ -238,30 +238,33 @@ export default function createSparrow(opt) {
           let pose = standLoop.getFrame();
           let isFacingLeft = pose > 4;
 
+          let sx = dx * scale; // using sx here makes the behavior scale with the bird
+          let sy = dy * scale;
+
           // TODO: these distance thresholds should be relative to scale of bird...
 
           // time to hop...
-          if (Math.abs(dx) > 20) {
+          if (Math.abs(sx) > 20) {
             // quite confusing... but switching to 4 ensures that the hop code starts on 0 ¯\_(ツ)_/¯
             changeLoop(rightward ? HOP_RIGHT : HOP_LEFT, 4);
             isHopping = true;
           }
 
           if (isFacingLeft) {
-            if (dx < -3) pose = 9;
-            if (dx < -7) pose = 8;
-            if (dx < -12) pose = 7;
-            if (dx < -17) pose = 6;
-            if (dx < 0 && dx >= -17 && dy > 5) pose = 5;
-            if (dx > 7) pose = 1; // the one that switches
+            if (sx < -3) pose = 9;
+            if (sx < -7) pose = 8;
+            if (sx < -12) pose = 7;
+            if (sx < -17) pose = 6;
+            if (sx < 0 && sx >= -17 && sy > 5) pose = 5;
+            if (sx > 7) pose = 1; // the one that switches
           } else {
-            if (dx < -7) pose = 8; // the one that switches
-            if (dx > 3) pose = 1;
-            if (dx > 3) pose = 0;
-            if (dx > 7) pose = 1;
-            if (dx > 12) pose = 2;
-            if (dx > 17) pose = 3;
-            if (dx > 0 && dx < 17 && dy > 5) pose = 4;
+            if (sx < -7) pose = 8; // the one that switches
+            if (sx > 3) pose = 1;
+            if (sx > 3) pose = 0;
+            if (sx > 7) pose = 1;
+            if (sx > 12) pose = 2;
+            if (sx > 17) pose = 3;
+            if (sx > 0 && sx < 17 && sy > 5) pose = 4;
           }
           standLoop.setFrame(pose);
         } else {
