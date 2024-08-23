@@ -68,12 +68,14 @@ export default function createSparrow(opt) {
       let dy = ny - y;
       let angle = Math.atan2(dy, dx);
 
+      // LANDING
       if (isLanding) {
         if (opt.render[loop].getFrame() === 1) { // stop when hop gets back to this frame
-          changeLoop('stand', 2);
+          changeLoop('stand', loop === 'hopRight' ? 2 : 7);
           isLanding = false;
         }
       }
+      // FLYING
       else if (isAirborn) {
         let landingZone = perches.find((perch) => {
           return (
@@ -98,7 +100,7 @@ export default function createSparrow(opt) {
             changeLoop(nx > x ? 'hoverRight' : 'hoverLeft');
           }
         } else {
-          if (Math.abs(dx) + Math.abs(dy) < 25) {
+          if (Math.abs(dx) + Math.abs(dy) < 23) {
             changeLoop(nx > x ? 'hoverRight' : 'hoverLeft');
             r = 0
           } else {
@@ -111,9 +113,12 @@ export default function createSparrow(opt) {
           x = ramp(x, nx, 0.4);
           y = ramp(y, ny, 0.6);
         }
-      } else {
+      }
+      // STANDING
+      else {
         // ...
-        opt.render[loop].setFrame(2)
+        // start the ground behavior
+        opt.render[loop].setFrame(opt.render[loop].getFrame() - 1)
       }
     },
     render() {
