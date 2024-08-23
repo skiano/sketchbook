@@ -168,6 +168,13 @@ export default function createSparrow(opt) {
             isHopping = false;
             changeLoop(STAND);
           }
+        } else if (
+          f === 2 &&
+          (ny < activePerch[1] - activePerch[3] || ny > activePerch[1] + activePerch[3])
+        ) {
+          isTakingOff = true;
+          isHopping = false;
+          changeLoop(rightward ? HOP_RIGHT : HOP_LEFT, 0); // reset the loop to beginning for a full hop
         } else {
           x = x + ((hopTarget - x) / 2) * f
         }
