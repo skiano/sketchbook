@@ -74,23 +74,26 @@ addCanvas((p) => {
 
     sparrow = createSparrow({
       render: loops,
-      x: 455 / 2,
-      y: 455 / 2,
     });
+
+    sparrow.addPerch(0, 300, 455);
   }
 
   p.draw = () => {
     p.background('#7c847a');
 
-    // render the wire
-    let wire = p.height * 2 / 3;
+    // render the perches
     p.noFill();
-    p.stroke('white');
-    p.line(0, wire, p.width, wire)
+    sparrow.eachPerch((x, y, w, magnet) => {
+      p.stroke('white');
+      p.line(x, y, x + w, y);
+      p.stroke('cyan');
+      p.line(x, y - magnet, x + w, y - magnet);
+    });
 
     // render the sparrow
     let x = p.constrain(p.mouseX, 50, p.width - 50);
-    let y = p.constrain(p.mouseY, 50, p.height - 50);
+    let y = p.constrain(p.mouseY, 80, p.height - 20);
     sparrow.moveTo(x, y);
     sparrow.render();
   };

@@ -97,8 +97,8 @@ export default function loadAnimationLoop(p5) {
               this.stroke('cyan');
               this.rect(0, 0, w, h);
               this.circle(anchorX, anchorY, 12);
-              this.line(pivotX - 10, pivotY, pivotX + 10, pivotY);
-              this.line(pivotX, pivotY - 10, pivotX, pivotY + 10);
+              this.line(pivotX, pivotY, pivotX + 15, pivotY);
+              this.line(pivotX, pivotY - 15, pivotX, pivotY + 15);
             }
           this.pop(); // end: second translation
         this.pop(); // end: first translation
