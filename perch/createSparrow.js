@@ -17,9 +17,24 @@ function ramp(v1, v2, force = 0.5) {
 
 const createConsoleRender = (name, length = 7) => {
   let frame = 0;
+  let isPaused = false;
   // A new renderer should implement this interface...
   // and each loop requires an instance of renderer
   return {
+    play() {
+      console.log(`
+        > ${name}  
+          Playing...
+        `);
+      isPaused = false;
+    },
+    pause() {
+      console.log(`
+        > ${name}  
+          Paused...
+        `);
+      isPaused = true;
+    },
     getLength() {
       return length;
     },
@@ -40,8 +55,10 @@ const createConsoleRender = (name, length = 7) => {
         y = ${y} px
         r = ${r} radians
       `);
-      frame += 1;
-      if (frame >= length) frame = 0;
+      if (!isPaused) {
+        frame += 1;
+        if (frame >= length) frame = 0;
+      }
     }
   }
 }
@@ -72,12 +89,17 @@ export default function createSparrow(opt) {
   let scale = opt.scale;
   let isAirborn = true;
   let isLanding = false;
+  let isTakingOff = false;
   let loop = HOP_RIGHT;
   let perches = [];
+  let loopTime = 0;
+  let totalTime = 0;
+  let activePerch;
 
   function changeLoop(l, frameStart) {
     if (loop === l) return; // no real change
     if (frameStart) opt.render[l].setFrame(frameStart);
+    loopTime = 0;
     loop = l;
   }
 
@@ -101,14 +123,30 @@ export default function createSparrow(opt) {
       
       // LANDING
       if (isLanding) {
+        // the bottom of the hop happens when the loop returns to 1
+        // at theat point we switch to the stand loop and call the landing complete
         if (opt.render[loop].getFrame() === 1) { // stop when hop gets back to this frame
           changeLoop(STAND, loop === HOP_RIGHT ? 2 : 7);
+          opt.render[loop].pause(); // stop the stand loop from autoplaying
           isLanding = false;
+        }
+      }
+      // TAKING OFF
+      if (isTakingOff) {
+        if (loop === HOVER_RIGHT || loop === HOVER_LEFT) {
+          x = ramp(x, nx, 0.1); // notice the ramp matches the one from flying
+          y = ramp(y, ny, 0.2); // notice the ramp matches the one from flying
+          if (loopTime > 2) {
+            isTakingOff = false;
+            isAirborn = true;
+          }
+        } else if (opt.render[loop].getFrame() === 2) { // stop when hop gets to mid point
+          changeLoop(loop === HOP_RIGHT ? HOVER_RIGHT : HOVER_LEFT);
         }
       }
       // FLYING
       else if (isAirborn) {
-        let landingZone = perches.find((perch) => {
+        activePerch = perches.find((perch) => {
           return (
             nx > perch[0] && 
             nx < perch[0] + perch[2] &&
@@ -116,14 +154,14 @@ export default function createSparrow(opt) {
             ny > perch[1] - perch[3]
           );
         });
-        if (landingZone) {
+        if (activePerch) {
           y = ramp(y, ny, 0.5);
           x = ramp(x, nx, 0.3);
           if (dist < 2) {
             isAirborn = false; // dont switch untill landing complete
             r = 0;
-            y = landingZone[1];
-            changeLoop(nx > x ? HOP_RIGHT : HOP_LEFT, 3); // 3 is a better frame to start on...
+            y = activePerch[1];
+            changeLoop(rightward ? HOP_RIGHT : HOP_LEFT, 3); // 3 is a better frame to start on...
             isLanding = true;
           } else {
             r = 0;
@@ -147,15 +185,27 @@ export default function createSparrow(opt) {
           y = ramp(y, ny, 0.6);
         }
       }
-      // STANDING
+      // ON THE GROUND
       else {
-        // ...
-        // start the ground behavior
-        opt.render[loop].setFrame(opt.render[loop].getFrame() - 1)
+        if (ny < activePerch[1] - activePerch[3]) {
+          isTakingOff = true;
+          changeLoop(rightward ? HOP_RIGHT : HOP_LEFT, 0); // reset the loop to beginning for a full hop
+        } else if (loop === STAND) {
+          let standLoop = opt.render[loop];
+          if (loopTime === 4) {
+            // do a little glace back...
+            standLoop.setFrame(standLoop.getFrame() === 2 ? 0 : 9);
+            // then start fidgeting...
+          }
+        }
       }
 
       // render the actual frame...
       opt.render[loop].render(x, y, r, scale);
+      // keep track of how many times this loop has rendered
+      // and how many times render has been called
+      loopTime += 1;
+      totalTime += 1;
     },
   }, {
     get(target, prop) {

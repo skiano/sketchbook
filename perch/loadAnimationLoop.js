@@ -66,6 +66,7 @@ export default function loadAnimationLoop(p5) {
       let debug = opt.debug;
       let anchor = opt.anchor;
       let pivot = opt.pivot;
+      let isPaused = false;
 
       // the main function to render a frame
       // TODO: should there be two different anchors? one for rotation and one for translation?
@@ -111,6 +112,8 @@ export default function loadAnimationLoop(p5) {
       }
 
       // expose some public stuff
+      result.play = () => { isPaused = false };
+      result.pause = () => { isPaused = true };
       result.debug = (d) => { debug = !!d; };
       result.scale = (s) => { scale = s; };
       result.setFrame = (i) => { frame = i; };
@@ -118,7 +121,7 @@ export default function loadAnimationLoop(p5) {
       result.getLength = () => totalFrames;
       result.render = (x, y, r, s) => {
         result.renderFrame(frame, x, y, r, s);
-        frame = (frame + 1) % totalFrames;
+        if (!isPaused) frame = (frame + 1) % totalFrames;
       }
 
       // tell p5 this is ready...
