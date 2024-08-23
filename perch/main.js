@@ -1,41 +1,11 @@
 import p5 from 'p5';
+import config from './config.js';
 import addCanvas from './addCanvas.js';
 import createSparrow from './createSparrow.js';
 import addAnimationLoops from './loadAnimationLoop.js';
 
 // install plugins
 addAnimationLoops(p5);
-
-// configure all animation loops
-const loopConfig = {
-  stand: {
-    file: './images/loop-stand.png',
-    anchor: [0, -58],
-    pivot: [0, 58],
-    fill: '#ff8559',
-  },
-  hop: {
-    file: './images/loop-hop.png',
-    anchor: [0, -58],
-    pivot: [6, 15],
-    fill: '#cca77d',
-    mirror: true,
-  },
-  fly: {
-    file: './images/loop-fly.png',
-    anchor: [-20, -69],
-    pivot: [22, 4],
-    fill: '#7c847a',
-    mirror: true,
-  },
-  hover: {
-    file: './images/loop-hover.png',
-    anchor: [-10, -58],
-    pivot: [17, -12],
-    fill: '#8ba574',
-    mirror: true,
-  }
-}
 
 ///////////////////////
 // TESTING BEHAVIORS //
@@ -46,7 +16,7 @@ addCanvas((p) => {
   let sparrow;
 
   p.preload = () => {
-    loops = p.loadAnimationLoopMap(loopConfig, {
+    loops = p.loadAnimationLoopMap(config, {
       // debug: true,
       fill: 'white',
     });
@@ -92,7 +62,7 @@ addCanvas((p) => {
   let sparrow;
 
   p.preload = () => {
-    loops = p.loadAnimationLoopMap(loopConfig, {
+    loops = p.loadAnimationLoopMap(config, {
       fill: '#ff8559',
     });
 
