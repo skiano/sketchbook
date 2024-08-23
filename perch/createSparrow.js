@@ -187,16 +187,56 @@ export default function createSparrow(opt) {
       }
       // ON THE GROUND
       else {
-        if (ny < activePerch[1] - activePerch[3]) {
+        if (
+          ny < activePerch[1] - activePerch[3]
+          // || ny > activePerch[1] + activePerch[3]
+        ) {
           isTakingOff = true;
           changeLoop(rightward ? HOP_RIGHT : HOP_LEFT, 0); // reset the loop to beginning for a full hop
         } else if (loop === STAND) {
           let standLoop = opt.render[loop];
-          if (loopTime === 4) {
-            // do a little glace back...
-            standLoop.setFrame(standLoop.getFrame() === 2 ? 0 : 9);
-            // then start fidgeting...
+          let pose = standLoop.getFrame();
+          let isFacingLeft = pose > 4;
+
+
+          if (isFacingLeft) {
+            if (dx < -3) pose = 9;
+            if (dx < -7) pose = 8;
+            if (dx < -12) pose = 7;
+            if (dx < -17) pose = 6;
+            if (dx < 0 && dx >= -17 && dy > 5) pose = 5;
+            if (dx > 7) pose = 1; // the one that switches
+          } else {
+            if (dx < -7) pose = 8; // the one that switches
+            if (dx > 3) pose = 1;
+            if (dx > 3) pose = 0;
+            if (dx > 7) pose = 1;
+            if (dx > 12) pose = 2;
+            if (dx > 17) pose = 3;
+            if (dx > 0 && dx < 17 && dy > 5) pose = 4;
           }
+
+          // let switchpose = ([l, r]) => isFacingLeft ? l : r;
+
+          // if (dx < -3) pose = [8, 6];
+          // if (dx < -7) pose = [9, 5];
+          // if (dx < -12) pose = [7, 7];
+          // if (dx < -17) pose = [6, 8];
+          // if (dx < 0 && dx >= -17 && dy > 5) pose = [5, 4];
+
+          // if (dx > 3) pose = 0;
+          // if (dx > 7) pose = 1;
+          // if (dx > 12) pose = 2;
+          // if (dx > 17) pose = 3;
+          
+          // if (dx >= 0 && dy > 5) pose = [5, 4];
+
+          // pose = switchpose(Array.isArray(pose) ? pose : [pose, pose]);
+
+          
+
+
+          standLoop.setFrame(pose);
         }
       }
 
