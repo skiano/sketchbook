@@ -124,16 +124,17 @@ export default function createSparrow(opt) {
       let angle = Math.atan2(dy, dx);
       let rightward = nx > x;
 
+      // detect if the bird
       let isEscaping = (
-        activePerch
+        !isAirborn
         && (
           ny < activePerch[1] - activePerch[3] || 
           ny > activePerch[1] + activePerch[3] || 
           nx < activePerch[0] ||
           nx > activePerch[0] + activePerch[2]
         )
-      )
-      
+      );
+
       // LANDING
       if (isLanding) {
         // the bottom of the hop happens when the loop returns to 1

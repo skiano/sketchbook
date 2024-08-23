@@ -1,5 +1,10 @@
 import p5 from 'p5';
 
+// patch p5 so this setup won't conflict with one specified by user...
+p5.prototype.registerMethod('afterSetup', function () {
+  this._standardSetup();
+});
+
 export default function addCanvas(fn, opt) {
   opt = {
     fps: 15,
@@ -14,10 +19,10 @@ export default function addCanvas(fn, opt) {
   c.style.background = '#f4efe6';
   document.getElementById(opt.rootId).append(c);
   new p5((p) => {
-    p.setup = () => {
+    p._standardSetup = () => {
       p.createCanvas(opt.width, opt.height);
       p.frameRate(opt.fps);
     }
-    fn(p);
+    fn(p, opt);
   }, c);
 }

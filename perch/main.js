@@ -11,22 +11,20 @@ addAnimationLoops(p5);
 // TESTING BEHAVIORS //
 ///////////////////////
 
-addCanvas((p) => {
+addCanvas((p, opt) => {
   let loops;
   let sparrow;
 
   p.preload = () => {
-    loops = p.loadAnimationLoopMap(config, {
-      // debug: true,
-      fill: 'white',
-    });
+    loops = p.loadAnimationLoopMap(config, { fill: 'white' });
+  }
 
-    sparrow = createSparrow({
-      render: loops,
-      // scale: 0.7,
-    });
-
-    sparrow.addPerch(0, 300, 455);
+  p.setup = () => {
+    sparrow = createSparrow({ render: loops });
+    let margin = 100;
+    console.log(p.width)
+    sparrow.addPerch(margin, 360, opt.width - margin * 2);
+    sparrow.addPerch(margin, 140, 30);
   }
 
   p.draw = () => {
