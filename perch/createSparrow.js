@@ -3,23 +3,45 @@
 
 const HALF_TURN = Math.PI;
 
+const STAND = 'stand';
+const HOP_LEFT = 'hopLeft';
+const HOP_RIGHT = 'hopRight';
+const HOVER_LEFT = 'hoverLeft';
+const HOVER_RIGHT = 'hoverRight';
+const FLY_LEFT = 'flyLeft';
+const FLY_RIGHT = 'flyRight';
+
 function ramp(v1, v2, force = 0.5) {
   return v1 + ((v2 - v1) * force);
 }
 
 const createConsoleRender = (name, length = 7) => {
+  let frame = 0;
+  // A new renderer should implement this interface...
+  // and each loop requires an instance of renderer
   return {
     getLength() {
       return length;
     },
-    render() {
+    getFrame() {
+      return frame;
+    },
+    setFrame(i) {
       console.log(`
-      > ${name}  
-      frame = ${i}
-      x = ${x}
-      y = ${y}
-      r = ${r}
+        > ${name}  
+          Set frame to ${i}
+        `);
+      frame = 0;
+    },
+    render(x, y, r) {
+      console.log(`
+      > ${name}: frame ${frame}
+        x = ${x} px
+        y = ${y} px
+        r = ${r} radians
       `);
+      frame += 1;
+      if (frame >= length) frame = 0;
     }
   }
 }
@@ -31,13 +53,13 @@ export default function createSparrow(opt) {
     r: 0,
     scale: 0.5,
     render: {
-      stand: createConsoleRender('stand'),
-      hopLeft: createConsoleRender('hopLeft'),
-      hopRight: createConsoleRender('hopRight'),
-      hoverLeft: createConsoleRender('hoverLeft'),
-      hoverRight: createConsoleRender('hoverRight'),
-      flyLeft: createConsoleRender('flyLeft'),
-      flyRight: createConsoleRender('flyRight'),
+      [STAND]: createConsoleRender(STAND),
+      [HOP_LEFT]: createConsoleRender(HOP_LEFT),
+      [HOP_RIGHT]: createConsoleRender(HOP_RIGHT),
+      [HOVER_LEFT]: createConsoleRender(HOVER_LEFT),
+      [HOVER_RIGHT]: createConsoleRender(HOVER_RIGHT),
+      [FLY_LEFT]: createConsoleRender(FLY_LEFT),
+      [FLY_RIGHT]: createConsoleRender(FLY_RIGHT),
     },
     ...opt,
   }
@@ -50,11 +72,12 @@ export default function createSparrow(opt) {
   let scale = opt.scale;
   let isAirborn = true;
   let isLanding = false;
-  let loop = 'flyRight';
+  let loop = HOP_RIGHT;
   let perches = [];
 
   function changeLoop(l, frameStart) {
-    if (frameStart && loop !== l) opt.render[l].setFrame(frameStart);
+    if (loop === l) return; // no real change
+    if (frameStart) opt.render[l].setFrame(frameStart);
     loop = l;
   }
 
@@ -72,12 +95,14 @@ export default function createSparrow(opt) {
     render() {
       let dx = nx - x;
       let dy = ny - y;
+      let dist = Math.abs(dx) + Math.abs(dy); // manhattan distance
       let angle = Math.atan2(dy, dx);
+      let rightward = nx > x;
       
       // LANDING
       if (isLanding) {
         if (opt.render[loop].getFrame() === 1) { // stop when hop gets back to this frame
-          changeLoop('stand', loop === 'hopRight' ? 2 : 7);
+          changeLoop(STAND, loop === HOP_RIGHT ? 2 : 7);
           isLanding = false;
         }
       }
@@ -94,27 +119,27 @@ export default function createSparrow(opt) {
         if (landingZone) {
           y = ramp(y, ny, 0.5);
           x = ramp(x, nx, 0.3);
-          if (Math.abs(dx) + Math.abs(dy) < 2) {
+          if (dist < 2) {
             isAirborn = false; // dont switch untill landing complete
             r = 0;
             y = landingZone[1];
-            changeLoop(nx > x ? 'hopRight' : 'hopLeft', 3); // 3 is a better frame to start on...
+            changeLoop(nx > x ? HOP_RIGHT : HOP_LEFT, 3); // 3 is a better frame to start on...
             isLanding = true;
           } else {
             r = 0;
             changeLoop(
-              Math.abs(dx) + Math.abs(dy) < 23
-                ? (nx > x ? 'hoverRight' : 'hoverLeft')
-                : (nx > x ? 'flyRight' : 'flyLeft')
+              dist < 23
+                ? (rightward ? HOVER_RIGHT : HOVER_LEFT)
+                : (rightward ? FLY_RIGHT : FLY_LEFT)
             );
           }
         } else {
-          if (Math.abs(dx) + Math.abs(dy) < 23) {
-            changeLoop(nx > x ? 'hoverRight' : 'hoverLeft');
+          if (dist < 23) {
+            changeLoop(rightward ? HOVER_RIGHT : HOVER_LEFT);
             r = 0
           } else {
-            changeLoop(nx > x ? 'flyRight' : 'flyLeft');
-            r = loop === 'flyLeft'
+            changeLoop(rightward ? FLY_RIGHT : FLY_LEFT);
+            r = loop === FLY_LEFT
               ? angle + HALF_TURN // trust me on this half turn... ¯\_(ツ)_/¯
               : angle;
           }

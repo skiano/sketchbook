@@ -1,4 +1,5 @@
 import p5 from 'p5';
+import addCanvas from './addCanvas.js';
 import createSparrow from './createSparrow.js';
 import addAnimationLoops from './loadAnimationLoop.js';
 
@@ -8,54 +9,32 @@ addAnimationLoops(p5);
 // configure all animation loops
 const loopConfig = {
   stand: {
-    file: './bird-strip-15.png',
+    file: './images/loop-stand.png',
     anchor: [0, -58],
     pivot: [0, 58],
     fill: '#ff8559',
   },
   hop: {
-    file: './bird-strip-16.png',
+    file: './images/loop-hop.png',
     anchor: [0, -58],
     pivot: [6, 15],
     fill: '#cca77d',
     mirror: true,
   },
   fly: {
-    file: './bird-strip-17.png',
+    file: './images/loop-fly.png',
     anchor: [-20, -69],
     pivot: [22, 4],
     fill: '#7c847a',
     mirror: true,
   },
   hover: {
-    file: './bird-strip-18.png',
+    file: './images/loop-hover.png',
     anchor: [-10, -58],
     pivot: [17, -12],
     fill: '#8ba574',
     mirror: true,
   }
-}
-
-function addCanvas(fn, opt) {
-  opt = {
-    fps: 15,
-    width: 300,
-    height: 300,
-    rootId: 'app',
-    ...opt,
-  }
-  const c = document.createElement('div');
-  c.style.width = `${opt.width}px`;
-  c.style.height = `${opt.height}px`;
-  c.style.background = '#f4efe6';
-  document.getElementById(opt.rootId).append(c);
-  new p5((p) => {
-    p.setup = () => {
-      p.createCanvas(opt.width, opt.height);
-      p.frameRate(opt.fps);
-    }
-    fn(p);
-  }, c);
 }
 
 ///////////////////////
