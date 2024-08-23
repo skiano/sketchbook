@@ -87,9 +87,12 @@ export default function createSparrow(opt) {
   let nx = x;
   let ny = y;
   let scale = opt.scale;
+  
   let isAirborn = true;
+  let isHopping = false;
   let isLanding = false;
   let isTakingOff = false;
+  let hopTarget = null;
   let loop = HOP_RIGHT;
   let perches = [];
   let loopTime = 0;
@@ -104,8 +107,8 @@ export default function createSparrow(opt) {
   }
 
   return new Proxy({
-    addPerch(x, y, w, magnet = 16) {
-      perches.push([x, y, w, magnet]);
+    addPerch(x, y, w, magnet = 30) {
+      perches.push([x, y, w, magnet * scale]);
     },
     eachPerch(fn) {
       perches.forEach(p => fn(...p));
@@ -132,7 +135,7 @@ export default function createSparrow(opt) {
         }
       }
       // TAKING OFF
-      if (isTakingOff) {
+      else if (isTakingOff) {
         if (loop === HOVER_RIGHT || loop === HOVER_LEFT) {
           x = ramp(x, nx, 0.1); // notice the ramp matches the one from flying
           y = ramp(y, ny, 0.2); // notice the ramp matches the one from flying
@@ -142,6 +145,31 @@ export default function createSparrow(opt) {
           }
         } else if (opt.render[loop].getFrame() === 2) { // stop when hop gets to mid point
           changeLoop(loop === HOP_RIGHT ? HOVER_RIGHT : HOVER_LEFT);
+        }
+      }
+      else if (isHopping) {
+        // hop to the new x...
+        // manage the hopping
+        // shouldn't jump too far
+        // shouldn't jump extra
+        // should land at the right point
+        // should wait for landing before shifting to stand loop
+        // shouldnt move on frames when feet are on the ground (0, 4)
+        let maxHopDistance = 200 * scale;
+        if (rightward && loop === HOP_LEFT) changeLoop(HOP_RIGHT);
+        if (!rightward && loop === HOP_RIGHT) changeLoop(HOP_LEFT);
+        let f = opt.render[loop].getFrame();
+        if (f === 0) {
+          hopTarget = Math.abs(dx) > maxHopDistance
+            ? (rightward ? x + maxHopDistance : x - maxHopDistance)
+            : nx;
+        } else if (f === 4) {
+          if (dx < 3) {
+            isHopping = false;
+            changeLoop(STAND);
+          }
+        } else {
+          x = x + ((hopTarget - x) / 2) * f
         }
       }
       // FLYING
@@ -187,10 +215,7 @@ export default function createSparrow(opt) {
       }
       // ON THE GROUND
       else {
-        if (
-          ny < activePerch[1] - activePerch[3]
-          // || ny > activePerch[1] + activePerch[3]
-        ) {
+        if (ny < activePerch[1] - activePerch[3] || ny > activePerch[1] + activePerch[3]) {
           isTakingOff = true;
           changeLoop(rightward ? HOP_RIGHT : HOP_LEFT, 0); // reset the loop to beginning for a full hop
         } else if (loop === STAND) {
@@ -198,6 +223,14 @@ export default function createSparrow(opt) {
           let pose = standLoop.getFrame();
           let isFacingLeft = pose > 4;
 
+          // TODO: these distance thresholds should be relative to scale of bird...
+
+          // time to hop...
+          if (Math.abs(dx) > 20) {
+            // quite confusing... but switching to 4 ensures that the hop code starts on 0 ¯\_(ツ)_/¯
+            changeLoop(rightward ? HOP_RIGHT : HOP_LEFT, 4);
+            isHopping = true;
+          }
 
           if (isFacingLeft) {
             if (dx < -3) pose = 9;
@@ -215,28 +248,8 @@ export default function createSparrow(opt) {
             if (dx > 17) pose = 3;
             if (dx > 0 && dx < 17 && dy > 5) pose = 4;
           }
-
-          // let switchpose = ([l, r]) => isFacingLeft ? l : r;
-
-          // if (dx < -3) pose = [8, 6];
-          // if (dx < -7) pose = [9, 5];
-          // if (dx < -12) pose = [7, 7];
-          // if (dx < -17) pose = [6, 8];
-          // if (dx < 0 && dx >= -17 && dy > 5) pose = [5, 4];
-
-          // if (dx > 3) pose = 0;
-          // if (dx > 7) pose = 1;
-          // if (dx > 12) pose = 2;
-          // if (dx > 17) pose = 3;
-          
-          // if (dx >= 0 && dy > 5) pose = [5, 4];
-
-          // pose = switchpose(Array.isArray(pose) ? pose : [pose, pose]);
-
-          
-
-
           standLoop.setFrame(pose);
+        } else {
         }
       }
 
