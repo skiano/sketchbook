@@ -134,8 +134,14 @@ addCanvas((p) => {
     if (p.frameCount === 10) {
       sparrow.moveTo(p.width * 0.4, 270);
     }
+    if (p.frameCount === 12) {
+      sparrow.moveTo(p.width * 0.5, 220);
+    }
     if (p.frameCount === 35) {
-      sparrow.moveTo(p.width * 0.7, 300 - 10);
+      sparrow.moveTo(p.width * 0.65, 300 - 20);
+    }
+    if (p.frameCount === 37) {
+      sparrow.moveTo(p.width * 0.8, 300 + 15);
     }
     sparrow.render();
   };
