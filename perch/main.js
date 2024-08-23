@@ -98,7 +98,7 @@ addCanvas((p) => {
     sparrow = createSparrow({
       render: loops,
       x: p.width + 50,
-      y: 120,
+      y: 100,
       scale: 0.5,
     });
     sparrow.addPerch(0, ground, 455);
@@ -115,7 +115,7 @@ addCanvas((p) => {
     p.push();
     p.fill('#ff8559')
     p.textSize(58)
-    p.text('perch', 50, ground)
+    p.text('perch', 55, ground)
     p.pop();
 
     // p.push()
@@ -126,10 +126,10 @@ addCanvas((p) => {
     let right = 232;
 
     if (p.frameCount === 1) {
-      sparrow.moveTo(p.width * 0.1, 200);
+      sparrow.moveTo(p.width * 0.2, 190);
     }
     if (p.frameCount === 10) {
-      sparrow.moveTo(p.width * 0.4, 270);
+      sparrow.moveTo(p.width * 0.4, 250);
     }
     if (p.frameCount === 12) {
       sparrow.moveTo(p.width * 0.8, 220);
