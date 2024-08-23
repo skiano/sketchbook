@@ -74,6 +74,7 @@ addCanvas((p) => {
 
     sparrow = createSparrow({
       render: loops,
+      // scale: 0.7,
     });
 
     sparrow.addPerch(0, 300, 455);
@@ -109,17 +110,22 @@ addCanvas((p) => {
 
 addCanvas((p) => {
   let loops;
+  let sparrow;
 
   p.preload = () => {
     loops = p.loadAnimationLoopMap(loopConfig, {
-      scale: 0.7,
-      debug: true,
       fill: '#ff8559',
+    });
+
+    sparrow = createSparrow({
+      render: loops,
     });
   }
 
   p.draw = () => {
-    p.background('#241a0e')
+    p.background('#241a0e');
+    sparrow.moveTo(p.width / 2, p.height / 2 + 25);
+    sparrow.render();
   };
 }, {
   width: 455,
