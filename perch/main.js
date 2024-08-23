@@ -129,7 +129,13 @@ addCanvas((p) => {
   p.draw = () => {
     p.background('#241a0e');
     if (p.frameCount === 1) {
-      sparrow.moveTo(p.width * 0.5, 300 - 10);
+      sparrow.moveTo(p.width * 0.1, 200);
+    }
+    if (p.frameCount === 10) {
+      sparrow.moveTo(p.width * 0.4, 270);
+    }
+    if (p.frameCount === 35) {
+      sparrow.moveTo(p.width * 0.7, 300 - 10);
     }
     sparrow.render();
   };
