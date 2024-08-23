@@ -3,9 +3,11 @@ import config from './config.js';
 import addCanvas from './addCanvas.js';
 import createSparrow from './createSparrow.js';
 import addAnimationLoops from './loadAnimationLoop.js';
+import addAwaitFonts from './awaitFonts.js';
 
 // install plugins
 addAnimationLoops(p5);
+addAwaitFonts(p5);
 
 ///////////////////////
 // TESTING BEHAVIORS //
@@ -79,23 +81,50 @@ addCanvas((p) => {
 addCanvas((p) => {
   let loops;
   let sparrow;
+  let ground;
 
   p.preload = () => {
+    p.awaitFonts([
+      ['Albert Sans', '100 900'],
+    ]);
     loops = p.loadAnimationLoopMap(config, {
-      fill: '#ff8559',
+      fill: '#ff8559'
     });
+  }
+
+  p.setup = () => {
+    ground = p.height * 2 / 3;
 
     sparrow = createSparrow({
       render: loops,
-      x: 475,
+      x: p.width + 50,
       y: 120,
+      scale: 0.5,
     });
+    sparrow.addPerch(0, ground, 455);
 
-    sparrow.addPerch(0, 300, 455);
+    p.updateFontVariables('Albert Sans', {
+      ital: 1,
+      wght: 650,
+    });
   }
 
   p.draw = () => {
     p.background('#241a0e');
+
+    p.push();
+    p.fill('#ff8559')
+    p.textSize(58)
+    p.text('perch', 50, ground)
+    p.pop();
+
+    // p.push()
+    // p.stroke('white');
+    // p.line(0, ground, p.width, ground);
+    // p.pop();
+
+    let right = 232;
+
     if (p.frameCount === 1) {
       sparrow.moveTo(p.width * 0.1, 200);
     }
@@ -103,13 +132,16 @@ addCanvas((p) => {
       sparrow.moveTo(p.width * 0.4, 270);
     }
     if (p.frameCount === 12) {
-      sparrow.moveTo(p.width * 0.5, 220);
+      sparrow.moveTo(p.width * 0.8, 220);
     }
     if (p.frameCount === 35) {
-      sparrow.moveTo(p.width * 0.65, 300 - 20);
+      sparrow.moveTo(right, ground - 20);
     }
     if (p.frameCount === 37) {
-      sparrow.moveTo(p.width * 0.8, 300 + 7);
+      sparrow.moveTo(right, ground + 7);
+    }
+    if (p.frameCount === 53) {
+      sparrow.moveTo(right -9, ground);
     }
     sparrow.render();
   };
