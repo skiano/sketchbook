@@ -129,7 +129,7 @@ export default function createSparrow(opt) {
         !isAirborn
         && (
           ny < activePerch[1] - activePerch[3] || 
-          ny > activePerch[1] + activePerch[3] || 
+          ny > activePerch[1] + (activePerch[3] * 2) || // bottom escapes seemed way to sensitive
           nx < activePerch[0] ||
           nx > activePerch[0] + activePerch[2]
         )
