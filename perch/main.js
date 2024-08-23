@@ -119,12 +119,18 @@ addCanvas((p) => {
 
     sparrow = createSparrow({
       render: loops,
+      x: 475,
+      y: 120,
     });
+
+    sparrow.addPerch(0, 300, 455);
   }
 
   p.draw = () => {
     p.background('#241a0e');
-    sparrow.moveTo(p.width / 2, p.height / 2 + 25);
+    // if (p.frameCount === 1) {
+    sparrow.moveTo(p.width * 1 / 3, 300 - 10);
+    // }
     sparrow.render();
   };
 }, {

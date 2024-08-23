@@ -67,7 +67,6 @@ export default function createSparrow(opt) {
       let dx = nx - x;
       let dy = ny - y;
       let angle = Math.atan2(dy, dx);
-
       // LANDING
       if (isLanding) {
         if (opt.render[loop].getFrame() === 1) { // stop when hop gets back to this frame
@@ -85,7 +84,6 @@ export default function createSparrow(opt) {
             ny > perch[1] - perch[3]
           );
         });
-
         if (landingZone) {
           y = ramp(y, ny, 0.5);
           x = ramp(x, nx, 0.3);
@@ -109,7 +107,6 @@ export default function createSparrow(opt) {
               ? angle + HALF_TURN // trust me on this half turn... ¯\_(ツ)_/¯
               : angle;
           }
-
           x = ramp(x, nx, 0.4);
           y = ramp(y, ny, 0.6);
         }
