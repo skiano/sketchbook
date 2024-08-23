@@ -11,7 +11,7 @@ addAnimationLoops(p5);
 // TESTING BEHAVIORS //
 ///////////////////////
 
-addCanvas((p, opt) => {
+addCanvas((p) => {
   let loops;
   let sparrow;
 
@@ -22,10 +22,9 @@ addCanvas((p, opt) => {
   p.setup = () => {
     sparrow = createSparrow({ render: loops });
     let margin = 100;
-    console.log(p.width)
-    sparrow.addPerch(margin, 320, opt.width - margin * 2);
+    sparrow.addPerch(margin, 320, p.width - margin * 2);
     sparrow.addPerch(margin, 140, 30);
-    sparrow.addPerch(opt.width - margin - 30, 140, 30);
+    sparrow.addPerch(p.width - margin - 30, 140, 30);
   }
 
   p.draw = () => {

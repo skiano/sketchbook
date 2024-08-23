@@ -1,8 +1,13 @@
 import p5 from 'p5';
 
-// patch p5 so this setup won't conflict with one specified by user...
-p5.prototype.registerMethod('afterSetup', function () {
-  this._standardSetup();
+// this is super silly,
+// but it allows you to add setup steps AFTER the _standardSetup runs...
+p5.prototype.registerMethod('beforeSetup', function () {
+  let userSetup = this.setup;
+  this.setup = function () {
+    this._standardSetup();
+    if (userSetup) userSetup();
+  }
 });
 
 export default function addCanvas(fn, opt) {
@@ -23,6 +28,6 @@ export default function addCanvas(fn, opt) {
       p.createCanvas(opt.width, opt.height);
       p.frameRate(opt.fps);
     }
-    fn(p, opt);
+    fn(p);
   }, c);
 }
