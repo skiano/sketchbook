@@ -14,17 +14,22 @@ addAnimationLoops(p5);
 addCanvas((p) => {
   let loops;
   let sparrow;
+  let homeBase;
 
   p.preload = () => {
     loops = p.loadAnimationLoopMap(config, { fill: 'white' });
   }
 
   p.setup = () => {
-    sparrow = createSparrow({ render: loops });
-    let margin = 100;
-    sparrow.addPerch(margin, 320, p.width - margin * 2);
-    sparrow.addPerch(margin, 140, 30);
-    sparrow.addPerch(p.width - margin - 30, 140, 30);
+    sparrow = createSparrow({
+      render: loops,
+      x: -50,
+      y: 100,
+    });
+    sparrow.addPerch(130, 200, 70);
+    sparrow.addPerch(200, 300, 190);
+    sparrow.addPerch(90, 380, 120);
+    homeBase = [175, 200];
   }
 
   p.draw = () => {
@@ -33,17 +38,33 @@ addCanvas((p) => {
     // render the perches
     p.noFill();
     sparrow.eachPerch((x, y, w, magnet) => {
+      p.push();
       p.stroke('white');
       p.line(x, y, x + w, y);
-      p.stroke('cyan');
+      p.strokeWeight(6);
+      p.point(x, y);
+      p.point(x + w, y);
+      // debugging...
+      // p.stroke('cyan');
       // p.line(x, y - magnet, x + w, y - magnet);
       // p.line(x, y + magnet, x + w, y + magnet);
+      p.pop();
     });
 
     // render the sparrow
-    let x = p.constrain(p.mouseX, 50, p.width - 50);
-    let y = p.constrain(p.mouseY, 80, p.height - 20);
-    sparrow.moveTo(x, y);
+    if (
+      p.mouseX >= p.width ||
+      p.mouseX <= 0 ||
+      p.mouseY >= p.height ||
+      p.mouseY <= 0
+    ) {
+      sparrow.moveTo(...homeBase);
+    } else {
+      let x = p.constrain(p.mouseX, 50, p.width - 50);
+      let y = p.constrain(p.mouseY, 80, p.height - 20);
+      sparrow.moveTo(x, y);
+    }
+
     sparrow.render();
   };
 }, {
@@ -88,7 +109,7 @@ addCanvas((p) => {
       sparrow.moveTo(p.width * 0.65, 300 - 20);
     }
     if (p.frameCount === 37) {
-      sparrow.moveTo(p.width * 0.8, 300 + 15);
+      sparrow.moveTo(p.width * 0.8, 300 + 7);
     }
     sparrow.render();
   };
