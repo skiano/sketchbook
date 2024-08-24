@@ -118,31 +118,30 @@ addCanvas((p) => {
     p.text('perch', 55, ground)
     p.pop();
 
-    // p.push()
-    // p.stroke('white');
-    // p.line(0, ground, p.width, ground);
-    // p.pop();
-
+    let loopFrame = p.frameCount % 160;
     let right = 232;
 
-    if (p.frameCount === 1) {
-      sparrow.moveTo(p.width * 0.2, 190);
-    }
-    if (p.frameCount === 10) {
-      sparrow.moveTo(p.width * 0.4, 250);
-    }
-    if (p.frameCount === 12) {
-      sparrow.moveTo(p.width * 0.8, 220);
-    }
-    if (p.frameCount === 35) {
-      sparrow.moveTo(right, ground - 20);
-    }
-    if (p.frameCount === 37) {
-      sparrow.moveTo(right, ground + 7);
-    }
-    if (p.frameCount === 53) {
-      sparrow.moveTo(right -9, ground);
-    }
+    if (loopFrame === 1) sparrow.moveTo(p.width * 0.2, 190);
+    if (loopFrame === 10) sparrow.moveTo(p.width * 0.4, 250);
+    if (loopFrame === 12) sparrow.moveTo(p.width * 0.8, 220);
+    if (loopFrame === 35) sparrow.moveTo(right, ground - 20);
+    if (loopFrame === 37) sparrow.moveTo(right, ground + 7);
+    if (loopFrame === 53) sparrow.moveTo(right - 9, ground);
+    if (loopFrame === 75) sparrow.moveTo(right + 19, ground);
+    if (loopFrame === 77) sparrow.moveTo(right + 30, ground);
+    if (loopFrame === 79) sparrow.moveTo(right + 70, ground);
+    if (loopFrame === 80) sparrow.moveTo(right + 71, ground);
+    if (loopFrame === 81) sparrow.moveTo(right + 72, ground);
+    if (loopFrame === 90) sparrow.moveTo(right + 90, ground);
+    if (loopFrame === 115) sparrow.moveTo(right + 120, ground - 20);
+    if (loopFrame === 124) sparrow.moveTo(300, 235);
+    if (loopFrame === 126) sparrow.moveTo(100, 135);
+
+    // hidden back to start
+    if (loopFrame === 150) sparrow.moveTo(-80, 90);
+    if (loopFrame === 151) sparrow.moveTo(-80, -200);
+    if (loopFrame === 152) sparrow.moveTo(p.width + 200, -200);
+
     sparrow.render();
   };
 }, {
