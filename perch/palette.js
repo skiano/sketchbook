@@ -4,15 +4,21 @@ function ramp(v1, v2, force = 0.5) {
   return v1 + ((v2 - v1) * force);
 }
 
-function swatchGroup() {
+function swatchGroup(titleText) {
+  const wrap = document.createElement('div');
+  wrap.classList.add('swatch-wrap');
   const group = document.createElement('div');
   group.classList.add('swatch-group');
-  document.getElementById('palette').append(group);
+  const title = document.createElement('h3');
+  title.innerText = titleText;
+  wrap.append(title);
+  wrap.append(group);
+  document.getElementById('palette').append(wrap);
   return function previewSwatch(color) {
     const swatch = document.createElement('div');
     swatch.classList.add('swatch');
     swatch.style.background = color.toHexString();
-    swatch.style.color = color.getLuminance() < 0.3 ? '#fff' : '#000';
+    swatch.style.color = color.getLuminance() < 0.3 ? '#edf5f6' : '#171f20';
     swatch.innerHTML = `${color.toHexString()}`;
     group.append(swatch);
   }
@@ -46,27 +52,24 @@ function matchLuminance(input, targetLuminance = 0.5) {
 
 const splitAngle = 35;
 const keyLuminance = 0.35;
-const leftoverSpace = 180 - 35;
 const keyColor = matchLuminance(tinycolor('#ff8559').spin(-5), keyLuminance);
 const complement = keyColor.clone().spin(180);
 const splitA = matchLuminance(complement.clone().spin(-splitAngle), keyColor.getLuminance());
 const splitB = matchLuminance(complement.clone().spin(splitAngle), keyColor.getLuminance());
 
-const previewPrimary = swatchGroup();
-
+const previewPrimary = swatchGroup('Brand Color');
 
 previewPrimary(keyColor);
 
-const previewSecondary = swatchGroup();
+const previewSecondary = swatchGroup('Secondary Colors');
 
 previewSecondary(splitA);
-previewSecondary(matchLuminance(splitA.spin(2), ramp(keyLuminance, 1, 0.62)).desaturate(20));
-previewSecondary(matchLuminance(splitA.spin(4), ramp(keyLuminance, 1, 0.8)).desaturate(20));
+previewSecondary(matchLuminance(splitA.clone().spin(4).desaturate(20), ramp(keyLuminance, 1, 0.5)));
+previewSecondary(matchLuminance(splitA.clone().spin(8).desaturate(25), ramp(keyLuminance, 1, 0.7)));
 
-previewSecondary(matchLuminance(splitB.spin(-4), ramp(keyLuminance, 1, 0.6)).desaturate(10));
-previewSecondary(matchLuminance(splitB.spin(-2), ramp(keyLuminance, 1, 0.33)).desaturate(5));
+previewSecondary(matchLuminance(splitB.clone().spin(-4).desaturate(25), ramp(keyLuminance, 1, 0.7)));
+previewSecondary(matchLuminance(splitB.clone().spin(-8).desaturate(20), ramp(keyLuminance, 1, 0.5)));
 previewSecondary(splitB);
-
 
 function makeGrays(col, strength = 1) {
   let lumPattern = [0.95, 0.9, 0.8, 0.65, 0.45, 0.15, 0.075, 0.03, 0.012, 0.005];
@@ -74,13 +77,16 @@ function makeGrays(col, strength = 1) {
   return lumPattern.map((l, i) => matchLuminance(col.clone().desaturate(satPattern[i] * strength), l));
 }
 
-const previewGrays = swatchGroup();
+const previewGrays = swatchGroup('Warm Neutrals');
 makeGrays(keyColor).forEach(previewGrays);
 
-const previewGrays2 = swatchGroup();
+const previewGrays2 = swatchGroup('Cool Neutrals');
 makeGrays(complement, 1.2).forEach(previewGrays2);
 
-const previewChartColors = swatchGroup();
+// chart colors
+
+const chart2 = swatchGroup('Chart Colors');
+const previewChartColors = swatchGroup('Chart Colors Expanded');
 
 let movement = splitAngle * 1.12;
 let lumaPattern = [-0.1, -0.18, -0.24];
@@ -98,5 +104,8 @@ const chartColors = [
 ].map((v, i) => matchLuminance(v.desaturate(30), keyLuminance + lumaPattern[i % lumaPattern.length]))
 
 chartColors.map(previewChartColors);
+
+
+chartColors.filter((v, i) => i % 2 === 0).map(chart2);
 
 
