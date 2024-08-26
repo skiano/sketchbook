@@ -101,7 +101,7 @@ const chartColors = [
   complement.clone().spin(movement * 2),
   complement.clone().spin(movement * 3),
   complement.clone().spin(movement * 4),  
-].map((v, i) => matchLuminance(v.desaturate(30), keyLuminance + lumaPattern[i % lumaPattern.length]))
+].map((v, i) => matchLuminance(v.saturate(100 * 1.5 * lumaPattern[i % lumaPattern.length]), keyLuminance + lumaPattern[i % lumaPattern.length]))
 
 chartColors.map(previewChartColors);
 
