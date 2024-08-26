@@ -14,6 +14,7 @@ export default function loadAnimationLoop(p5) {
       anchor: [0, 0], // where to register 
       pivot: [0, 0],
       mirror: false,
+      cb: () => {},
       ...opt,
     }
 
@@ -125,6 +126,7 @@ export default function loadAnimationLoop(p5) {
       }
 
       // tell p5 this is ready...
+      opt.cb();
       this._decrementPreload();
     });
 
@@ -137,23 +139,36 @@ export default function loadAnimationLoop(p5) {
   // A helpful function for loading a bunch of loops
   p5.prototype.loadAnimationLoopMap = function(map, sharedOpt) {
     let loops = {};
+    let entries = 0;
     Object.entries(map).forEach(([key, opt]) => {
+      entries += 1;
       loops[key] = this.loadAnimationLoop(opt.file, {
         ...opt,
         ...sharedOpt,
         mirror: false,
         key,
+        cb: () => {
+          entries -= 1;
+          if (entries === 0) this._decrementPreload();
+        }
       });
       if (opt.mirror) {
+        entries += 1;
         loops[`${key}Right`] = loops[key];
         loops[`${key}Left`] = this.loadAnimationLoop(opt.file, {
           ...opt,
           ...sharedOpt,
           mirror: true,
           key,
+          cb: () => {
+            entries -= 1;
+            if (entries === 0) this._decrementPreload();
+          }
         });
       }
     });
     return loops;
   }
+
+  p5.prototype.registerPreloadMethod('loadAnimationLoopMap', p5.prototype);
 }

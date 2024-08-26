@@ -273,6 +273,7 @@ export default function createSparrow(opt) {
 
       // render the actual frame...
       opt.render[loop].render(x, y, r, scale);
+
       // keep track of how many times this loop has rendered
       // and how many times render has been called
       loopTime += 1;

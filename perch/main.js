@@ -86,9 +86,10 @@ addCanvas((p) => {
   let ground;
 
   p.preload = () => {
-    p.awaitFonts([
-      ['Albert Sans', '100 900'],
-    ]);
+    // TODO: the await fonts function is interfering with the decrement logic
+    // p.awaitFonts([
+    //   ['Albert Sans', '100 900'],
+    // ]);
     loops = p.loadAnimationLoopMap(config, {
       fill: '#ff8559'
     });
