@@ -2,14 +2,25 @@
 // WITHOUT resorting to a local copy of the font loaded by p5...
 
 // TODO: what about italics and variants etc...
+// TODO: there is a race condition
+let earlyEvents = [];
 
 export default function addAwaitFonts (p5) {
   let tasks = [];
 
-  document.fonts.onloadingdone = (evt) => {
+  const runTasks = (evt) => {
     tasks = tasks.filter((fn) => {
       return fn(evt);
     });
+  }
+
+  document.fonts.onloadingdone = (evt) => {
+    if (!tasks.length) {
+      console.log('early events')
+      earlyEvents.push(evt);
+    } else {
+      runTasks(evt);
+    }
   };
 
   p5.prototype.awaitFonts = function(requiredFonts, timeout = 700) {
@@ -46,6 +57,12 @@ export default function addAwaitFonts (p5) {
     // add this waiting thing to the list of
     // tasks to run on font events
     tasks.push(check);
+
+    // annoying... but if the plugin is added after the event fires
+    if (earlyEvents.length) {
+      earlyEvents.forEach(runTasks);
+      earlyEvents = [];
+    }
   }
 
   p5.prototype.registerPreloadMethod('awaitFonts', p5.prototype);

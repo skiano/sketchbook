@@ -4,6 +4,7 @@ import addCanvas from './addCanvas.js';
 import createSparrow from './createSparrow.js';
 import addAnimationLoops from './loadAnimationLoop.js';
 import addAwaitFonts from './awaitFonts.js';
+import './palette.js';
 
 // install plugins
 addAnimationLoops(p5);
@@ -23,6 +24,7 @@ addCanvas((p) => {
   }
 
   p.setup = () => {
+    console.log(loops)
     sparrow = createSparrow({
       render: loops,
       x: p.width + 50,
