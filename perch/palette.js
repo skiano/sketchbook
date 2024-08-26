@@ -69,8 +69,8 @@ previewSecondary(splitB);
 
 
 function makeGrays(col, strength = 1) {
-  let lumPattern = [0.95, 0.9, 0.8, 0.65, 0.45, 0.055, 0.03, 0.012, 0.005];
-  let satPattern = [40, 60, 80, 85, 90, 85, 80, 70, 40];
+  let lumPattern = [0.95, 0.9, 0.8, 0.65, 0.45, 0.15, 0.075, 0.03, 0.012, 0.005];
+  let satPattern = [40, 55, 80, 85, 90, 95, 85, 80, 70, 40];
   return lumPattern.map((l, i) => matchLuminance(col.clone().desaturate(satPattern[i] * strength), l));
 }
 
@@ -78,7 +78,7 @@ const previewGrays = swatchGroup();
 makeGrays(keyColor).forEach(previewGrays);
 
 const previewGrays2 = swatchGroup();
-makeGrays(complement, 1.7).forEach(previewGrays2);
+makeGrays(complement, 1.2).forEach(previewGrays2);
 
 const previewChartColors = swatchGroup();
 
