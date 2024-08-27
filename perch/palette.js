@@ -87,7 +87,7 @@ const warmGrays = makeGrays(keyColor);
 warmGrays.forEach(previewGrays);
 
 const previewGrays2 = swatchGroup('Cool Neutrals');
-const coolGrays = makeGrays(complement, 1.2);
+const coolGrays = makeGrays(complement, 1.03);
 coolGrays.forEach(previewGrays2);
 
 // chart colors
