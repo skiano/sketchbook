@@ -8,6 +8,18 @@ function ramp(v1, v2, force = 0.5) {
 const rootElm = document.getElementById('typography');
 const headings = 6;
 
+function renderLabel(content) {
+  let label = document.createElement('h5');
+  label.innerHTML = content;
+  label.style.textTransform = 'uppercase';
+  label.style.fontSize = '11px';
+  label.style.fontWeight = 900;
+  label.style.letterSpacing = '0.05em';
+  label.style.color = palette.secondary[0];
+  label.style.marginBottom = '8px';
+  return label;
+}
+
 function renderHeading(h, content) {
   let elm = document.createElement(h.tag);
   elm.style.fontFamily = h.fontFamily;
@@ -17,21 +29,11 @@ function renderHeading(h, content) {
   elm.style.lineHeight = h.lineHeight;
   elm.innerHTML = content;
 
-  let label = document.createElement(h.tag);
-  label.innerHTML = `${h.tag} • ${h.fontFamily}`;
-  label.style.textTransform = 'uppercase';
-  label.style.fontSize = '11px';
-  label.style.fontWeight = 900;
-  label.style.letterSpacing = '0.05em';
-  label.style.color = palette.secondary[0];
-  label.style.marginBottom = '8px';
-
-
   let labeled = document.createElement('div');
   labeled.style.marginBottom = '24px';
 
   
-  labeled.append(label);
+  labeled.append(renderLabel(`${h.tag} • ${h.fontFamily}`));
   labeled.append(elm);
   return labeled;
 }
@@ -117,6 +119,8 @@ albertBodyWrap.style.background = palette.warm[0];
 albertBodyWrap.style.color = palette.warm[8];
 rootElm.append(albertBodyWrap);
 
+albertBodyWrap.append(renderLabel('P • Albert Sans'));
+
 const div = document.createElement('div');
 div.innerHTML = markdown(`
   Nullam id commodo mauris, nec porta orci. **Maecenas vehicula** nisi eget cursus convallis. Vivamus vel viverra leo. Suspendisse eleifend risus non egestas luctus. Mauris sollicitudin nisl quis ante condimentum accumsan. Curabitur aliquam facilisis est et scelerisque. Nulla ac dictum nunc. Nam sed auctor augue.
@@ -125,8 +129,8 @@ div.innerHTML = markdown(`
 `);
 div.style.fontSize = '16px';
 div.style.lineHeight = '24px';
-div.style.fontWeight = 450;
-div.style.letterSpacing = '-0.007em';
+div.style.fontWeight = 460;
+div.style.letterSpacing = '-0.008em';
 div.style.color = palette.cool[7];
 albertBodyWrap.append(div)
 
@@ -138,6 +142,8 @@ literataBodyWrap.style.width = '455px';
 literataBodyWrap.style.background = palette.warm[0];
 literataBodyWrap.style.color = palette.warm[8];
 rootElm.append(literataBodyWrap);
+
+literataBodyWrap.append(renderLabel('P • literata'))
 
 const ldiv = document.createElement('div');
 ldiv.innerHTML = markdown(`
