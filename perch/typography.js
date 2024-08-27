@@ -30,7 +30,7 @@ function renderHeading(h, content) {
   elm.innerHTML = content;
 
   let labeled = document.createElement('div');
-  labeled.style.marginBottom = '24px';
+  labeled.style.marginBottom = '30px';
 
   
   labeled.append(renderLabel(`${h.tag} • ${h.fontFamily}`));
