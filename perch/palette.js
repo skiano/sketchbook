@@ -51,7 +51,7 @@ function matchLuminance(input, targetLuminance = 0.5) {
 };
 
 const splitAngle = 35;
-const keyLuminance = 0.35;
+const keyLuminance = 0.33;
 const keyColor = matchLuminance(tinycolor('#ff8559').spin(-4), keyLuminance);
 const complement = keyColor.clone().spin(180);
 const splitA = matchLuminance(complement.clone().spin(-splitAngle), keyColor.getLuminance());
