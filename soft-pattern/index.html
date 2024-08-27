@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Soft pattern</title>
+    <link rel="stylesheet" href="../shared/reset.css">
+    <link rel="stylesheet" href="../shared/base.css">
+    <style>
+      #p5_loading {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="p5_loading" class="loadingclass">
+      this could be some sweet graphics loading lots of bits.
+    </div>
+    <div id="app"></div>
+    <script type="importmap">
+      {
+        "imports": {
+          "p5": "https://esm.run/p5@1.10"
+        }
+      }
+    </script>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
