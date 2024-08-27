@@ -21,7 +21,7 @@ export default function addCanvas(fn, opt) {
   const c = document.createElement('div');
   c.style.width = `${opt.width}px`;
   c.style.height = `${opt.height}px`;
-  c.style.background = '#f4efe6';
+  c.style.background = '#f9f2f0';
   document.getElementById(opt.rootId).append(c);
   new p5((p) => {
     p._standardSetup = () => {

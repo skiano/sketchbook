@@ -4,77 +4,12 @@ import addCanvas from './addCanvas.js';
 import createSparrow from './createSparrow.js';
 import addAnimationLoops from './loadAnimationLoop.js';
 import addAwaitFonts from './awaitFonts.js';
-import './palette.js';
+import palette from './palette.js';
+import './typography.js';
 
 // install plugins
 addAnimationLoops(p5);
 addAwaitFonts(p5);
-
-///////////////////////
-// TESTING BEHAVIORS //
-///////////////////////
-
-addCanvas((p) => {
-  let loops;
-  let sparrow;
-  let homeBase;
-
-  p.preload = () => {
-    loops = p.loadAnimationLoopMap(config, { fill: 'white' });
-  }
-
-  p.setup = () => {
-    console.log(loops)
-    sparrow = createSparrow({
-      render: loops,
-      x: p.width + 50,
-      y: 30,
-    });
-    sparrow.addPerch(130, 200, 70);
-    sparrow.addPerch(200, 300, 190);
-    sparrow.addPerch(90, 380, 120);
-    homeBase = [325, 185];
-  }
-
-  p.draw = () => {
-    p.background('#7c847a');
-
-    // render the perches
-    p.noFill();
-    sparrow.eachPerch((x, y, w, magnet) => {
-      p.push();
-      p.stroke('white');
-      p.line(x, y, x + w, y);
-      p.strokeWeight(6);
-      p.point(x, y);
-      p.point(x + w, y);
-      // debugging...
-      // p.stroke('cyan');
-      // p.line(x, y - magnet, x + w, y - magnet);
-      // p.line(x, y + magnet, x + w, y + magnet);
-      p.pop();
-    });
-
-    // render the sparrow
-    if (
-      p.mouseX >= p.width ||
-      p.mouseX <= 0 ||
-      p.mouseY >= p.height ||
-      p.mouseY <= 0
-    ) {
-      sparrow.moveTo(...homeBase);
-    } else {
-      let x = p.constrain(p.mouseX, 50, p.width - 50);
-      let y = p.constrain(p.mouseY, 80, p.height - 20);
-      sparrow.moveTo(x, y);
-    }
-
-    sparrow.render();
-  };
-}, {
-  width: 455,
-  height: 455,
-});
 
 ///////////////////////
 // TESTING WITH LOGO //
@@ -91,7 +26,7 @@ addCanvas((p) => {
     //   ['Albert Sans', '100 900'],
     // ]);
     loops = p.loadAnimationLoopMap(config, {
-      fill: '#ff8559'
+      fill: palette.primary[0],
     });
   }
 
@@ -113,10 +48,10 @@ addCanvas((p) => {
   }
 
   p.draw = () => {
-    p.background('#241a0e');
+    p.background(palette.cool[8]);
 
     p.push();
-    p.fill('#ff8559')
+    p.fill(palette.primary[0])
     p.textSize(58)
     p.text('perch', 55, ground)
     p.pop();
@@ -144,6 +79,71 @@ addCanvas((p) => {
     if (loopFrame === 150) sparrow.moveTo(-80, 90);
     if (loopFrame === 151) sparrow.moveTo(-80, -200);
     if (loopFrame === 152) sparrow.moveTo(p.width + 200, -200);
+
+    sparrow.render();
+  };
+}, {
+  width: 455,
+  height: 455,
+});
+
+///////////////////////
+// TESTING BEHAVIORS //
+///////////////////////
+
+addCanvas((p) => {
+  let loops;
+  let sparrow;
+  let homeBase;
+
+  p.preload = () => {
+    loops = p.loadAnimationLoopMap(config, { fill: palette.primary[0] });
+  }
+
+  p.setup = () => {
+    sparrow = createSparrow({
+      render: loops,
+      x: p.width + 50,
+      y: 30,
+    });
+    sparrow.addPerch(130, 200, 70);
+    sparrow.addPerch(200, 300, 190);
+    sparrow.addPerch(90, 380, 120);
+    homeBase = [325, 185];
+  }
+
+  p.draw = () => {
+    p.background(palette.warm[1]);
+
+    // render the perches
+    p.noFill();
+    sparrow.eachPerch((x, y, w, magnet) => {
+      p.push();
+      p.stroke(palette.warm[4]);
+      p.line(x, y, x + w, y);
+      p.strokeWeight(6);
+      p.point(x, y);
+      p.point(x + w, y);
+      // debugging...
+      // p.stroke('cyan');
+      // p.line(x, y - magnet, x + w, y - magnet);
+      // p.line(x, y + magnet, x + w, y + magnet);
+      p.pop();
+    });
+
+    // render the sparrow
+    if (
+      p.mouseX >= p.width ||
+      p.mouseX <= 0 ||
+      p.mouseY >= p.height ||
+      p.mouseY <= 0
+    ) {
+      sparrow.moveTo(...homeBase);
+    } else {
+      let x = p.constrain(p.mouseX, 50, p.width - 50);
+      let y = p.constrain(p.mouseY, 80, p.height - 20);
+      sparrow.moveTo(x, y);
+    }
 
     sparrow.render();
   };
