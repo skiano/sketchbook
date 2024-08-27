@@ -113,7 +113,7 @@ addCanvas((p) => {
   }
 
   p.draw = () => {
-    p.background(palette.warm[1]);
+    p.background(palette.warm[0]);
 
     // render the perches
     p.noFill();

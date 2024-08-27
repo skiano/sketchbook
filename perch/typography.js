@@ -1,4 +1,5 @@
 import palette from "./palette.js";
+import { parse as markdown } from 'marked';
 
 function ramp(v1, v2, force = 0.5) {
   return v1 + ((v2 - v1) * force);
@@ -38,7 +39,7 @@ function renderHeading(h, content) {
 // Albert headings
 
 const albertHeadingsWrap = document.createElement('section');
-albertHeadingsWrap.style.padding = '30px';
+albertHeadingsWrap.style.padding = '36px 30px';
 albertHeadingsWrap.style.width = '455px';
 albertHeadingsWrap.style.background = palette.warm[0];
 albertHeadingsWrap.style.color = palette.warm[8];
@@ -69,6 +70,7 @@ for (let h = 0; h < headings; h += 1) {
 albertHeadings.reverse().forEach((h) => {
   albertHeadingsWrap.append(renderHeading(h, 'Evidence-based<br/>homebuying.'));
 });
+
 
 // Literata headings
 
@@ -105,3 +107,47 @@ literataHeadings.reverse().forEach((h) => {
   literataHeadingsWrap.append(renderHeading(h, 'A Wonderful Headline for a Blog Post, Don’t You Think?'));
 });
 
+
+// Albert body and caption
+
+const albertBodyWrap = document.createElement('section');
+albertBodyWrap.style.padding = '36px 30px';
+albertBodyWrap.style.width = '455px';
+albertBodyWrap.style.background = palette.warm[0];
+albertBodyWrap.style.color = palette.warm[8];
+rootElm.append(albertBodyWrap);
+
+const div = document.createElement('div');
+div.innerHTML = markdown(`
+  Nullam id commodo mauris, nec porta orci. **Maecenas vehicula** nisi eget cursus convallis. Vivamus vel viverra leo. Suspendisse eleifend risus non egestas luctus. Mauris sollicitudin nisl quis ante condimentum accumsan. Curabitur aliquam facilisis est et scelerisque. Nulla ac dictum nunc. Nam sed auctor augue.
+
+  Fusce interdum congue ornare. Pellentesque et molestie lorem. Etiam aliquam nibh leo, vitae vestibulum quam pharetra nec. Donec non nunc eu lorem condimentum eleifend non ac arcu. Etiam rhoncus ipsum eleifend mauris gravida, sed pellentesque arcu maximus. Sed facilisis ornare elementum. Integer eu iaculis lorem. Mauris at ultrices lectus. Aenean massa mauris, imperdiet in ultricies tempus, accumsan id ligula. Maecenas iaculis augue ipsum, ut tempor tortor tempor vitae. Maecenas ante tortor, gravida quis dapibus ut, vulputate at tortor. Nunc consectetur est eget tortor gravida, at imperdiet nulla molestie. Donec efficitur molestie mi a pulvinar.
+`);
+div.style.fontSize = '16px';
+div.style.lineHeight = '24px';
+div.style.fontWeight = 450;
+div.style.letterSpacing = '-0.007em';
+div.style.color = palette.cool[7];
+albertBodyWrap.append(div)
+
+// literata body and caption
+
+const literataBodyWrap = document.createElement('section');
+literataBodyWrap.style.padding = '36px 30px';
+literataBodyWrap.style.width = '455px';
+literataBodyWrap.style.background = palette.warm[0];
+literataBodyWrap.style.color = palette.warm[8];
+rootElm.append(literataBodyWrap);
+
+const ldiv = document.createElement('div');
+ldiv.innerHTML = markdown(`
+  Nullam id commodo mauris, nec porta orci. **Maecenas vehicula** nisi eget cursus convallis. Vivamus vel viverra leo. Suspendisse eleifend risus non egestas luctus. Mauris sollicitudin nisl quis ante condimentum accumsan. Curabitur aliquam facilisis est et scelerisque. Nulla ac dictum nunc. Nam sed auctor augue.
+
+  Fusce interdum congue ornare. Pellentesque et molestie lorem. Etiam aliquam nibh leo, vitae vestibulum quam pharetra nec. Donec non nunc eu lorem condimentum eleifend non ac arcu. Etiam rhoncus ipsum eleifend mauris gravida, sed pellentesque arcu maximus. Sed facilisis ornare elementum. Integer eu iaculis lorem. Mauris at ultrices lectus. Aenean massa mauris, imperdiet in ultricies tempus, accumsan id ligula. Maecenas iaculis augue ipsum, ut tempor tortor tempor vitae. Maecenas ante tortor, gravida quis dapibus ut, vulputate at tortor. Nunc consectetur est eget tortor gravida, at imperdiet nulla molestie. Donec efficitur molestie mi a pulvinar.
+`);
+ldiv.style.fontFamily = 'Literata';
+ldiv.style.fontSize = '15.2px';
+ldiv.style.lineHeight = '24px';
+ldiv.style.fontWeight = 470;
+ldiv.style.color = palette.cool[7];
+literataBodyWrap.append(ldiv)
