@@ -132,6 +132,7 @@ div.style.fontSize = '16px';
 div.style.lineHeight = '24px';
 div.style.fontWeight = 460;
 div.style.letterSpacing = '-0.008em';
+div.style.wordSpacing = '-0.07em';
 div.style.color = palette.cool[7];
 albertBodyWrap.append(div)
 
