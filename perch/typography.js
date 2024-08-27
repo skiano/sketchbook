@@ -113,6 +113,7 @@ literataHeadings.reverse().forEach((h) => {
 // Albert body and caption
 
 const albertBodyWrap = document.createElement('section');
+albertBodyWrap.classList.add('test-body-copy');
 albertBodyWrap.style.padding = '36px 30px';
 albertBodyWrap.style.width = '455px';
 albertBodyWrap.style.background = palette.warm[0];
@@ -137,6 +138,7 @@ albertBodyWrap.append(div)
 // literata body and caption
 
 const literataBodyWrap = document.createElement('section');
+literataBodyWrap.classList.add('test-body-copy');
 literataBodyWrap.style.padding = '36px 30px';
 literataBodyWrap.style.width = '455px';
 literataBodyWrap.style.background = palette.warm[0];
