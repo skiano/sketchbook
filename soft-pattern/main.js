@@ -4,6 +4,19 @@ import p5 from 'p5';
 
 new p5((ctx) => {
 
+  function createHeightMap() {
+    let t = 0;
+    let noiseLevel = 255;
+    let noiseScale = 0.005;
+    ctx.noiseSeed(99);
+    return function(x, y, t = 0) {
+      let nx = noiseScale * x;
+      let ny = noiseScale * y;
+      let nt = noiseScale * (t * 10);
+      return noiseLevel * ctx.noise(nx, ny, nt);;
+    }
+  }
+
   function createModel() {
     return new p5.Geometry(1, 1, function createGeometry() {
 
@@ -29,6 +42,9 @@ new p5((ctx) => {
   let m;
   let cam;
   let img;
+  let gfx;
+  let depth;
+  let paintDepth;
 
   ctx.preload = () => {
     img = ctx.loadImage('./blanket.png');
@@ -40,6 +56,43 @@ new p5((ctx) => {
     ctx.frameRate(30);
     cam = ctx.createCamera();
     m = createModel();
+
+
+
+    depth = createHeightMap();
+
+    // render clouds...
+    gfx = ctx.createGraphics(200, 300);
+    gfx.canvas.style.display = 'block';
+    let d = gfx.pixelDensity();
+    let t = 4 * (d * gfx.width) * (d * gfx.height);
+    gfx.loadPixels();
+    // Copy the top half of the canvas to the bottom.
+
+    paintDepth = () => {
+      let x = 0;
+      let y = 0;
+      let vx;
+      let vy;
+      let vz;
+      let maxX = gfx.width * d;
+      let maxY = gfx.height * d;
+      for (let i = 0; i < t; i += 4) {
+        vx = ctx.map(x, 0, maxX, 0, 255);
+        vy = ctx.map(y, 0, maxY, 0, 255);
+        vz = depth(x, y, ctx.frameCount);
+        gfx.pixels[i] = vz;
+        gfx.pixels[i + 1] = vz;
+        gfx.pixels[i + 2] = vz;
+        gfx.pixels[i + 3] = 255;
+        x += 1;
+        if (x >= maxX) {
+          x = 0;
+          y += 1;
+        }
+      }
+      gfx.updatePixels();
+    }
   }
 
   ctx.draw = () => {
@@ -57,5 +110,7 @@ new p5((ctx) => {
 
     ctx.texture(img);
     ctx.model(m);
+
+    paintDepth()
   }
 });
