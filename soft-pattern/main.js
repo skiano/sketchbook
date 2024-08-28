@@ -1,5 +1,6 @@
 // @see https://www.paulwheeler.us/articles/custom-3d-geometry-in-p5js/
-// other thing @https://pixijs.com/8.x/playground?exampleId=basic.meshPlane
+// @see other thing @https://pixijs.com/8.x/playground?exampleId=basic.meshPlane
+// @see https://editor.p5js.org/davepagurek/sketches/05c1DIBTp
 
 import p5 from 'p5';
 
@@ -22,13 +23,9 @@ const cyrb53 = function (ary) {
 };
 
 new p5((ctx) => {
-
   function createHeightMap() {
-    let t = 0;
     let noiseLevel = 255;
-    let noiseScale = 0.007;
-    // let noiseScale = 0.005;
-    ctx.noiseSeed(99);
+    let noiseScale = 0.009;
     return function(x, y, t = 0) {
       let nx = noiseScale * x;
       let ny = noiseScale * y;
@@ -38,28 +35,6 @@ new p5((ctx) => {
   }
 
   const heightMap = createHeightMap();
-
-  function createModel() {
-    return new p5.Geometry(1, 1, function createGeometry() {
-
-      let v0 = new p5.Vector(-50, -56, 0);
-      let v1 = new p5.Vector(50, -56, 0);
-      let v2 = new p5.Vector(0, 30, 0);
-
-      this.vertices.push(v0, v1, v2);
-
-      this.faces.push([0, 1, 2]);
-
-      this.uvs.push([0.28, 0]);
-      this.uvs.push([0.87, 0.43]);
-      this.uvs.push([0.62, 1.0]);
-
-      // Call this once, after all vertices and faces have been initialized
-      this.computeNormals();
-
-      this.gid = 'my-example-geometry';
-    });
-  }
 
   function terrainFromNoise(width, height, detailX = 100, detailY = 100) {
     return new p5.Geometry(detailX, detailY, function createGeometry() {
@@ -96,81 +71,34 @@ new p5((ctx) => {
     });
   }
 
-  let m;
   let cam;
   let img;
-  let gfx;
-  let depth;
-  let paintDepth;
   let terrain;
 
   ctx.preload = () => {
-    img = ctx.loadImage('./blanket-3.png');
+    img = ctx.loadImage('./blanket-4.png');
   }
 
   ctx.setup = () => {
-    // ctx.createCanvas(540, 540, ctx.WEBGL);
-    ctx.createCanvas(540, 540, ctx.WEBGL);
     ctx.frameRate(30);
+    ctx.createCanvas(540, 540, ctx.WEBGL);
     cam = ctx.createCamera(0, -150, 300);
-
-
-
-    m = createModel();
-    depth = createHeightMap();
     terrain = terrainFromNoise(400, 600, 100, 200);
-
-    // render clouds...
-    gfx = ctx.createGraphics(200, 300);
-    // gfx.canvas.style.display = 'block';
-    let d = gfx.pixelDensity();
-    let t = 4 * (d * gfx.width) * (d * gfx.height);
-    gfx.loadPixels();
-    // Copy the top half of the canvas to the bottom.
-
-    paintDepth = () => {
-      let x = 0;
-      let y = 0;
-      let vx;
-      let vy;
-      let vz;
-      let maxX = gfx.width * d;
-      let maxY = gfx.height * d;
-      for (let i = 0; i < t; i += 4) {
-        vx = ctx.map(x, 0, maxX, 0, 255);
-        vy = ctx.map(y, 0, maxY, 0, 255);
-        vz = depth(x, y, ctx.frameCount);
-        gfx.pixels[i] = vz;
-        gfx.pixels[i + 1] = vz;
-        gfx.pixels[i + 2] = vz;
-        gfx.pixels[i + 3] = 255;
-        x += 1;
-        if (x >= maxX) {
-          x = 0;
-          y += 1;
-        }
-      }
-      gfx.updatePixels();
-    }
   }
 
   ctx.draw = () => {
     ctx.background('#000');
     ctx.orbitControl();
-    ctx.directionalLight(255, 255, 255, 0.3, 1, -0.5);
+    ctx.directionalLight(230, 230, 230, 0.3, 1, -0.5);
+    ctx.directionalLight(230, 230, 230, 0.5, 1, -100.5);
     ctx.rotateX(ctx.PI / 4);
     ctx.rotateZ(ctx.frameCount / 40);
     ctx.scale(3, 3, 0.4);
-
     ctx.noStroke();
     ctx.specularMaterial(50, 30, 20);
-    ctx.shininess(300);
-    ctx.metalness(20);
+    ctx.shininess(270);
+    ctx.metalness(15);
     ctx.texture(img);
     ctx.model(terrain);
-
-
-
-    // paintDepth()
   }
 });
