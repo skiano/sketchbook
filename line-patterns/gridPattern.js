@@ -14,7 +14,7 @@ export default function gridPattern(opt) {
       ctx.stroke();
     },
     layers: [
-      { color: '#eee', weight: 5, segments: [[2, 0, 2, 4], [0, 2, 4, 2]] },
+      // { color: '#eee', weight: 5, segments: [[2, 0, 2, 4], [0, 2, 4, 2]] },
       { color: 'red', weight: 8, segments: [[1, 1, 3, 3], [3, 1, 1, 3]] },
     ],
     ...opt,
@@ -31,6 +31,11 @@ export default function gridPattern(opt) {
   can.style.height = `${height / 2}px`;
   can.width = width;
   can.height = height;
+
+  // TODO:
+  // translate to stamp out nine
+  // in case edges need to be perfect
+  // then crop...? or can i just draw off screen??
 
   opt.layers.forEach((layer) => {
     layer.segments.forEach(([x1, y1, x2, y2]) => {

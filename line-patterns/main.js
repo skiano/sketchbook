@@ -23,14 +23,15 @@ function addCanvas(fn, opt) {
 addCanvas((p) => {
   let fillGridPattern = gridPattern();
   p.draw = () => {
-    p.background('#000');
-    let offset = p.frameCount;
+    p.background('#0aa');
+    let offsetX = p.frameCount;
+    let offsetY = p.frameCount / 2;
 
     p.push();
     p.beginClip();
     p.circle(p.width / 2, p.height / 2, 400);
     p.endClip();
-    fillGridPattern(p.canvas, -offset, -offset);
+    fillGridPattern(p.canvas, -offsetX, -offsetY);
     p.pop();
 
 
@@ -38,7 +39,7 @@ addCanvas((p) => {
     p.beginClip({ invert: true });
     p.circle(p.width / 2, p.height / 2, 400);
     p.endClip();
-    fillGridPattern(p.canvas, offset, offset);
+    fillGridPattern(p.canvas, offsetY, offsetX);
     p.pop();
   };
 });
