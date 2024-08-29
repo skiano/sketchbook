@@ -1,4 +1,5 @@
 import p5 from 'p5';
+import gridPattern from './gridPattern.js';
 
 function addCanvas(fn, opt) {
   opt = {
@@ -18,6 +19,29 @@ function addCanvas(fn, opt) {
     fn(p);
   }, c);
 }
+
+addCanvas((p) => {
+  let fillGridPattern = gridPattern();
+  p.draw = () => {
+    p.background('#000');
+    let offset = p.frameCount;
+
+    p.push();
+    p.beginClip();
+    p.circle(p.width / 2, p.height / 2, 400);
+    p.endClip();
+    fillGridPattern(p.canvas, -offset, -offset);
+    p.pop();
+
+
+    p.push();
+    p.beginClip({ invert: true });
+    p.circle(p.width / 2, p.height / 2, 400);
+    p.endClip();
+    fillGridPattern(p.canvas, offset, offset);
+    p.pop();
+  };
+});
 
 function createPattern(opt) {
   opt = {
@@ -107,75 +131,76 @@ const TINY_EXES_LINES_01 = createPattern({
   ],
 });
 
-addCanvas((p) => {
-  p.draw = () => {
-    p.background('#eee');
-    renderPattern(p, TINY_EXES_LINES_01, {
-      x: p.frameCount,
-      y: p.frameCount * 1,
-      stroke: '#333',
-    });
-  };
-});
+// addCanvas((p) => {
+//   p.draw = () => {
+//     p.background('#000');
+//     renderPattern(p, TINY_EXES_LINES_01, {
+//       x: p.frameCount,
+//       y: p.frameCount * 1,
+//       stroke: '#f00',
+//       weight: 3,
+//     });
+//   };
+// });
 
-addCanvas((p) => {
-  p.draw = () => {
-    p.background('#333');
-    renderPattern(p, TINY_EXES_LINES_01, {
-      x: p.frameCount,
-      y: p.frameCount * 1,
-      stroke: '#eee',
-      mask: [2, 3, 4, 5],
-    });
-  };
-});
+// addCanvas((p) => {
+//   p.draw = () => {
+//     p.background('#333');
+//     renderPattern(p, TINY_EXES_LINES_01, {
+//       x: p.frameCount,
+//       y: p.frameCount * 1,
+//       stroke: '#eee',
+//       mask: [2, 3, 4, 5],
+//     });
+//   };
+// });
 
-addCanvas((p) => {
-  p.draw = () => {
-    p.background('#333');
-    renderPattern(p, TINY_EXES_LINES_01, {
-      x: p.frameCount,
-      y: p.frameCount * 1,
-      stroke: '#eee',
-      mask: [0, 1],
-    });
-  };
-});
+// addCanvas((p) => {
+//   p.draw = () => {
+//     p.background('#333');
+//     renderPattern(p, TINY_EXES_LINES_01, {
+//       x: p.frameCount,
+//       y: p.frameCount * 1,
+//       stroke: '#eee',
+//       mask: [0, 1],
+//     });
+//   };
+// });
 
-addCanvas((p) => {
-  p.draw = () => {
-    p.background('#444');
+// addCanvas((p) => {
+//   p.draw = () => {
+//     p.background('#444');
 
-    renderPattern(p, TINY_EXES_LINES_01, {
-      x: p.frameCount,
-      y: p.frameCount * 1,
-      stroke: '#111',
-      weight: 23,
-      mask: [0, 1, 3, 5],
-    });
+//     renderPattern(p, TINY_EXES_LINES_01, {
+//       x: p.frameCount,
+//       y: p.frameCount * 1,
+//       stroke: '#111',
+//       weight: 23,
+//       mask: [0, 1, 3, 5],
+//     });
 
-    renderPattern(p, TINY_EXES_LINES_01, {
-      x: p.frameCount,
-      y: p.frameCount * 1,
-      stroke: '#333',
-      weight: 15,
-      mask: [0, 1, 3, 5],
-    });
+//     renderPattern(p, TINY_EXES_LINES_01, {
+//       x: p.frameCount,
+//       y: p.frameCount * 1,
+//       stroke: '#333',
+//       weight: 15,
+//       mask: [0, 1, 3, 5],
+//     });
 
-    renderPattern(p, TINY_EXES_LINES_01, {
-      x: p.frameCount,
-      y: p.frameCount * 1,
-      stroke: '#fff',
-      weight: 1,
-      mask: [0, 1],
-    });
+//     renderPattern(p, TINY_EXES_LINES_01, {
+//       x: p.frameCount,
+//       y: p.frameCount * 1,
+//       stroke: '#fff',
+//       weight: 1,
+//       mask: [0, 1],
+//     });
 
-    renderPattern(p, TINY_EXES_LINES_01, {
-      x: p.frameCount,
-      y: p.frameCount * 1,
-      stroke: 'tomato',
-      weight: 1,
-      mask: [3, 5],
-    });
-  };
-});
+//     renderPattern(p, TINY_EXES_LINES_01, {
+//       x: p.frameCount,
+//       y: p.frameCount * 1,
+//       stroke: 'tomato',
+//       weight: 1,
+//       mask: [3, 5],
+//     });
+//   };
+// });

@@ -2,13 +2,20 @@ import * as THREE from 'three';
 import { createNoise3D } from 'simplex-noise';
 import { exampleTexture, exampleDisplacement, exampleBump, exampleShine } from './exampleTexture.js';
 
+
+// const screenWidth = window.innerWidth;
+// const screenHeight = window.innerHeight;
+
+const screenWidth = 540;
+const screenHeight = 540;
+
 const noise3D = createNoise3D();
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 2000);
+const camera = new THREE.PerspectiveCamera(35, screenWidth / screenHeight, 0.1, 2000);
 const renderer = new THREE.WebGLRenderer();
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setSize(screenWidth, screenHeight);
 document.body.appendChild(renderer.domElement);
 // renderer.domElement.style.border = '1px solid red'; // preview
 
@@ -90,8 +97,8 @@ function animate(currentTime) {
   for (let i = 0; i < positionAttribute.count; i++) {
     let { x, y, z } = particles[i];
     // positionAttribute.setXYZ(i, x, y + (Math.cos((z + t) / 12) * 2) + (Math.cos((x + (t / 2)) / 16) * 1), z  );
-    let ny = noise3D(x / 80, z / 80, t / 80) * 4;
-    let sy = Math.cos((z + t) / 20) * 4;
+    let ny = noise3D(x / 80, z / 80, t / 80) * 5;
+    let sy = Math.cos((z + t) / 20) * 5;
     positionAttribute.setXYZ(i, x, y + ny + sy, z);
   }
 
