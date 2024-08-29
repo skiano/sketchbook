@@ -21,7 +21,9 @@ function addCanvas(fn, opt) {
 }
 
 addCanvas((p) => {
-  let fillGridPattern = gridPattern();
+  let fillGridPattern = gridPattern({
+    scale: 6,
+  });
   p.draw = () => {
     p.background('#0aa');
     let offsetX = p.frameCount;
