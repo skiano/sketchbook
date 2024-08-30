@@ -62,7 +62,7 @@ addCanvas((p) => {
   const fillExes_1 = gridPattern({
     width: 2,
     height: 2,
-    scale: 30,
+    scale: 60,
     layers: [
       { color: 'white', weight: 1, segments: [[0, 0, 2, 2], [3, 0, 1, 2], [0.5, 0, 0.5, 1], [0, 0.5, 2, 0.5]] },
       { color: 'red', weight: 5.5, segments: TINY_EXES_SEGMENTS },
@@ -75,7 +75,8 @@ addCanvas((p) => {
     height: 2,
     scale: 30,
     layers: [
-      { color: 'black', weight: 3, segments: TINY_EXES_SEGMENTS },
+      { color: 'white', weight: 1, segments: [[1.5, 0, 1.5, 2], [0, 1.5, 2, 1.5]] },
+      { color: '#f00', weight: 3, segments: TINY_EXES_SEGMENTS },
     ],
   });
 
@@ -84,12 +85,12 @@ addCanvas((p) => {
   }
 
   p.draw = () => {
-    p.background('#f00');
+    p.background('#100');
     p.rectMode(p.CENTER);
     let offsetX = p.loopFraction;
     let offsetY = p.loopFraction;
 
-    p.fill('#000')
+    p.fill('#100')
     p.rect(p.width / 2, p.height / 2, 400);
 
     p.push();
