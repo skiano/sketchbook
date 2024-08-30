@@ -1,6 +1,8 @@
-# P5 SKETCHES
+# My Sketchbook
 
-You will need to serve the files through a web server.
+This is a collection of html/css/js for me to work out ideas. There is no build process or fanciness, just plain old web development.
+
+Locally, you will need to serve the files through a web server (since it uses esm and import maps).
 
 If you have python, try:
 
