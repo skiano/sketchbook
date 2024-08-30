@@ -1,5 +1,14 @@
 import { Muxer, ArrayBufferTarget } from 'mp4-muxer';
 
+// NOTE:
+// in order to use this,
+// remember to add the muxer to the import map!!!
+// {
+//   "imports": {
+//     "mp4-muxer": "https://esm.run/mp4-muxer@5.0.1"
+//   }
+// }
+
 // @see https://github.com/processing/p5.js/blob/main/contributor_docs/creating_libraries.md#step-6
 // @see https://github.com/Vanilagy/mp4-muxer/blob/main/demo/script.js
 
@@ -14,7 +23,7 @@ const downloadBlob = (blob, title) => {
 	window.URL.revokeObjectURL(url);
 };
 
-export default function addRecorder(p5, opt) {
+export default function p5Recorder(p5, opt) {
   opt = {
     fps: 30,
     ...opt,
