@@ -182,3 +182,34 @@ addCanvas((p) => {
     fillWithPattern(p.canvas, offsetX, 0.55);
   };
 });
+
+addCanvas((p) => {
+  const fillWithPattern = gridPattern({
+    width: 12,
+    height: 10,
+    scale: 20,
+    layers: [
+      {
+        color: '#eea',
+        weight: 10,
+        segments: final,
+      },
+      {
+        color: '#f61',
+        weight: 2.5,
+        segments: final,
+      },
+    ],
+  });
+
+  p.setup = () => {
+    p.loopLength(30 * 8);
+  }
+
+  p.draw = () => {
+    p.background('#001');
+    let offsetX = p.loopFraction;
+    let offsetY = p.loopFraction;
+    fillWithPattern(p.canvas, offsetX, 0.55);
+  };
+});
