@@ -108,77 +108,77 @@ addCanvas((p) => {
   };
 });
 
+function translate(segments, [dx, dy]) {
+  return segments.map(([x1, y1, x2, y2]) => {
+    return [x1 + dx, y1 + dy, x2 + dx, y2 + dy];
+  });
+}
 
-// addCanvas((p) => {
-//   p.draw = () => {
-//     p.background('#000');
-//     renderPattern(p, TINY_EXES_LINES_01, {
-//       x: p.frameCount,
-//       y: p.frameCount * 1,
-//       stroke: '#f00',
-//       weight: 3,
-//     });
-//   };
-// });
+function repeat(segments, [dx, dy], quant) {
+  let newSegments = [];
+  for (let i = 0; i < quant; i += 1) {
+    newSegments = newSegments.concat(translate(segments, [dx * i, dy * i]))
+  }
+  return newSegments;
+}
 
-// addCanvas((p) => {
-//   p.draw = () => {
-//     p.background('#333');
-//     renderPattern(p, TINY_EXES_LINES_01, {
-//       x: p.frameCount,
-//       y: p.frameCount * 1,
-//       stroke: '#eee',
-//       mask: [2, 3, 4, 5],
-//     });
-//   };
-// });
+function reflectX(segments, cx) {
+  return segments.map(([x1, y1, x2, y2]) => {
+    return [cx + (cx - x1), y1, cx + (cx - x2), y2];
+  });
+}
 
-// addCanvas((p) => {
-//   p.draw = () => {
-//     p.background('#333');
-//     renderPattern(p, TINY_EXES_LINES_01, {
-//       x: p.frameCount,
-//       y: p.frameCount * 1,
-//       stroke: '#eee',
-//       mask: [0, 1],
-//     });
-//   };
-// });
+function reflectY(segments, cy) {
+  return segments.map(([x1, y1, x2, y2]) => {
+    return [x1, cy + (cy - y1), x2, cy + (cy - y2)];
+  });
+}
 
-// addCanvas((p) => {
-//   p.draw = () => {
-//     p.background('#444');
+let zigsag1 = repeat([[2, 0, 0, 3], [2, 0, 2, 3]], [2, 0], 3);
+let zigsag2 = repeat([[0, 5, 3, 3], [3, 3, 3, 5]], [3, 0], 2);
+let zigsag3 = translate(reflectY(zigsag1, 1.5), [0, 5]);
+let zigsag4 = translate(reflectX(zigsag2, 3), [0, 5]);
+let group1 = [
+  ...zigsag1,
+  ...zigsag2,
+  ...zigsag3,
+  ...zigsag4,
+];
 
-//     renderPattern(p, TINY_EXES_LINES_01, {
-//       x: p.frameCount,
-//       y: p.frameCount * 1,
-//       stroke: '#111',
-//       weight: 23,
-//       mask: [0, 1, 3, 5],
-//     });
+let final = [
+  ...group1,
+  ...reflectX(group1, 6),
+  // borders
+  [0, 0, 12, 0],
+  [0, 3, 12, 3],
+  [0, 5, 12, 5],
+  [0, 8, 12, 8],
+  [0, 0, 0, 10],
+  [6, 0, 6, 10],
+];
 
-//     renderPattern(p, TINY_EXES_LINES_01, {
-//       x: p.frameCount,
-//       y: p.frameCount * 1,
-//       stroke: '#333',
-//       weight: 15,
-//       mask: [0, 1, 3, 5],
-//     });
+addCanvas((p) => {
+  const fillWithPattern = gridPattern({
+    width: 12,
+    height: 10,
+    scale: 20,
+    layers: [
+      {
+        color: '#222',
+        weight: 2,
+        segments: final,
+      },
+    ],
+  });
 
-//     renderPattern(p, TINY_EXES_LINES_01, {
-//       x: p.frameCount,
-//       y: p.frameCount * 1,
-//       stroke: '#fff',
-//       weight: 1,
-//       mask: [0, 1],
-//     });
+  p.setup = () => {
+    p.loopLength(30 * 8);
+  }
 
-//     renderPattern(p, TINY_EXES_LINES_01, {
-//       x: p.frameCount,
-//       y: p.frameCount * 1,
-//       stroke: 'tomato',
-//       weight: 1,
-//       mask: [3, 5],
-//     });
-//   };
-// });
+  p.draw = () => {
+    p.background('#eec');
+    let offsetX = p.loopFraction;
+    let offsetY = p.loopFraction;
+    fillWithPattern(p.canvas, offsetX, 0.55);
+  };
+});
