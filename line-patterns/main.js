@@ -1,33 +1,23 @@
 import p5 from 'p5';
+import p5Loop from '../shared/p5Loop.js';
+import addCanvas from '../shared/addP5Canvas.js';
 import gridPattern from './gridPattern.js';
 
-function addCanvas(fn, opt) {
-  opt = {
-    fps: 30,
-    width: 540,
-    height: 540,
-    rootId: 'app',
-    ...opt,
-  }
-  const c = document.createElement('div');
-  document.getElementById(opt.rootId).append(c);
-  new p5((p) => {
-    p.setup = () => {
-      p.createCanvas(opt.width, opt.height);
-      p.frameRate(opt.fps);
-    }
-    fn(p);
-  }, c);
-}
+p5Loop(p5);
 
 addCanvas((p) => {
-  let fillGridPattern = gridPattern({
-    scale: 6,
-  });
+  let fillGridPattern;
+  let loopLength = 30 * 3; // 2 seconds
+
+  p.setup = () => {
+    fillGridPattern = gridPattern({});
+    p.loopLength(loopLength);
+  }
+
   p.draw = () => {
     p.background('#0aa');
-    let offsetX = p.frameCount;
-    let offsetY = p.frameCount / 2;
+    let offsetX = p.loopFraction * 2;
+    let offsetY = p.loopFraction;
 
     p.push();
     p.beginClip();
@@ -36,12 +26,11 @@ addCanvas((p) => {
     fillGridPattern(p.canvas, -offsetX, -offsetY);
     p.pop();
 
-
     p.push();
     p.beginClip({ invert: true });
     p.circle(p.width / 2, p.height / 2, 400);
     p.endClip();
-    fillGridPattern(p.canvas, offsetY, offsetX);
+    fillGridPattern(p.canvas, offsetX, offsetY);
     p.pop();
   };
 });

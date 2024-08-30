@@ -1,7 +1,7 @@
 
 export default function gridPattern(opt) {
   opt = {
-    scale: 12,
+    scale: 8,
     width: 4,
     height: 4,
     render: (ctx, x1, y1, x2, y2, color = 'black', weight = 2) => {
@@ -39,21 +39,38 @@ export default function gridPattern(opt) {
 
   opt.layers.forEach((layer) => {
     layer.segments.forEach(([x1, y1, x2, y2]) => {
-      opt.render(ctx, x1 * scale, y1 * scale, x2 * scale, y2 * scale, layer.color, (layer.weight / 24 * scale) >> 0);
+      opt.render(
+        ctx,
+        x1 * scale,
+        y1 * scale,
+        x2 * scale,
+        y2 * scale,
+        layer.color,
+        (layer.weight / 24 * scale) >> 0)
+      ;
     });
   });
 
-  let pattern;
-
-  return function fillRect(targetCanvas, x = 0, y = 0, w, h) {
+  // targetCanvas = canvas to fill with the pattern
+  // x = nubmer between 0 and 1, indicating the FRACTION the pattern should be offset horizontally
+  // y = nubmer between 0 and 1, indicating the FRACTION the pattern should be offset vertically
+  return function fillRect(targetCanvas, x = 0, y = 0) {
     const targetCtx = targetCanvas.getContext("2d");
-    if (!pattern) pattern = targetCtx.createPattern(can, 'repeat');
-    targetCtx.fillStyle = pattern;
+    if (!targetCtx._patternCache) targetCtx._patternCache = new WeakMap();
+    if (!targetCtx._patternCache.get(can)) targetCtx._patternCache.set(can, targetCtx.createPattern(can, 'repeat'));
+    targetCtx.fillStyle = targetCtx._patternCache.get(can);
     targetCtx.save();
     let s = 1 / dpr;
+    x = x * width; // x is a fraction of the pattern width
+    y = y * height; // y is a fraction of the pattern height
     targetCtx.scale(s, s);
-    targetCtx.translate(x * dpr, x * dpr);
-    targetCtx.fillRect(-x * dpr, -x * dpr, targetCanvas.width * dpr, targetCanvas.height * dpr);
+    targetCtx.translate(x * dpr, y * dpr);
+    targetCtx.fillRect(
+      -x * dpr,
+      -y * dpr,
+      targetCanvas.width * dpr,
+      targetCanvas.height * dpr
+    );
     targetCtx.restore();
   }
 }
