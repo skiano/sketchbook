@@ -9,6 +9,10 @@ export default function p5Loop(p5) {
     this._loopLength = v;
   }
 
+  p5.prototype.getLoopLength = function() {
+    return this._loopLength;
+  }
+
   p5.prototype.loopFrame = function(v) {
     return (this.frameCount - 1) % this._loopLength;
   }

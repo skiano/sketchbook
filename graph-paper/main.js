@@ -1,9 +1,13 @@
 import p5 from 'p5';
 import p5Loop from '../shared/p5Loop.js';
+import p5Recorder from '../shared/p5Recorder.js';
 import addCanvas from '../shared/addP5Canvas.js';
 import gridPattern from './gridPattern.js';
 
 p5Loop(p5);
+p5Recorder(p5, {
+  recordLoop: { repeat: 1 },
+});
 
 addCanvas((p) => {
   let fillGridPattern;
@@ -26,6 +30,7 @@ addCanvas((p) => {
       ],
     });
     p.loopLength(loopLength);
+    // p.recordFrames(loopLength);
   }
 
   p.draw = () => {

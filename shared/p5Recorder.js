@@ -26,6 +26,8 @@ const downloadBlob = (blob, title) => {
 export default function p5Recorder(p5, opt) {
   opt = {
     fps: 30,
+    quality: 5,
+    recordLoop: null,
     ...opt,
   };
 
@@ -42,8 +44,28 @@ export default function p5Recorder(p5, opt) {
     this._recordFrame = true;
   }
 
+  p5.prototype.stopRecorder = async function(title = 'video') {
+    if (this._recorderStopped) return;
+
+    this._recordFrame = false;
+    this._recorderStopped = true;
+    await this._encoder.flush();
+    this._muxer.finalize();
+    let buffer = this._muxer.target.buffer;
+    downloadBlob(new Blob([buffer]), `${title}.mp4`);
+  }
+
+  p5.prototype.recordFrames = function(totalFrames) {
+    this._totalFramesToRecord = totalFrames;
+    this.startRecorder();
+  }
+
   // after setup create a muxer and a video encoder
   p5.prototype.registerMethod('afterSetup', function () {
+
+    // TODO: maybe I should wait to set this up when the recording starts??
+    // that way I can make multiple recordings without refreshing
+
     this.frameRate(opt.fps);
     this._videoFrame = 0;
     this._lastKeyFrame = -Infinity;
@@ -67,21 +89,40 @@ export default function p5Recorder(p5, opt) {
       codec: 'avc1.64802a', // maybe higher quality? (based on chat gpt)
       width: this.canvas.width,
       height: this.canvas.height,
-      bitrate: 1e6 * 3.5,
+      bitrate: 1e6 * opt.quality,
       // bitrate: 1e6 * 10,
     });
-    this.stopRecorder = async function(title = 'video') {
-      this._recorderStopped = true;
-      await this._encoder.flush();
-      this._muxer.finalize();
-      let buffer = this._muxer.target.buffer;
-      downloadBlob(new Blob([buffer]), `${title}.mp4`);
+
+    if (opt.recordLoop) {
+
+      // TODO maybe set this up per sketch instead of at installation
+      // AND... make it wait for the beginning of the loop
+      // AND... add some indication on the screen that recording is happening
+      opt.recordLoop = {
+        key: 'l',
+        repeat: 1,
+        ...opt.recordLoop,
+      }
+      this.canvas.addEventListener('keyup', (evt) => {
+        if (evt.key === opt.recordLoop.key && this.getLoopLength() && !this._recordFrame) {
+          console.log('Start recording...', this.getLoopLength() * opt.recordLoop.repeat)
+          this.recordFrames(this.getLoopLength() * opt.recordLoop.repeat);
+        }
+      });
+      this.canvas.setAttribute('tabindex', 1);
+      this.canvas.focus();
     }
   });
 
   // After each draw, render frame(s)
   p5.prototype.registerMethod('post', function() {
+    if (this._videoFrame === this._totalFramesToRecord) {
+      this.stopRecorder();
+      return;
+    }
     if (this._recorderStopped || !this._recordFrame) return;
+
+    
 
     let frame = new VideoFrame(this.canvas, {
       timestamp: this._videoFrame * 1e6 / opt.fps, // Ensure equally-spaced frames every 1/30th of a second
