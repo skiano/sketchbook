@@ -1,9 +1,14 @@
 
+// gridPattern() creates a repeating pattern
+// drawn on a grid like "graph paper"
+// the pattern is defined as a set of layers,
+// drawn one after the other
+// where each layer has a color and a line weight along with a list
+// of line segments to draw on the graph paper (integers represent points on the graph paper)
+// the default renderer draws a line for each of the points with a round line cap, respecting the fill color
+
 export default function gridPattern(opt) {
   opt = {
-    scale: 8,
-    width: 4,
-    height: 4,
     render: (ctx, x1, y1, x2, y2, color = 'black', weight = 2) => {
       ctx.strokeStyle = color;
       ctx.lineWidth = weight;
@@ -13,12 +18,16 @@ export default function gridPattern(opt) {
       ctx.lineTo(x2, y2);
       ctx.stroke();
     },
+    scale: 8,
+    width: 4,
+    height: 4,
     layers: [
-      // { color: '#eee', weight: 5, segments: [[2, 0, 2, 4], [0, 2, 4, 2]] },
+      { color: '#eee', weight: 5, segments: [[2, 0, 2, 4], [0, 2, 4, 2]] },
       { color: 'red', weight: 8, segments: [[1, 1, 3, 3], [3, 1, 1, 3]] },
     ],
     ...opt,
   }
+
   const dpr = window.devicePixelRatio || 1;
   const can = document.createElement('canvas');
   const ctx = can.getContext("2d");
@@ -34,8 +43,8 @@ export default function gridPattern(opt) {
 
   // TODO:
   // translate to stamp out nine
-  // in case edges need to be perfect
   // then crop...? or can i just draw off screen??
+  // to prevent edges from lookning bad
 
   opt.layers.forEach((layer) => {
     layer.segments.forEach(([x1, y1, x2, y2]) => {
