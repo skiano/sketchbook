@@ -52,7 +52,7 @@ export default function p5Recorder(p5, opt) {
     await this._encoder.flush();
     this._muxer.finalize();
     let buffer = this._muxer.target.buffer;
-    downloadBlob(new Blob([buffer]), `${title}.mp4`);
+    downloadBlob(new Blob([buffer]), `${opt.title || title}.mp4`);
   }
 
   p5.prototype.recordFrames = function(totalFrames) {

@@ -41,23 +41,33 @@ export default function gridPattern(opt) {
   can.width = width;
   can.height = height;
 
-  // TODO:
-  // translate to stamp out nine
-  // then crop...? or can i just draw off screen??
-  // to prevent edges from lookning bad
-
+  
+  // the pattern is rendered nine times
+  // so that bits going over the edge work correctly
+  // TODO: make buffer size optionally controlled???
   opt.layers.forEach((layer) => {
-    layer.segments.forEach(([x1, y1, x2, y2]) => {
-      opt.render(
-        ctx,
-        x1 * scale,
-        y1 * scale,
-        x2 * scale,
-        y2 * scale,
-        layer.color,
-        (layer.weight / 24 * scale) >> 0)
-      ;
-    });
+    // looping each layer because overlaps cause problems otherwise...
+    ctx.save();
+    ctx.translate(-width, -height);
+    for (let px = 0; px < 3; px += 1) {
+      for (let py = 0; py < 3; py += 1) {
+        layer.segments.forEach(([x1, y1, x2, y2]) => {
+          opt.render(
+            ctx,
+            x1 * scale,
+            y1 * scale,
+            x2 * scale,
+            y2 * scale,
+            layer.color,
+            (layer.weight / 24 * scale) >> 0)
+          ;
+        });
+        ctx.translate(0, height);
+      }
+      ctx.translate(width, 0);
+      ctx.translate(0, -height * 3);
+    }
+    ctx.restore();
   });
 
   // targetCanvas = canvas to fill with the pattern
