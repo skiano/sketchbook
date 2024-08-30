@@ -188,7 +188,7 @@ addCanvas((p) => {
   const fillWithPattern = gridPattern({
     width: 12,
     height: 10,
-    scale: 20,
+    scale: 40,
     layers: [
       {
         color: '#eea',
@@ -204,13 +204,13 @@ addCanvas((p) => {
   });
 
   p.setup = () => {
-    p.loopLength(30 * 8);
+    p.loopLength(30 * 16);
   }
 
   p.draw = () => {
     p.background('#001');
     let offsetX = p.loopFraction;
     let offsetY = p.loopFraction;
-    fillWithPattern(p.canvas, offsetX, 0.55);
+    fillWithPattern(p.canvas, offsetX, offsetY * 2);
   };
 });
