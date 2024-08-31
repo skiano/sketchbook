@@ -11,12 +11,12 @@ addP5Canvas((p) => {
     centerX: 0,
     centerY: 0,
     segments: [
-      [1, 1, 3, 3],
-      [3, 1, 1, 3],
+      // [1, 1, 3, 3],
+      // [3, 1, 1, 3],
     ],
-    pendingSegment: [],
-    width: 4,
-    height: 6,
+    pendingSegment: null,
+    width: 5,
+    height: 5,
     unit: 24,
   };
 
@@ -36,7 +36,23 @@ addP5Canvas((p) => {
   });
 
   p.mousePressed = () => {
-    // TODO: drawing...
+    if (p.mouseX < 0 || p.mouseX > p.width || p.mouseY < 0 || p.mouseY > p.height) {
+      return;
+    }
+
+    if (!state.pendingSegment) {
+      state.pendingSegment = [p.patternX, p.patternY].map(v => p.round(v * 2, 0) / 2);
+    } else {
+      state.segments = [
+        ...state.segments,
+        [
+          ...state.pendingSegment,
+          p.patternX,
+          p.patternY
+        ].map(v => p.round(v * 2, 0) / 2)
+      ];
+      state.pendingSegment = null;
+    }
   }
 
   p.setup = () => {
@@ -51,7 +67,8 @@ addP5Canvas((p) => {
 
   p.draw = () => {
     Object.entries(render).forEach(([key, value]) => {
-      render[key] = p.lerp(value, state[key], 0.3);
+      if (p.abs(value - state[key]) < 0.001) render[key] = state[key];
+      else render[key] = p.lerp(value, state[key], 0.3);
     });
 
     let renderWidth = state.width * state.unit * render.zoom;
@@ -64,8 +81,10 @@ addP5Canvas((p) => {
     let yMax = p.ceil(((p.height + (renderHeight / 2)) / 2) / renderHeight) * state.height;
 
     // set the "patternX" and "patternY" to make interactions easier
-    p.patternX = toLoopNumber((p.mouseX - render.centerX + shiftX) / render.zoom, state.width * state.unit) / state.unit;
-    p.patternY = toLoopNumber((p.mouseY - render.centerY + shiftY) / render.zoom, state.height * state.unit) / state.unit;
+    // p.patternX = toLoopNumber((p.mouseX - render.centerX + shiftX) / render.zoom, state.width * state.unit) / state.unit;
+    // p.patternY = toLoopNumber((p.mouseY - render.centerY + shiftY) / render.zoom, state.height * state.unit) / state.unit;
+    p.patternX = ((p.mouseX - render.centerX + shiftX) / render.zoom) / state.unit;
+    p.patternY = ((p.mouseY - render.centerY + shiftY) / render.zoom) / state.unit;
 
     // START RENDERING
 
@@ -132,16 +151,40 @@ addP5Canvas((p) => {
       for (let y = yt; y <= yb; y += 1) {
         let ox = x * w;
         let oy = y * h;
-        p.push();
-        p.fill('#fda');
-        p.noStroke();
-        p.strokeWeight(lineWeight / render.zoom);
-        p.circle(p.patternX * state.unit + ox, p.patternY * state.unit + oy, dotSize / render.zoom)
-        p.textSize(14 / render.zoom)
-        p.textAlign(p.CENTER, p.CENTER)
-        p.text(p.patternX.toFixed(2), p.patternX * state.unit + ox, p.patternY * state.unit + oy - (15 / render.zoom))
-        p.text(p.patternY.toFixed(2), p.patternX * state.unit + ox, p.patternY * state.unit + oy + (15 / render.zoom))
-        p.noFill();
+        let rx = p.patternX * state.unit + ox;
+        let ry = p.patternY * state.unit + oy;
+
+        // p.push();
+        // p.fill('#977');
+        // p.noStroke();
+        // p.circle(
+        //   p.round(p.patternX * 2) / 2 * state.unit + ox,
+        //   p.round(p.patternY * 2) / 2 * state.unit + oy,
+        //   dotSize * 2 / render.zoom
+        // )
+        // p.pop();
+
+        if (state.pendingSegment) {
+          p.push();
+          p.stroke('#fda');
+          p.strokeWeight(lineWeight / render.zoom);
+          p.noFill();
+          p.line(
+            state.pendingSegment[0] * state.unit + ox,
+            state.pendingSegment[1] * state.unit + oy,
+            rx,
+            ry
+          );
+          // p.fill('#fda');
+          // p.noStroke();
+          // p.strokeWeight(lineWeight / render.zoom);
+          // p.circle(p.patternX * state.unit + ox, p.patternY * state.unit + oy, dotSize / render.zoom)
+          // p.textSize(14 / render.zoom)
+          // p.textAlign(p.CENTER, p.CENTER)
+          // p.text(p.patternX.toFixed(2), p.patternX * state.unit + ox, p.patternY * state.unit + oy - (15 / render.zoom))
+          // p.text(p.patternY.toFixed(2), p.patternX * state.unit + ox, p.patternY * state.unit + oy + (15 / render.zoom))
+          p.noFill();
+        }
       }
     }
 
