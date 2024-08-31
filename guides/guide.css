@@ -1,0 +1,42 @@
+html {
+  background: rgb(240, 245, 245);
+  color: rgb(37, 0, 14);
+}
+
+#app {
+  margin: 40px auto;
+  max-width: 700px;
+  padding: 12px;
+  font-size: 17px;
+  line-height: 25px;
+  word-spacing: -0.035em;
+}
+
+a {
+  color: magenta;
+  -webkit-font-smoothing: initial;
+  -moz-osx-font-smoothing: initial;
+}
+
+h1 {
+  font-size: 28px;
+  line-height: 32px;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+p + p {
+  margin-top: 12.5px;
+}
+
+p > strong {
+  font-weight: bold;
+}
+
+p > em {
+  font-style: italic;
+}
+
+.example-wrap {
+  margin: 24px 0;
+}
