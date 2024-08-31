@@ -45,14 +45,15 @@ p > em {
 
 pre {
   font-family: Consolas, monospace;
-  font-size: 14px;
-  line-height: 19px;
+  /* font-weight: bold; */
+  font-size: 13px;
+  line-height: 18px;
+  word-spacing: 0;
+  letter-spacing: 0;
 }
 
 code.hljs {
-  background: #fff;
-  padding: 14px;
-  border-radius: 5px;
+  padding: 20px !important;
   margin: 24px 0;
   overflow-x: auto;
 }

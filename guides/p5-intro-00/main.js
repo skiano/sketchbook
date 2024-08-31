@@ -19,6 +19,8 @@ addP5Example((p) => {
 });
 
 addCodeExample(`
+// and here is a comment...
+
 function setup() {
   createCanvas(540, 540);
   background('white');
