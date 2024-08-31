@@ -1,5 +1,9 @@
 import addP5Canvas from '../shared/addP5Canvas.js';
 
+function toLoopNumber(x, loopLength) {
+  return x >= 0 ? x % loopLength : x % loopLength + loopLength;
+}
+
 addP5Canvas((p) => {
   const render = {};
   const state = {
@@ -7,12 +11,12 @@ addP5Canvas((p) => {
     centerX: 0,
     centerY: 0,
     segments: [
-      [0, 0, 1, 1],
-      [2, 0, 0, 2],
+      [1, 1, 3, 3],
+      [3, 1, 1, 3],
     ],
     pendingSegment: [],
     width: 4,
-    height: 4,
+    height: 6,
     unit: 24,
   };
 
@@ -30,6 +34,10 @@ addP5Canvas((p) => {
   zoomOut.mousePressed(() => {
     state.zoom = state.zoom / zoomFactor;
   });
+
+  p.mousePressed = () => {
+    // TODO: drawing...
+  }
 
   p.setup = () => {
     state.centerX = p.width / 2;
@@ -55,8 +63,17 @@ addP5Canvas((p) => {
     let yMin = p.ceil(((p.height - (renderHeight / 2)) / 2) / renderHeight) * -state.height;
     let yMax = p.ceil(((p.height + (renderHeight / 2)) / 2) / renderHeight) * state.height;
 
+    // set the "patternX" and "patternY" to make interactions easier
+    p.patternX = toLoopNumber((p.mouseX - render.centerX + shiftX) / render.zoom, state.width * state.unit) / state.unit;
+    p.patternY = toLoopNumber((p.mouseY - render.centerY + shiftY) / render.zoom, state.height * state.unit) / state.unit;
+
+    // START RENDERING
+
     p.background('#1a000f');
+
     p.push();
+    
+    // manipulate the render context
     p.translate(render.centerX - shiftX, render.centerY - shiftY);
     p.scale(render.zoom);
 
@@ -107,6 +124,24 @@ addP5Canvas((p) => {
           )
         });
         p.pop();
+      }
+    }
+
+    // repeat interaction...
+    for (let x = xl; x <= xr; x += 1) {
+      for (let y = yt; y <= yb; y += 1) {
+        let ox = x * w;
+        let oy = y * h;
+        p.push();
+        p.fill('#fda');
+        p.noStroke();
+        p.strokeWeight(lineWeight / render.zoom);
+        p.circle(p.patternX * state.unit + ox, p.patternY * state.unit + oy, dotSize / render.zoom)
+        p.textSize(14 / render.zoom)
+        p.textAlign(p.CENTER, p.CENTER)
+        p.text(p.patternX.toFixed(2), p.patternX * state.unit + ox, p.patternY * state.unit + oy - (15 / render.zoom))
+        p.text(p.patternY.toFixed(2), p.patternX * state.unit + ox, p.patternY * state.unit + oy + (15 / render.zoom))
+        p.noFill();
       }
     }
 
