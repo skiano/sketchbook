@@ -20,3 +20,20 @@ addCanvas((p) => {
   height: 32,
   background: 'transparent',
 });
+
+addCanvas((p) => {
+  p.draw = () => {
+    p.rectMode(p.CENTER);
+    p.noStroke();
+    p.fill('magenta');
+    p.rect(p.width / 2, p.height / 2, 180, 180, 8);
+    p.textAlign(p.CENTER, p.CENTER);
+    p.textSize(128);
+    p.text('📓', p.width / 2 - 0.5, p.height / 2 + 8.5);
+    p.noLoop();
+  }
+}, {
+  width: 180,
+  height: 180,
+  background: 'transparent',
+});

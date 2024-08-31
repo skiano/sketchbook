@@ -61,7 +61,7 @@ export function addP5Example(fn, opt) {
   c.style.position = 'relative';
   c.style.paddingBottom = `${opt.ratio * 100}%`;
   c.style.background = '#eee';
-  c.style.border = '1px solid #ccc';
+  c.style.border = '3px solid #a99';
   c.style.overflow = 'hidden';
   document.getElementById(opt.rootId).append(c);
 

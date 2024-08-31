@@ -1,6 +1,8 @@
 html {
   background: rgb(240, 245, 245);
   color: rgb(37, 0, 14);
+  -webkit-font-smoothing: initial;
+  -moz-osx-font-smoothing: initial;
 }
 
 #app {
