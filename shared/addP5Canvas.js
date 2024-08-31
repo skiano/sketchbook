@@ -12,7 +12,7 @@ p5.prototype.registerMethod('beforeSetup', function () {
 
 export default function addCanvas(fn, opt) {
   opt = {
-    fps: 15,
+    fps: 30,
     width: 540,
     height: 540,
     rootId: 'app',

@@ -110,7 +110,7 @@ export default function p5Recorder(p5, opt) {
         }
       });
       this.canvas.setAttribute('tabindex', 1);
-      this.canvas.focus();
+      // this.canvas.focus();
     }
   });
 
