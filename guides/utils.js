@@ -87,8 +87,8 @@ export function addP5Example(fn, opt) {
     height: 540,
     ratio: 9 / 16,
     rootId: 'app',
-    background: '#eee',
-    prompt: 'Click me.',
+    background: '#e6e6e6',
+    prompt: 'Click to try!',
     ...opt,
   }
   const c = document.createElement('div');
@@ -97,8 +97,7 @@ export function addP5Example(fn, opt) {
   c.style.height = `0px`;
   c.style.position = 'relative';
   c.style.paddingBottom = `${opt.ratio * 100}%`;
-  c.style.background = '#eee';
-  c.style.border = '3px solid #a99';
+  c.style.background = opt.background;
   c.style.overflow = 'hidden';
   document.getElementById(opt.rootId).append(c);
 
