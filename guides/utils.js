@@ -1,5 +1,6 @@
 import p5 from 'p5';
 import { marked } from 'marked';
+import hljs from 'highlightjs';
 
 export function addMarkdown(md) {
   // TODO: will i need to import dedent to fix these strings?
@@ -21,6 +22,13 @@ export function addHeader(opt) {
   addMarkdown(`
     # ${opt.title}
   `);
+}
+
+export function addCodeExample(code) {
+  const sect = document.createElement('section');
+  sect.innerHTML = `<pre class="language-javascript"><code>${code.trim().replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/,"")}</code></pre>`;
+  hljs.highlightElement(sect.children[0].children[0]);
+  document.getElementById('app').append(sect);
 }
 
 //////////////////////////////////////////////

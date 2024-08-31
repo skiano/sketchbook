@@ -42,3 +42,17 @@ p > em {
 .example-wrap {
   margin: 24px 0;
 }
+
+pre {
+  font-family: Consolas, monospace;
+  font-size: 14px;
+  line-height: 19px;
+}
+
+code.hljs {
+  background: #fff;
+  padding: 14px;
+  border-radius: 5px;
+  margin: 24px 0;
+  overflow-x: auto;
+}
