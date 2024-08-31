@@ -35,6 +35,7 @@ p5.prototype.registerMethod('beforeSetup', function () {
 
   this.setup = function () {
     this._standardSetup();
+    this._hand = this.loadImage('../../images/cursor.png');
     if (userSetup) userSetup();
   }
 
@@ -42,6 +43,41 @@ p5.prototype.registerMethod('beforeSetup', function () {
     this.resizeCanvas(this._wrapper.offsetWidth, this._wrapper.offsetHeight);
     if (userResize) userResize();
   }
+});
+
+p5.prototype.registerMethod('post', function () {
+  if (this._hasBeenPressed) return;
+
+  if (this.mouseIsPressed) {
+    this.clear();
+    this._hasBeenPressed = true;
+    return;
+  }
+
+  let ctx = this;
+  ctx.push();
+  ctx.fill('#fff');
+  ctx.stroke('#aaa');
+  ctx.strokeWeight(2);
+  ctx.rectMode(ctx.CENTER);
+  ctx.rect(ctx.width / 2, ctx.height / 2, 150, 150, 7);
+  ctx.noStroke();
+  ctx.fill('#666');
+  ctx.textSize(14);
+  ctx.textStyle(ctx.BOLD);
+  ctx.textAlign(ctx.CENTER, ctx.CENTER);
+  ctx.text(this._prompt || 'Play!', ctx.width / 2, ctx.height / 2 + 28)
+  if (this._hand.width) {
+    ctx.imageMode(ctx.CENTER);
+    ctx.image(
+      this._hand,
+      ctx.width / 2,
+      ctx.height / 2 - 12 + (ctx.sin(ctx.frameCount / 10) * 5),
+      32,
+      32
+    )
+  }
+  ctx.pop();
 });
 
 export function addP5Example(fn, opt) {
@@ -52,6 +88,7 @@ export function addP5Example(fn, opt) {
     ratio: 9 / 16,
     rootId: 'app',
     background: '#eee',
+    prompt: 'Click me.',
     ...opt,
   }
   const c = document.createElement('div');
@@ -67,6 +104,7 @@ export function addP5Example(fn, opt) {
 
   new p5((p) => {
     p._standardSetup = () => {
+      p._prompt = opt.prompt;
       p._wrapper = c;
       p.createCanvas(c.offsetWidth, c.offsetHeight);
       p.frameRate(opt.fps);
@@ -77,7 +115,6 @@ export function addP5Example(fn, opt) {
       p.canvas.style.right = '0';
       p.canvas.style.bottom = '0';
     }
-
     fn(p);
   }, c);
 }
