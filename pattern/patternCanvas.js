@@ -128,7 +128,7 @@ export default function patternCanvas(opt) {
   const pattern = createPattern(ctx);
 
   function drawGrid() {
-    ctx.lineWidth = 2 / view.zoom;
+    ctx.lineWidth = 3 / view.zoom;
     ctx.strokeStyle = 'rgba(0, 100, 255, 0.5)';
     ctx.beginPath();
     pattern.eachCol((ox) => {
@@ -138,6 +138,24 @@ export default function patternCanvas(opt) {
     pattern.eachRow((oy) => {
       ctx.moveTo(pattern.viewLeft, oy);
       ctx.lineTo(pattern.viewRight, oy);
+    });
+    ctx.stroke();
+
+    ctx.lineWidth = 1 / view.zoom;
+    ctx.strokeStyle = 'rgba(0, 100, 255, 0.5)';
+    ctx.beginPath();
+    pattern.eachCol((ox) => {
+      for (let i = 1; i < opt.width; i += 1) {
+        ctx.moveTo(ox + i * opt.unit, pattern.viewTop);
+        ctx.lineTo(ox + i * opt.unit, pattern.viewBottom);
+      }
+    });
+    pattern.eachRow((oy) => {
+      for (let i = 1; i < opt.height; i += 1) {
+        ctx.moveTo(pattern.viewLeft, oy + i * opt.unit);
+        ctx.lineTo(pattern.viewRight, oy + i * opt.unit);
+      }
+      
     });
     ctx.stroke();
   }
