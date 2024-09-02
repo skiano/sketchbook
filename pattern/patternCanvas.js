@@ -29,7 +29,7 @@ function smoothState(initialState) {
             if (Math.abs(idealValues[p] - target[p]) < 0.005) {
               target[p] = idealValues[p];
             } else {
-              target[p] = target[p] + ((idealValues[p] - target[p]) * 0.3);
+              target[p] = target[p] + ((idealValues[p] - target[p]) * 0.2);
             }
           }
         }
@@ -86,6 +86,20 @@ function createPattern(ctx) {
     const [x1, x2] = getRepeatRange(pattern.width, topLeft.x, bottomRight.x);
     const [y1, y2] = getRepeatRange(pattern.height, topLeft.y, bottomRight.y);
     pattern.repeat = [x1, y1, x2, y2];
+
+    pattern.eachRow = (fn) => {
+      let oy = pattern.height / -2;
+      for (let ry = pattern.repeat[1]; ry <= pattern.repeat[3]; ry += 1) {
+        fn(ry * pattern.height + oy);
+      }
+    }
+
+    pattern.eachCol = (fn) => {
+      let ox = pattern.width / -2;
+      for (let rx = pattern.repeat[0]; rx <= pattern.repeat[2]; rx += 1) {
+        fn(rx * pattern.width + ox);
+      }
+    }
   }
 
   return pattern;
@@ -114,39 +128,17 @@ export default function patternCanvas(opt) {
   const pattern = createPattern(ctx);
 
   function drawGrid() {
-    // ctx.fillStyle = 'blue';
-    // ctx.font = "32px serif";
-    // ctx.fillText("(0,0)", 0, 0);
-    // drawCircle(ctx, 0, 0, 3);
-    // ctx.fillText("(-200,0)", -200, 0);
-    // drawCircle(ctx, -200, 0, 3);
-    // ctx.fillText("(100,100)", 100, 100);
-    // drawCircle(ctx, 100, 100, 3);
-
-    // ctx.font = "30px serif";
-    // ctx.fillText(ctx.pattern.viewLeft.toFixed(0), -70, -40);
-    // ctx.fillText(ctx.pattern.viewRight.toFixed(0), 70, -40);
-    // ctx.fillText(ctx.pattern.viewTop.toFixed(0), -70, 40);
-    // ctx.fillText(ctx.pattern.viewBottom.toFixed(0), 70, 40);
-    // ctx.fillText(ctx.pattern.cursorX.toFixed(0), 0, 140);
-
     ctx.lineWidth = 2 / view.zoom;
     ctx.strokeStyle = 'rgba(0, 100, 255, 0.5)';
     ctx.beginPath();
-
-    let ox = pattern.width / -2;
-    let oy = pattern.height / -2;
-
-    for (let rx = pattern.repeat[0]; rx <= pattern.repeat[2]; rx += 1) {
-      ctx.moveTo(rx * pattern.width + ox, pattern.viewTop);
-      ctx.lineTo(rx * pattern.width + ox, pattern.viewBottom);
-    }
-
-    for (let ry = pattern.repeat[1]; ry <= pattern.repeat[3]; ry += 1) {
-      ctx.moveTo(pattern.viewLeft, ry * pattern.height + oy);
-      ctx.lineTo(pattern.viewRight, ry * pattern.height + oy);
-    }
-
+    pattern.eachCol((ox) => {
+      ctx.moveTo(ox, pattern.viewTop);
+      ctx.lineTo(ox, pattern.viewBottom);
+    });
+    pattern.eachRow((oy) => {
+      ctx.moveTo(pattern.viewLeft, oy);
+      ctx.lineTo(pattern.viewRight, oy);
+    });
     ctx.stroke();
   }
 
@@ -156,7 +148,7 @@ export default function patternCanvas(opt) {
     if (!canvas.getAttribute('pattern-ready')) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
-    ctx.translate((canvas.width / 2), (canvas.height / 2)); // TODO: deal with shift...
+    ctx.translate((canvas.width / 2) + view.x, (canvas.height / 2) + view.y);
     ctx.scale(view.zoom, view.zoom);
     pattern.update(opt);
     drawGrid();
@@ -168,6 +160,27 @@ export default function patternCanvas(opt) {
   // test interactions...
   canvas.addEventListener('click', (evt) => {
     view.zoom = evt.altKey ? view.zoom / 1.3 : view.zoom * 1.3;
+  });
+
+  // TODO: think about how focus would work if there were multiple
+  // i.e. maybe dont do this...
+  window.addEventListener('keydown', (evt) => {
+    switch (evt.code) {
+      case 'ArrowRight':
+        view.x = view.x + 30;
+        break;
+      case 'ArrowLeft':
+        view.x = view.x - 30;
+        break;
+      case 'ArrowUp':
+        view.y = view.y - 30;
+        break;
+      case 'ArrowDown':
+        view.y = view.y + 30;
+        break;
+      default:
+        console.log(evt.code);   
+    }
   });
 
   // Insert into the DOM, and observe size...
