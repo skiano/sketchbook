@@ -15,8 +15,8 @@ addP5Canvas((p) => {
       // [3, 1, 1, 3],
     ],
     pendingSegment: null,
-    width: 5,
-    height: 5,
+    width: 3,
+    height: 3,
     unit: 24,
   };
 

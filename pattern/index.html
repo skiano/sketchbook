@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="../images/sketchbook-favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skiano | Pattern Base</title>
+    <link rel="stylesheet" href="../shared/reset.css">
+    <link rel="stylesheet" href="../shared/base.css">
+    <style>
+      #app {
+        /* width: 100vw; */
+        /* height: 100vh; */
+        background: #edf289;
+        position: fixed;
+        top: 100px;
+        left: 100px;
+        right: 100px;
+        bottom: 100px;
+      }
+    </style>
+  </head>
+  <body class="center-body-content">
+    <div id="app"></div>
+    <script type="importmap">
+      {}
+    </script>
+    <script type="module">
+      import patternCanvas from './patterncanvas.js';
+      patternCanvas({
+        root: document.getElementById('app'),
+      });
+    </script>
+  </body>
+</html>
