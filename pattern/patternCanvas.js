@@ -60,7 +60,7 @@ function smoothState(initialState) {
   });
 }
 
-function createLayers(pattern, initial = []) {
+function createLayers(pattern, initial) {
   let currentLayer;
   let currentSegment;
   const layers = [];
@@ -136,9 +136,13 @@ function createLayers(pattern, initial = []) {
     }
   };
   
-  initial.forEach((layer) => {
-    api.addLayer(layer, layer.segments);
-  });
+  if (initial && initial.length) {
+    initial.forEach((layer) => {
+      api.addLayer(layer, layer.segments);
+    });
+  } else {
+    api.addLayer();
+  }
   return api;
 }
 
@@ -216,24 +220,25 @@ export default function patternCanvas(opt) {
     width: 4,
     height: 4,
     root: null,
+    showGrid: true,
     view: { x: 0, y: 0, zoom: 1 },
-    layers: [
-      {
-        color: 'red',
-        weight: 2,
-        segments: [
-          // [0, 4, 4, 0],
-          [0, 0, 4, 4],
-        ]
-      },
-      {
-        color: '#333',
-        weight: 6,
-        segments: [
-          [2, 1, 2, 3],
-        ]
-      }
-    ],
+    // layers: [
+    //   // {
+    //   //   color: 'red',
+    //   //   weight: 2,
+    //   //   segments: [
+    //   //     // [0, 4, 4, 0],
+    //   //     [0, 0, 4, 4],
+    //   //   ]
+    //   // },
+    //   // {
+    //   //   color: '#333',
+    //   //   weight: 6,
+    //   //   segments: [
+    //   //     [2, 1, 2, 3],
+    //   //   ]
+    //   // }
+    // ],
     ...opt,
   };
 
@@ -336,7 +341,7 @@ export default function patternCanvas(opt) {
     ctx.translate((canvas.width / 2) + view.x, (canvas.height / 2) + view.y);
     ctx.scale(view.zoom, view.zoom);
     pattern.update(opt);
-    drawGrid();
+    if (opt.showGrid) drawGrid();
     drawLayers();
     drawCursor();
     ctx.restore();
@@ -371,6 +376,9 @@ export default function patternCanvas(opt) {
   // i.e. maybe dont do this...
   window.addEventListener('keydown', (evt) => {
     switch (evt.code) {
+      case 'KeyG':
+        opt.showGrid = !opt.showGrid;
+        break;
       case 'ArrowRight':
         view.x = view.x + 30;
         break;
