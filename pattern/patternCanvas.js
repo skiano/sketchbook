@@ -73,15 +73,17 @@ function createLayers(pattern, initial = []) {
     }
   };
 
-  api.addLayer = (spec) => {
+  api.addLayer = (spec, segments = []) => {
     const x = layers.push({
-      color: '#000',
-      weight: 5,
+      color: `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`,
+      weight: 1 + (Math.random() * 6) >> 0,
       lineCap: 'round',
       ...spec,
       segments: []
     });
     currentLayer = x - 1;
+    segments.forEach(api.addSegment);
+    if (!layers[currentLayer].segments.length) api.addSegment();
   };
 
   api.deleteLayer = (idx) => {
@@ -135,8 +137,7 @@ function createLayers(pattern, initial = []) {
   };
   
   initial.forEach((layer) => {
-    api.addLayer(layer);
-    layer.segments.forEach(api.addSegment);
+    api.addLayer(layer, layer.segments);
   });
   return api;
 }
@@ -398,6 +399,11 @@ export default function patternCanvas(opt) {
         if (evt.metaKey) layers.deleteLayer();
         else layers.deletePoint();
         break;
+      case 'KeyL':
+        if (evt.metaKey) {
+          layers.addLayer();
+          evt.preventDefault();
+        }
       default:
         // console.log(evt.code);
     }
