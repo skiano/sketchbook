@@ -11,8 +11,8 @@ const resizeObserver = new ResizeObserver((entries) => {
     canvas.setAttribute('pattern-ready', true);
     canvas.style.width = `${entry.contentBoxSize[0].inlineSize}px`;
     canvas.style.height = `${entry.contentBoxSize[0].blockSize}px`;
-    canvas.width = entry.devicePixelContentBoxSize[0].inlineSize;
-    canvas.height = entry.devicePixelContentBoxSize[0].blockSize;
+    canvas.width = canvas.style.width * DPR;
+    canvas.height = canvas.style.height * DPR;
   }
 });
 
