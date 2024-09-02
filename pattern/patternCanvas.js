@@ -195,10 +195,21 @@ export default function patternCanvas(opt) {
     });
   }
 
+  let initialized;
+
   // The animation loop...
   function draw() {
     requestAnimationFrame(draw);
     if (!canvas.getAttribute('pattern-ready')) return;
+
+    if (!initialized) {
+      view.zoom = Math.min(
+        canvas.width / (opt.unit * opt.width) / 3,
+        canvas.height / (opt.unit * opt.height) / 3,
+      );
+      initialized = true;
+    }
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.translate((canvas.width / 2) + view.x, (canvas.height / 2) + view.y);
