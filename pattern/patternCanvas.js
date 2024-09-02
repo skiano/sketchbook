@@ -82,7 +82,6 @@ function createPattern(ctx) {
     //   3) the size of the pattern repeat
     //   4) the bounding box of the drawing in the pattern
     //   5) the main preview pattern should be centered on the origin
-
     const [x1, x2] = getRepeatRange(pattern.width, topLeft.x, bottomRight.x);
     const [y1, y2] = getRepeatRange(pattern.height, topLeft.y, bottomRight.y);
     pattern.repeat = [x1, y1, x2, y2];
@@ -101,7 +100,6 @@ function createPattern(ctx) {
       }
     }
   }
-
   return pattern;
 }
 
@@ -112,6 +110,24 @@ export default function patternCanvas(opt) {
     height: 4,
     root: null,
     view: { x: 0, y: 0, zoom: 1 },
+    layers: [
+      {
+        color: 'red',
+        weight: 2,
+        segments: [
+          [0, 4, 4, 0],
+          [0, 0, 4, 4],
+        ]
+      },
+      {
+        color: '#333',
+        weight: 6,
+        segments: [
+          [1, 1, 1, 3],
+          [3, 1, 3, 3],
+        ]
+      }
+    ],
     ...opt,
   };
 
@@ -160,6 +176,25 @@ export default function patternCanvas(opt) {
     ctx.stroke();
   }
 
+  function drawLayers() {
+    opt.layers.forEach((layer) => {
+      // ctx.lineWidth = 6 / view.zoom;
+      ctx.lineWidth = layer.weight || 1;
+      ctx.lineCap = layer.lineCap || 'round';
+      ctx.strokeStyle = layer.color || '#red';
+      ctx.beginPath();
+      pattern.eachCol((ox) => {
+        pattern.eachRow((oy) => {
+          layer.segments.forEach((seg) => {
+            ctx.moveTo(ox + seg[0] * opt.unit, oy + seg[1] * opt.unit);
+            ctx.lineTo(ox + seg[2] * opt.unit, oy + seg[3] * opt.unit);
+          });
+        });
+      });
+      ctx.stroke();
+    });
+  }
+
   // The animation loop...
   function draw() {
     requestAnimationFrame(draw);
@@ -170,6 +205,7 @@ export default function patternCanvas(opt) {
     ctx.scale(view.zoom, view.zoom);
     pattern.update(opt);
     drawGrid();
+    drawLayers();
     ctx.restore();
     view.update();
   }
