@@ -1,4 +1,8 @@
 const DPR = window.devicePixelRatio;
+const MOUSE = {};
+const updateMouse = (evt) => { MOUSE.x = evt.pageX; MOUSE.y = evt.pageY; };
+document.addEventListener('mousemove', updateMouse);
+document.addEventListener('mousedown', updateMouse);
 
 // Keep canvases size up to date
 const resizeObserver = new ResizeObserver((entries) => {
@@ -39,22 +43,23 @@ function smoothState(initialState) {
   });
 }
 
-const MOUSE = {};
-const updateMouse = (evt) => { MOUSE.x = evt.pageX; MOUSE.y = evt.pageY; };
-document.addEventListener('mousemove', updateMouse);
-document.addEventListener('mousedown', updateMouse);
-
 function addPatternInfo(ctx) {
   // TODO: consider a caching strategy for getBoundingClientRect
   const rect = ctx.canvas.getBoundingClientRect();
   const canvasCursor = new DOMPoint((MOUSE.x - rect.left) * DPR, (MOUSE.y - rect.top) * DPR);
   const invertedMatrix = ctx.getTransform().invertSelf();
   const virtualCursor = canvasCursor.matrixTransform(invertedMatrix);
+  const topLeft = new DOMPoint(0, 0).matrixTransform(invertedMatrix);
+  const bottomRight = new DOMPoint(ctx.canvas.width, ctx.canvas.height).matrixTransform(invertedMatrix);
   ctx.pattern = {
     cursorX: canvasCursor.x,
     cursorY: canvasCursor.y,
     virtualX: virtualCursor.x,
     virtualY: virtualCursor.y,
+    viewTop: topLeft.y,
+    viewLeft: topLeft.x,
+    viewRight: bottomRight.x,
+    viewBottom: bottomRight.y,
   }
 }
 
@@ -89,14 +94,17 @@ export default function patternCanvas(opt) {
     ctx.fillStyle = 'blue';
     ctx.font = "32px serif";
     ctx.fillText("(0,0)", 0, 0);
-    ctx.fillRect(0, 0, view.unit / 2, view.unit / 2);
+    drawCircle(ctx, 0, 0, 3);
     ctx.fillText("(-200,0)", -200, 0);
-    ctx.fillRect(-200, 0, view.unit / 2, view.unit / 2);
+    drawCircle(ctx, -200, 0, 3);
     ctx.fillText("(100,100)", 100, 100);
-    ctx.fillRect(100, 100, view.unit / 2, view.unit / 2);
+    drawCircle(ctx, 100, 100, 3);
 
-    ctx.font = "16px serif";
-    ctx.fillText(JSON.stringify(ctx.pattern), -200, -100);
+    ctx.font = "30px serif";
+    ctx.fillText(ctx.pattern.viewLeft.toFixed(0), -70, -40);
+    ctx.fillText(ctx.pattern.viewRight.toFixed(0), 70, -40);
+    ctx.fillText(ctx.pattern.viewTop.toFixed(0), -70, 40);
+    ctx.fillText(ctx.pattern.viewBottom.toFixed(0), 70, 40);
   }
 
   // The animation loop...
