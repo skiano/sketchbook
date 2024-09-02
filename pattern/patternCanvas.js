@@ -115,8 +115,12 @@ function createLayers(pattern, initial = []) {
     x = snapToGrid ? Math.round(x * snapDetail) / snapDetail : x;
     y = snapToGrid ? Math.round(y * snapDetail) / snapDetail : y;
     let curr = layers[currentLayer].segments[currentSegment];
-    if (curr.length === 4) api.addSegment([x, y]);
-    else curr.splice(2, 0, x, y);
+    if (curr.length === 4) {
+      api.addSegment([x, y]);
+    } else {
+      if (Math.abs(x - curr[0]) < 0.1 && Math.abs(y - curr[1]) < 0.1) return api.deletePoint();
+      curr.splice(2, 0, x, y);
+    }
   };
 
   api.deletePoint = () => {
