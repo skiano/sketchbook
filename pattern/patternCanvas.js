@@ -34,6 +34,12 @@ function smoothState(initialState) {
           }
         }
       }
+      if (prop === 'hardSet') {
+        return (key, val) => {
+          target[key] = val;
+          idealValues[key] = val;
+        }
+      }
       return target[prop];
     },
     set(_, prop, value) {
@@ -203,10 +209,10 @@ export default function patternCanvas(opt) {
     if (!canvas.getAttribute('pattern-ready')) return;
 
     if (!initialized) {
-      view.zoom = Math.min(
+      view.hardSet('zoom', Math.min(
         canvas.width / (opt.unit * opt.width) / 3,
         canvas.height / (opt.unit * opt.height) / 3,
-      );
+      ));
       initialized = true;
     }
 
