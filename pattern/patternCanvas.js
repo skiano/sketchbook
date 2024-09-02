@@ -23,7 +23,7 @@ function smoothState(initialState) {
   };
   return new Proxy(initialState, {
     get(target, prop) {
-      if (prop === 'updateProps') {
+      if (prop === 'update') {
         return () => {
           for (let p in idealValues) {
             if (Math.abs(idealValues[p] - target[p]) < 0.005) {
@@ -43,39 +43,61 @@ function smoothState(initialState) {
   });
 }
 
-function addPatternInfo(ctx) {
-  // TODO: consider a caching strategy for getBoundingClientRect
-  const rect = ctx.canvas.getBoundingClientRect();
-  const canvasCursor = new DOMPoint((MOUSE.x - rect.left) * DPR, (MOUSE.y - rect.top) * DPR);
-  const invertedMatrix = ctx.getTransform().invertSelf();
-  const virtualCursor = canvasCursor.matrixTransform(invertedMatrix);
-  const topLeft = new DOMPoint(0, 0).matrixTransform(invertedMatrix);
-  const bottomRight = new DOMPoint(ctx.canvas.width, ctx.canvas.height).matrixTransform(invertedMatrix);
-  ctx.pattern = {
-    cursorX: canvasCursor.x,
-    cursorY: canvasCursor.y,
-    virtualX: virtualCursor.x,
-    virtualY: virtualCursor.y,
-    viewTop: topLeft.y,
-    viewLeft: topLeft.x,
-    viewRight: bottomRight.x,
-    viewBottom: bottomRight.y,
-  }
-}
+function createPattern(ctx) {
+  const pattern = {};
 
-function drawCircle(ctx, cx, cy, r) {
-  ctx.strokeStyle = 'blue';
-  ctx.lineWidth = 5;
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-  ctx.stroke();
+  const getRepeatRange = (width, min, max, buffer = 1) => {
+    let fill = (max - min) + (buffer * width * 2);
+    let total = Math.ceil(fill / width);
+    total = total % 2 ? total : total + 1; // make sure the total is odd and higher
+    return [
+      -Math.floor(total / 2),
+      Math.ceil(total / 2),
+    ];
+  }
+
+  pattern.update = (opt) => {
+    // TODO: before a click or movement, how to gracefully handle nonexistent cursor
+    // TODO: consider a caching strategy for getBoundingClientRect
+    const rect = ctx.canvas.getBoundingClientRect();
+    const canvasCursor = new DOMPoint((MOUSE.x - rect.left) * DPR, (MOUSE.y - rect.top) * DPR);
+    const invertedMatrix = ctx.getTransform().invertSelf();
+    const virtualCursor = canvasCursor.matrixTransform(invertedMatrix);
+    const topLeft = new DOMPoint(0, 0).matrixTransform(invertedMatrix);
+    const bottomRight = new DOMPoint(ctx.canvas.width, ctx.canvas.height).matrixTransform(invertedMatrix);
+    pattern.cursorX = virtualCursor.x;
+    pattern.cursorY = virtualCursor.y;
+    pattern.viewTop = topLeft.y;
+    pattern.viewLeft = topLeft.x;
+    pattern.viewRight = bottomRight.x;
+    pattern.viewBottom = bottomRight.y;
+    pattern.width = opt.width * opt.unit;
+    pattern.height = opt.height * opt.unit;
+    // (occlusion?) logic
+    // TODO: this will also depend on the bounding box of the pattern elements too...
+    // the goal is to decide how many repeats to render
+    // given:
+    //   1) the zoom and translation of the viewport
+    //   2) the actual size of the canvas
+    //   3) the size of the pattern repeat
+    //   4) the bounding box of the drawing in the pattern
+    //   5) the main preview pattern should be centered on the origin
+
+    const [x1, x2] = getRepeatRange(pattern.width, topLeft.x, bottomRight.x);
+    const [y1, y2] = getRepeatRange(pattern.height, topLeft.y, bottomRight.y);
+    pattern.repeat = [x1, y1, x2, y2];
+  }
+
+  return pattern;
 }
 
 export default function patternCanvas(opt) {
   opt = {
+    unit: 20,
+    width: 4,
+    height: 4,
     root: null,
-    width: 2,
-    height: 2,
+    view: { x: 0, y: 0, zoom: 1 },
     ...opt,
   };
 
@@ -88,47 +110,64 @@ export default function patternCanvas(opt) {
     willReadFrequently: false,
   });
 
-  const view = smoothState({ x: 0, y: 0, zoom: 1, unit: 20 });
+  const view = smoothState(opt.view);
+  const pattern = createPattern(ctx);
 
   function drawGrid() {
-    ctx.fillStyle = 'blue';
-    ctx.font = "32px serif";
-    ctx.fillText("(0,0)", 0, 0);
-    drawCircle(ctx, 0, 0, 3);
-    ctx.fillText("(-200,0)", -200, 0);
-    drawCircle(ctx, -200, 0, 3);
-    ctx.fillText("(100,100)", 100, 100);
-    drawCircle(ctx, 100, 100, 3);
+    // ctx.fillStyle = 'blue';
+    // ctx.font = "32px serif";
+    // ctx.fillText("(0,0)", 0, 0);
+    // drawCircle(ctx, 0, 0, 3);
+    // ctx.fillText("(-200,0)", -200, 0);
+    // drawCircle(ctx, -200, 0, 3);
+    // ctx.fillText("(100,100)", 100, 100);
+    // drawCircle(ctx, 100, 100, 3);
 
-    ctx.font = "30px serif";
-    ctx.fillText(ctx.pattern.viewLeft.toFixed(0), -70, -40);
-    ctx.fillText(ctx.pattern.viewRight.toFixed(0), 70, -40);
-    ctx.fillText(ctx.pattern.viewTop.toFixed(0), -70, 40);
-    ctx.fillText(ctx.pattern.viewBottom.toFixed(0), 70, 40);
+    // ctx.font = "30px serif";
+    // ctx.fillText(ctx.pattern.viewLeft.toFixed(0), -70, -40);
+    // ctx.fillText(ctx.pattern.viewRight.toFixed(0), 70, -40);
+    // ctx.fillText(ctx.pattern.viewTop.toFixed(0), -70, 40);
+    // ctx.fillText(ctx.pattern.viewBottom.toFixed(0), 70, 40);
+    // ctx.fillText(ctx.pattern.cursorX.toFixed(0), 0, 140);
+
+    ctx.lineWidth = 2 / view.zoom;
+    ctx.strokeStyle = 'rgba(0, 100, 255, 0.5)';
+    ctx.beginPath();
+
+    let ox = pattern.width / -2;
+    let oy = pattern.height / -2;
+
+    for (let rx = pattern.repeat[0]; rx <= pattern.repeat[2]; rx += 1) {
+      ctx.moveTo(rx * pattern.width + ox, pattern.viewTop);
+      ctx.lineTo(rx * pattern.width + ox, pattern.viewBottom);
+    }
+
+    for (let ry = pattern.repeat[1]; ry <= pattern.repeat[3]; ry += 1) {
+      ctx.moveTo(pattern.viewLeft, ry * pattern.height + oy);
+      ctx.lineTo(pattern.viewRight, ry * pattern.height + oy);
+    }
+
+    ctx.stroke();
   }
 
   // The animation loop...
   function draw() {
     requestAnimationFrame(draw);
     if (!canvas.getAttribute('pattern-ready')) return;
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
-    // TODO: deal with shift...
-    ctx.translate((canvas.width / 2), (canvas.height / 2));
+    ctx.translate((canvas.width / 2), (canvas.height / 2)); // TODO: deal with shift...
     ctx.scale(view.zoom, view.zoom);
-
-    addPatternInfo(ctx);
-
+    pattern.update(opt);
     drawGrid();
     ctx.restore();
-    view.updateProps();
+    view.update();
   }
   requestAnimationFrame(draw);
 
   // test interactions...
-  canvas.addEventListener('click', () => {
-    view.zoom = view.zoom * 1.3;
+  canvas.addEventListener('click', (evt) => {
+    view.zoom = evt.altKey ? view.zoom / 1.3 : view.zoom * 1.3;
   });
 
   // Insert into the DOM, and observe size...
