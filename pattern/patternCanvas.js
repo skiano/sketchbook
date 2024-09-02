@@ -60,6 +60,83 @@ function smoothState(initialState) {
   });
 }
 
+function createLayers(pattern, initial = []) {
+  let currentLayer;
+  let currentSegment;
+  const layers = [];
+  const hiddenLayers = {};
+  const api = {};
+
+  api.eachLayer = (fn) => {
+    for (let l = 0; l < layers.length; l += 1) {
+      if (!hiddenLayers[l]) fn(layers[l]);
+    }
+  };
+
+  api.addLayer = (spec) => {
+    const x = layers.push({
+      color: '#000',
+      weight: 5,
+      lineCap: 'round',
+      ...spec,
+      segments: []
+    });
+    currentLayer = x - 1;
+  };
+
+  api.deleteLayer = (idx) => {
+    if (typeof idx === 'undefined') idx = currentLayer;
+    delete hiddenLayers[idx];
+    layers.splice(idx, 1);
+    // TODO: not sure if returning focus to top layer would always make sense...
+    if (!layers.length) {
+      currentLayer = 0;
+      currentSegment = 0;
+      api.addLayer();
+      api.addSegment();
+    } else {
+      currentLayer = layers.length - 1;
+      currentSegment = layers[currentLayer].segments.length - 1;
+    }
+  };
+
+  api.enableLayer = () => {};
+
+  api.disableLayer = () => {};
+
+  api.sendToBack = () => {};
+
+  api.addSegment = (segment = []) => {
+    let x = layers[currentLayer].segments.push(segment);
+    currentSegment = x - 1;
+  };
+
+  api.addPoint = (x, y, snapToGrid, snapDetail = 2) => {
+    x = snapToGrid ? Math.round(x * snapDetail) / snapDetail : x;
+    y = snapToGrid ? Math.round(y * snapDetail) / snapDetail : y;
+    let curr = layers[currentLayer].segments[currentSegment];
+    if (curr.length === 4) api.addSegment([x, y]);
+    else curr.splice(2, 0, x, y);
+  };
+
+  api.deletePoint = () => {
+    let curr = layers[currentLayer];
+    if (curr.segments.length) {
+      curr.segments.pop();
+      if (curr.segments.length) currentSegment = curr.segments.length - 1;
+      else api.addSegment();
+    } else {
+      api.deleteLayer();
+    }
+  };
+  
+  initial.forEach((layer) => {
+    api.addLayer(layer);
+    layer.segments.forEach(api.addSegment);
+  });
+  return api;
+}
+
 function createPattern(ctx) {
   const pattern = {};
 
@@ -95,8 +172,11 @@ function createPattern(ctx) {
     pattern.viewLeft = topLeft.x;
     pattern.viewRight = bottomRight.x;
     pattern.viewBottom = bottomRight.y;
+    pattern.unit = opt.unit;
     pattern.width = opt.width * opt.unit;
     pattern.height = opt.height * opt.unit;
+    pattern.patternX = (pattern.cursorX + pattern.width / 2) / pattern.unit;
+    pattern.patternY = (pattern.cursorY + pattern.height / 2) / pattern.unit;
     // (occlusion?) logic
     // TODO: this will also depend on the bounding box of the pattern elements too...
     // the goal is to decide how many repeats to render
@@ -137,7 +217,7 @@ export default function patternCanvas(opt) {
         color: 'red',
         weight: 2,
         segments: [
-          [0, 4, 4, 0],
+          // [0, 4, 4, 0],
           [0, 0, 4, 4],
         ]
       },
@@ -145,8 +225,7 @@ export default function patternCanvas(opt) {
         color: '#333',
         weight: 6,
         segments: [
-          [1, 1, 1, 3],
-          [3, 1, 3, 3],
+          [2, 1, 2, 3],
         ]
       }
     ],
@@ -155,6 +234,7 @@ export default function patternCanvas(opt) {
 
   const elm = opt.root || document.body;
   const canvas = document.createElement('canvas');
+  canvas.style.cursor = 'none';
   const ctx = canvas.getContext('2d', {
     alpha: true,
     colorSpace: 'srgb', // wide gamut = display-p3
@@ -164,6 +244,17 @@ export default function patternCanvas(opt) {
 
   const view = smoothState(opt.view);
   const pattern = createPattern(ctx);
+  const layers = createLayers(pattern, opt.layers);
+
+  function drawCursor() {
+    ctx.lineWidth = 8 / view.zoom;
+    ctx.strokeStyle = 'black';
+    ctx.fillStyle = 'magenta';
+    ctx.beginPath();
+    ctx.arc(pattern.cursorX, pattern.cursorY, 2, 0, 2 * Math.PI);
+    ctx.stroke();
+    ctx.fill();
+  }
 
   function drawGrid() {
     ctx.lineWidth = 3 / view.zoom;
@@ -193,23 +284,26 @@ export default function patternCanvas(opt) {
         ctx.moveTo(pattern.viewLeft, oy + i * opt.unit);
         ctx.lineTo(pattern.viewRight, oy + i * opt.unit);
       }
-      
     });
     ctx.stroke();
   }
 
   function drawLayers() {
-    opt.layers.forEach((layer) => {
-      // ctx.lineWidth = 6 / view.zoom;
-      ctx.lineWidth = layer.weight || 1;
-      ctx.lineCap = layer.lineCap || 'round';
-      ctx.strokeStyle = layer.color || '#red';
+    layers.eachLayer((layer) => {
+      ctx.lineWidth = layer.weight;
+      ctx.lineCap = layer.lineCap;
+      ctx.strokeStyle = layer.color;
       ctx.beginPath();
       pattern.eachCol((ox) => {
         pattern.eachRow((oy) => {
           layer.segments.forEach((seg) => {
-            ctx.moveTo(ox + seg[0] * opt.unit, oy + seg[1] * opt.unit);
-            ctx.lineTo(ox + seg[2] * opt.unit, oy + seg[3] * opt.unit);
+            if (seg.length === 4) {
+              ctx.moveTo(ox + seg[0] * opt.unit, oy + seg[1] * opt.unit);
+              ctx.lineTo(ox + seg[2] * opt.unit, oy + seg[3] * opt.unit);
+            } else if (seg.length === 2) {
+              ctx.moveTo(ox + seg[0] * opt.unit, oy + seg[1] * opt.unit);
+              ctx.lineTo(ox + pattern.patternX * opt.unit, oy + pattern.patternY * opt.unit);
+            }
           });
         });
       });
@@ -239,14 +333,33 @@ export default function patternCanvas(opt) {
     pattern.update(opt);
     drawGrid();
     drawLayers();
+    drawCursor();
     ctx.restore();
     view.update();
   }
   requestAnimationFrame(draw);
 
-  // test interactions...
+  // INTERACTIONS...
+
   canvas.addEventListener('click', (evt) => {
-    view.zoom = evt.altKey ? view.zoom / 1.3 : view.zoom * 1.3;
+    console.log('click');
+    layers.addPoint(pattern.patternX, pattern.patternY, true);
+  });
+
+  canvas.addEventListener('dblclick', (evt) => {
+    console.log('dblclick')
+  });
+
+  canvas.addEventListener('mousedown', (evt) => {
+    console.log('mousedown');
+  });
+
+  canvas.addEventListener('mouseup', (evt) => {
+    console.log('mouseup');
+  });
+
+  canvas.addEventListener('mouseout', (evt) => {
+    console.log('mouseout');
   });
 
   // TODO: think about how focus would work if there were multiple
@@ -265,8 +378,24 @@ export default function patternCanvas(opt) {
       case 'ArrowDown':
         view.y = view.y + 30;
         break;
+      case 'Minus':
+        if (evt.metaKey) view.zoom = view.zoom / 1.3;
+        evt.preventDefault();
+        break;
+      case 'Equal':
+        if (evt.metaKey) view.zoom = view.zoom * 1.3;
+        evt.preventDefault();
+        break;
+      case 'KeyZ':
+        view.zoom = (evt.altKey || evt.metaKey) ? view.zoom / 1.3 : view.zoom * 1.3;
+        break;
+      case 'KeyX':
+      case 'Backspace':
+        if (evt.metaKey) layers.deleteLayer();
+        else layers.deletePoint();
+        break;
       default:
-        // console.log(evt.code);   
+        // console.log(evt.code);
     }
   });
 
