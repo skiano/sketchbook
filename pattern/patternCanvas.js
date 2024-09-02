@@ -4,6 +4,17 @@ const updateMouse = (evt) => { MOUSE.x = evt.pageX; MOUSE.y = evt.pageY; };
 document.addEventListener('mousemove', updateMouse);
 document.addEventListener('mousedown', updateMouse);
 
+function throttle(fn, limit = 200) {
+  let inThrottle;
+  return function(...args) {
+    if (!inThrottle) {
+      fn.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
+
 // Keep canvases size up to date
 const resizeObserver = new ResizeObserver((entries) => {
   for (const entry of entries) {
@@ -62,11 +73,18 @@ function createPattern(ctx) {
     ];
   }
 
+  const updateBoundingBox = throttle(() => {
+    // TODO: consider a more thoughtful caching strategy for getBoundingClientRect
+    // for now, just throttling it in case the parent element moves or changes size...
+    // I already have a resize observer, so that would be one moment i know
+    // to evacuate the cache
+    // but not sure if there is a clever way to guess that a position has changed
+    ctx.boundingRect = ctx.canvas.getBoundingClientRect();
+  }, 1500);
+
   pattern.update = (opt) => {
-    // TODO: before a click or movement, how to gracefully handle nonexistent cursor
-    // TODO: consider a caching strategy for getBoundingClientRect
-    const rect = ctx.canvas.getBoundingClientRect();
-    const canvasCursor = new DOMPoint((MOUSE.x - rect.left) * DPR, (MOUSE.y - rect.top) * DPR);
+    updateBoundingBox();
+    const canvasCursor = new DOMPoint((MOUSE.x - ctx.boundingRect.left) * DPR, (MOUSE.y - ctx.boundingRect.top) * DPR);
     const invertedMatrix = ctx.getTransform().invertSelf();
     const virtualCursor = canvasCursor.matrixTransform(invertedMatrix);
     const topLeft = new DOMPoint(0, 0).matrixTransform(invertedMatrix);
@@ -91,14 +109,12 @@ function createPattern(ctx) {
     const [x1, x2] = getRepeatRange(pattern.width, topLeft.x, bottomRight.x);
     const [y1, y2] = getRepeatRange(pattern.height, topLeft.y, bottomRight.y);
     pattern.repeat = [x1, y1, x2, y2];
-
     pattern.eachRow = (fn) => {
       let oy = pattern.height / -2;
       for (let ry = pattern.repeat[1]; ry <= pattern.repeat[3]; ry += 1) {
         fn(ry * pattern.height + oy);
       }
     }
-
     pattern.eachCol = (fn) => {
       let ox = pattern.width / -2;
       for (let rx = pattern.repeat[0]; rx <= pattern.repeat[2]; rx += 1) {
@@ -250,7 +266,7 @@ export default function patternCanvas(opt) {
         view.y = view.y + 30;
         break;
       default:
-        console.log(evt.code);   
+        // console.log(evt.code);   
     }
   });
 
