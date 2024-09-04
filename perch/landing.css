@@ -9,19 +9,17 @@ html {
   color: #415053;
 }
 
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-}
-
 #p5_loading {
   display: none;
 }
 
 #splash {
   margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
 }
 
 .main-info {
@@ -36,6 +34,7 @@ body {
   text-transform: lowercase;
   font-weight: 730;
   font-size: 42px;
+  line-height: 42px;
   letter-spacing: -0.05em;
 }
 
@@ -87,5 +86,5 @@ body {
 }
 
 .splash-input:focus {
-  outline: 1px solid #ff654a;
+  outline: 1px solid #415053;
 }
