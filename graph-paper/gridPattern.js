@@ -29,19 +29,13 @@ export default function gridPattern(opt) {
   }
 
   const dpr = window.devicePixelRatio || 1;
-  const can = document.createElement('canvas');
-  const ctx = can.getContext("2d");
-
   const scale = opt.scale * dpr;
   const width = opt.width * scale;
   const height = opt.height * scale;
-
-  can.style.width = `${width / 2}px`;
-  can.style.height = `${height / 2}px`;
-  can.width = width;
-  can.height = height;
-
   
+  const can = new OffscreenCanvas(width, height);
+  const ctx = can.getContext("2d");
+
   // the pattern is rendered nine times
   // so that bits going over the edge work correctly
   // TODO: make buffer size optionally controlled???
