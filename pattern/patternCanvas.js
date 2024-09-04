@@ -1,6 +1,6 @@
 const DPR = window.devicePixelRatio;
 const MOUSE = {};
-const updateMouse = (evt) => { MOUSE.x = evt.pageX; MOUSE.y = evt.pageY; };
+const updateMouse = (evt) => { MOUSE.x = evt.offsetX; MOUSE.y = evt.offsetY; };
 document.addEventListener('mousemove', updateMouse);
 document.addEventListener('mousedown', updateMouse);
 
@@ -159,18 +159,18 @@ function createPattern(ctx) {
     ];
   }
 
-  const updateBoundingBox = throttle(() => {
-    // TODO: consider a more thoughtful caching strategy for getBoundingClientRect
-    // for now, just throttling it in case the parent element moves or changes size...
-    // I already have a resize observer, so that would be one moment i know
-    // to evacuate the cache
-    // but not sure if there is a clever way to guess that a position has changed
-    ctx.boundingRect = ctx.canvas.getBoundingClientRect();
-  }, 1500);
+  // const updateBoundingBox = throttle(() => {
+  //   // TODO: consider a more thoughtful caching strategy for getBoundingClientRect
+  //   // for now, just throttling it in case the parent element moves or changes size...
+  //   // I already have a resize observer, so that would be one moment i know
+  //   // to evacuate the cache
+  //   // but not sure if there is a clever way to guess that a position has changed
+  //   ctx.boundingRect = ctx.canvas.getBoundingClientRect();
+  // }, 1500);
 
   pattern.update = (opt) => {
-    updateBoundingBox();
-    const canvasCursor = new DOMPoint((MOUSE.x - ctx.boundingRect.left) * DPR, (MOUSE.y - ctx.boundingRect.top) * DPR);
+    // updateBoundingBox();
+    const canvasCursor = new DOMPoint((MOUSE.x) * DPR, (MOUSE.y) * DPR);
     const invertedMatrix = ctx.getTransform().invertSelf();
     const virtualCursor = canvasCursor.matrixTransform(invertedMatrix);
     const topLeft = new DOMPoint(0, 0).matrixTransform(invertedMatrix);
@@ -245,7 +245,7 @@ export default function patternCanvas(opt) {
   const elm = opt.root || document.body;
   console.log(elm)
   const canvas = document.createElement('canvas');
-  canvas.style.cursor = 'none';
+  // canvas.style.cursor = 'none';
   const ctx = canvas.getContext('2d', {
     alpha: true,
     colorSpace: 'srgb', // wide gamut = display-p3
