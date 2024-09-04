@@ -1,7 +1,15 @@
 const DPR = window.devicePixelRatio;
 const MOUSE = {};
 
-function getMousePos(canvas, w, h, evt) {
+function getMousePos(canvas, evt) {
+  // with mouse movements offset x avoids having to call getBoundingClientRect
+  if (typeof evt.offsetX !== 'undefined') {
+    return {
+      x: evt.offsetX,
+      y: evt.offsetY,
+    };
+  }
+
   if (evt && !evt.clientX) {
     // use touches if touch and not mouse
     if (evt.touches) {
@@ -11,25 +19,20 @@ function getMousePos(canvas, w, h, evt) {
     }
   }
   const rect = canvas.getBoundingClientRect();
-  const sx = canvas.scrollWidth / w || 1;
-  const sy = canvas.scrollHeight / h || 1;
   return {
-    x: (evt.clientX - rect.left) / sx,
-    y: (evt.clientY - rect.top) / sy,
-    winX: evt.clientX,
-    winY: evt.clientY,
+    x: (evt.clientX - rect.left),
+    y: (evt.clientY - rect.top),
     id: evt.identifier
   };
 }
 
 const updateMouse = (evt) => {
-  const p = getMousePos(evt.target, evt.target.width, evt.target.height, evt)
+  const p = getMousePos(evt.target, evt)
   MOUSE.x = p.x;
   MOUSE.y = p.y;
 };
 
 document.addEventListener('mousemove', updateMouse);
-// document.addEventListener('mousedown', updateMouse);
 document.addEventListener('touchstart', updateMouse);
 
 // Keep canvases size up to date
@@ -177,7 +180,7 @@ function createPattern(ctx) {
   }
 
   pattern.update = (opt) => {
-    const canvasCursor = new DOMPoint(MOUSE.x, MOUSE.y);
+    const canvasCursor = new DOMPoint(MOUSE.x * DPR, MOUSE.y * DPR);
     const invertedMatrix = ctx.getTransform().invertSelf();
     const virtualCursor = canvasCursor.matrixTransform(invertedMatrix);
     const topLeft = new DOMPoint(0, 0).matrixTransform(invertedMatrix);
