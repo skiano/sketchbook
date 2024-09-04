@@ -26,6 +26,9 @@ body {
 
 .main-info {
   max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .perch-logotype {
@@ -59,7 +62,8 @@ body {
   line-height: 1.12;
 }
 
-.perch-p {
+.perch-p,
+.splash-input {
   font-size: 16px;
   line-height: 24px;
   font-weight: 460;
@@ -70,4 +74,18 @@ body {
 
 .perch-mb-lg {
   margin-bottom: 24px;
+}
+
+.splash-input {
+  display: block;
+  margin-top: 18px;
+  padding: 12px 12px;
+  border-radius: 4px;
+  border: none;
+  outline: 1px solid #dbd1cf;
+  transition: outline 250ms ease;
+}
+
+.splash-input:focus {
+  outline: 1px solid #ff654a;
 }
