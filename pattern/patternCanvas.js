@@ -1,19 +1,36 @@
 const DPR = window.devicePixelRatio;
 const MOUSE = {};
-const updateMouse = (evt) => { MOUSE.x = evt.offsetX; MOUSE.y = evt.offsetY; };
-document.addEventListener('mousemove', updateMouse);
-document.addEventListener('mousedown', updateMouse);
 
-function throttle(fn, limit = 200) {
-  let inThrottle;
-  return function(...args) {
-    if (!inThrottle) {
-      fn.apply(this, args);
-      inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+function getMousePos(canvas, w, h, evt) {
+  if (evt && !evt.clientX) {
+    // use touches if touch and not mouse
+    if (evt.touches) {
+      evt = evt.touches[0];
+    } else if (evt.changedTouches) {
+      evt = evt.changedTouches[0];
     }
+  }
+  const rect = canvas.getBoundingClientRect();
+  const sx = canvas.scrollWidth / w || 1;
+  const sy = canvas.scrollHeight / h || 1;
+  return {
+    x: (evt.clientX - rect.left) / sx,
+    y: (evt.clientY - rect.top) / sy,
+    winX: evt.clientX,
+    winY: evt.clientY,
+    id: evt.identifier
   };
 }
+
+const updateMouse = (evt) => {
+  const p = getMousePos(evt.target, evt.target.width, evt.target.height, evt)
+  MOUSE.x = p.x;
+  MOUSE.y = p.y;
+};
+
+document.addEventListener('mousemove', updateMouse);
+// document.addEventListener('mousedown', updateMouse);
+document.addEventListener('touchstart', updateMouse);
 
 // Keep canvases size up to date
 const resizeObserver = new ResizeObserver((entries) => {
@@ -159,18 +176,8 @@ function createPattern(ctx) {
     ];
   }
 
-  // const updateBoundingBox = throttle(() => {
-  //   // TODO: consider a more thoughtful caching strategy for getBoundingClientRect
-  //   // for now, just throttling it in case the parent element moves or changes size...
-  //   // I already have a resize observer, so that would be one moment i know
-  //   // to evacuate the cache
-  //   // but not sure if there is a clever way to guess that a position has changed
-  //   ctx.boundingRect = ctx.canvas.getBoundingClientRect();
-  // }, 1500);
-
   pattern.update = (opt) => {
-    // updateBoundingBox();
-    const canvasCursor = new DOMPoint((MOUSE.x) * DPR, (MOUSE.y) * DPR);
+    const canvasCursor = new DOMPoint(MOUSE.x, MOUSE.y);
     const invertedMatrix = ctx.getTransform().invertSelf();
     const virtualCursor = canvasCursor.matrixTransform(invertedMatrix);
     const topLeft = new DOMPoint(0, 0).matrixTransform(invertedMatrix);
@@ -243,7 +250,6 @@ export default function patternCanvas(opt) {
   };
 
   const elm = opt.root || document.body;
-  console.log(elm)
   const canvas = document.createElement('canvas');
   // canvas.style.cursor = 'none';
   const ctx = canvas.getContext('2d', {
