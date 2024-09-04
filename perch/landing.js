@@ -1,4 +1,18 @@
 import p5 from 'p5';
+import config from './config.js';
+import p5FontVariables from './p5FontVariables.js';
+import addAnimationLoops from './loadAnimationLoop.js';
+import createSparrow from './createSparrow.js';
+
+p5FontVariables(p5);
+addAnimationLoops(p5);
+
+// // TEMP: just forcing the font to load
+// const c = document.createElement('canvas');
+// const ctx = c.getContext('2d');
+// ctx.font = `200 100px Literata`;
+// ctx.fillText( "hello", 50, 50 );
+// document.body.append(c);
 
 const QUERIES = [
   'What are the average home prices in this neighborhood?',
@@ -42,10 +56,24 @@ const resizeObserver = new ResizeObserver((entries) => {
   }
 });
 
+function onceEvery(fn, repeat = 4) {
+  let called = 0;
+  return (...args) => {
+    if (called === 0) fn(...args);
+    called += 1;
+    if (called >= repeat) called = 0;
+  }
+}
+
 new p5((p) => {
+  let loops;
+  let sparrow;
+  let drawSparrow;
+
   // COLORS
   const perchOrange = p.color('#ff654a');
   const perchGreen1 = p.color('#00ae62');
+  const perchWarmGray5 = p.color('#bdb0ae');
 
   const smoothstep = (t) => {
     t = p.constrain(t, 0, 1);
@@ -60,12 +88,16 @@ new p5((p) => {
     return ((f - start) / duration);
   }
 
+  p.preload = () => {
+    loops = p.loadAnimationLoopMap(config, {
+      fill: perchOrange,
+    });
+  }
+
   p.setup = () => {
     p.frameRate(30);
     updateBoxes();
     splash.style.position = 'relative';
-    const w = splash.scrollWidth;
-    const h = splash.scrollHeight;
     p.createCanvas(splashBox.width, splashBox.height);
     p.canvas.style.position = 'absolute';
     p.canvas.style.top = '0';
@@ -73,8 +105,22 @@ new p5((p) => {
     p.canvas.style.right = '0';
     p.canvas.style.bottom = '0';
     p.canvas.style.pointerEvents = 'none';
-    console.log(splashContent.getBoundingClientRect());
     resizeObserver.observe(splash);
+
+    sparrow = createSparrow({
+      render: loops,
+      x: contentBox.left + 160,
+      y: contentBox.top,
+      scale: 0.4,
+      repeatFrames: 4,
+    });
+
+    // sparrow.addPerch(0, ground, 455);
+
+    // p.updateFontVariables('Literata', {
+    //   ital: 1,
+    //   wght: 220,
+    // });
   }
 
   function perchLine(x1, y1, x2, y2, t = 1, c = perchGreen1) {
@@ -112,31 +158,59 @@ new p5((p) => {
   }
 
   p.draw = () => {
+    // when the resize observer fires the canvas will no longer match the splashbox
+    // and it's time to resize the canvas
     if (splashBox.width * DPR !== p.canvas.width || splashBox.height * DPR !== p.canvas.height) {
       p.resizeCanvas(splashBox.width, splashBox.height);
     }
+
+    // clear the background
+    // and unset the defaults
     p.clear();
     p.noFill();
+    p.noStroke();
 
-    let MX = 40;
-    let MY = 60;
-    let BT = contentBox.top - MY;
-    let BL = contentBox.left - MX;
-    let BR = contentBox.right + MX;
-    let BB = contentBox.bottom + MY;
+    let MX = 40; // margin x around content
+    let MY = 60; // margin y around content
+    let BT = contentBox.top - MY; // content box top
+    let BL = contentBox.left - MX; // content box left
+    let BR = contentBox.right + MX; // content box right
+    let BB = contentBox.bottom + MY; // content box bottom
 
     // FIRST: the main lines...
     let duration = 30;
     perchLine(0, BT, BR, BT, getAnimationTime(duration, 0, 0));
-    perchLine(BR, 0, BR, BB, getAnimationTime(duration, 0, duration * 0.25));
-    perchLine(p.width, BB, BL, BB, getAnimationTime(duration, 0, duration * 0.5));
-    perchLine(BL, p.height, BL, BT, getAnimationTime(duration, 0, duration * 0.75));
+    perchLine(BR, 0, BR, BB, getAnimationTime(duration, 0, duration * 0.5));
+    perchLine(p.width, BB, BL, BB, getAnimationTime(duration, 0, duration * 0.65));
+    perchLine(BL, p.height, BL, BT, getAnimationTime(duration, 0, duration * 0.8));
 
     // THEN: Box divisions...
-    questionBoxes(0, 0, BR, BT, getAnimationTime(15, duration - 7, 0), false, false);
-    questionBoxes(BR, 0, p.width - BR, BB, getAnimationTime(15, duration - 7, 0), true, false);
-    questionBoxes(BL, BB, p.width - BL, p.height - BB, getAnimationTime(15, duration - 7, 0), false, true);
-    questionBoxes(0, BT, BL, p.height - BT, getAnimationTime(15, duration - 7, 0), true, true);
+    let enterTime = duration / 3;
+    let startTime = duration * 0.85;
+    questionBoxes(0, 0, BR, BT, getAnimationTime(enterTime, startTime), false, false);
+    questionBoxes(BR, 0, p.width - BR, BB, getAnimationTime(enterTime, startTime), true, false);
+    questionBoxes(BL, BB, p.width - BL, p.height - BB, getAnimationTime(enterTime, startTime), false, true);
+    questionBoxes(0, BT, BL, p.height - BT, getAnimationTime(enterTime, startTime), true, true);
+
+    // p.fill(perchGreen1);
+    // // p.textStyle(p.ITALIC);
+
+    // p.drawingContext.font = `normal 200 24px/1.2 Literata`;
+    // p.drawingContext.letterSpacing = "-0.05em";
+    // p.drawingContext.fillText("Hello world", 50, 100);
+    // // p.textSize(26);
+    // // p.textLeading(32);
+    // // p.textAlign(p.LEFT, p.CENTER);
+    // // p.text(QUERIES[1], 100, 290, 250);
+    // // p.text(QUERIES[2], 100, 480, 250);
+    // // p.text(QUERIES[3], 1000, 480, 250);
+    // // p.text(QUERIES[4], 1000, 100, 250);
+    // // p.noLoop();
+
+    let x = p.constrain(p.mouseX, 50, p.width - 50);
+    let y = p.constrain(p.mouseY, 80, p.height - 20);
+    sparrow.moveTo(x, y);
+    sparrow.render();
   }
 
 }, splash);

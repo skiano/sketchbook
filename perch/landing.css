@@ -22,6 +22,10 @@ html {
   width: 100vw;
 }
 
+#splash-content {
+  position: relative;
+}
+
 .main-info {
   max-width: 400px;
   display: flex;
