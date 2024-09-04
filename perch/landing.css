@@ -1,0 +1,73 @@
+html {
+  font-family: "Albert Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-size: 16px;
+  font-weight: 460;
+  line-height: 24px;
+  font-style: normal;
+  background: #f9efee;
+  color: #415053;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+#p5_loading {
+  display: none;
+}
+
+#splash {
+  margin: 0 auto;
+}
+
+.main-info {
+  max-width: 400px;
+}
+
+.perch-logotype {
+  color: #ff654a;
+  text-transform: lowercase;
+  font-weight: 730;
+  font-size: 42px;
+  letter-spacing: -0.05em;
+}
+
+.perch-h2 {
+  font-family: "Albert Sans";
+  font-size: 49px;
+  font-weight: 344;
+  letter-spacing: -0.034em;
+  line-height: 1.04;
+}
+
+.perch-h3 {
+  font-size: 42px;
+  font-weight: 388;
+  letter-spacing: -0.028em;
+  line-height: 1.08;
+}
+
+.perch-h4 {
+  font-family: "Albert Sans";
+  font-size: 35px;
+  font-weight: 432;
+  letter-spacing: -0.022em;
+  line-height: 1.12;
+}
+
+.perch-p {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 460;
+  letter-spacing: -0.008em;
+  word-spacing: -0.07em;
+  color: #696d6e;
+}
+
+.perch-mb-lg {
+  margin-bottom: 24px;
+}
