@@ -217,8 +217,8 @@ function createPattern(ctx) {
 export default function patternCanvas(opt) {
   opt = {
     unit: 20,
-    width: 4,
-    height: 4,
+    width: 5,
+    height: 5,
     root: null,
     showGrid: true,
     view: { x: 0, y: 0, zoom: 1 },
@@ -243,6 +243,7 @@ export default function patternCanvas(opt) {
   };
 
   const elm = opt.root || document.body;
+  console.log(elm)
   const canvas = document.createElement('canvas');
   canvas.style.cursor = 'none';
   const ctx = canvas.getContext('2d', {
@@ -377,6 +378,7 @@ export default function patternCanvas(opt) {
   window.addEventListener('keydown', (evt) => {
     switch (evt.code) {
       case 'KeyG':
+      case 'KeyW':
         opt.showGrid = !opt.showGrid;
         break;
       case 'ArrowRight':
