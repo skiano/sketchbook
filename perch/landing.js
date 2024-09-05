@@ -115,32 +115,32 @@ new p5((p) => {
       p.resizeCanvas(splashBox.width, splashBox.height);
     }
 
-    // clear the background
-    // and unset the defaults
-    p.clear();
-    p.noFill();
-    p.noStroke();
+    // // clear the background
+    // // and unset the defaults
+    // p.clear();
+    // p.noFill();
+    // p.noStroke();
 
-    // FIRST: the main lines...
-    let duration = 90;
-    perchLine(extraBox.left, p.height + 10, extraBox.left, -10, getAnimationTime(duration, 0, 0));
+    // // FIRST: the main lines...
+    // let duration = 90;
+    // perchLine(extraBox.left, p.height + 10, extraBox.left, -10, getAnimationTime(duration, 0, 0));
 
-    let lines = 12;
-    let leading = p.height / lines;
-    for (let i = 1; i < lines; i += 1) {
-      let y = p.height - i * leading;
-      perchLine(p.width + 10, y, extraBox.left, y, getAnimationTime(duration * 0.3, 30 + i * 6));
-    }
+    // let lines = 12;
+    // let leading = p.height / lines;
+    // for (let i = 1; i < lines; i += 1) {
+    //   let y = p.height - i * leading;
+    //   perchLine(p.width + 10, y, extraBox.left, y, getAnimationTime(duration * 0.3, 30 + i * 6));
+    // }
 
-    if (p.frameCount > 60 * 4) {
-      p.fill('#696d6e');
-      p.drawingContext.font = `normal 350 18px/1.2 Literata`;
-      p.drawingContext.letterSpacing = "-0.03em";
+    // if (p.frameCount > 60 * 4) {
+    //   p.fill('#696d6e');
+    //   p.drawingContext.font = `normal 350 18px/1.2 Literata`;
+    //   p.drawingContext.letterSpacing = "-0.03em";
   
-      for (let i = 1; i <= lines; i += 1) {
-        p.drawingContext.fillText(QUERIES[i + 3], extraBox.left + 20, leading * i - 25);
-      }
-    }
+    //   for (let i = 1; i <= lines; i += 1) {
+    //     p.drawingContext.fillText(QUERIES[i + 3], extraBox.left + 20, leading * i - 25);
+    //   }
+    // }
   }
 
 }, splash);
@@ -188,12 +188,12 @@ new p5((p) => {
 
     p.clear();
 
-    if (p.frameCount > 2 * 20) {
+    if (p.frameCount > 0) {
       let x = p.constrain(p.mouseX, 50, p.width - 50);
       let y = p.constrain(p.mouseY, 80, p.height - 20);
-      sparrow.moveTo(x, y);
+      sparrow.moveTo(170, 320);
     } else {
-      sparrow.moveTo(p.width * 2/3, -60);
+      sparrow.moveTo(-60, 160);
     }
     
     
