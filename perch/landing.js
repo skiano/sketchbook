@@ -40,12 +40,15 @@ const QUERIES = [
 const DPR = window.devicePixelRatio;
 const splash = document.getElementById('splash');
 const splashContent = document.getElementById('splash-content');
+const extraContent = document.getElementById('splash-extra');
 
 let splashBox;
 let contentBox;
+let extraBox;
 function updateBoxes() {
   splashBox = splash.getBoundingClientRect();
   contentBox = splashContent.getBoundingClientRect();
+  extraBox = extraContent.getBoundingClientRect();
 }
 
 const resizeObserver = new ResizeObserver((entries) => {
@@ -56,20 +59,7 @@ const resizeObserver = new ResizeObserver((entries) => {
   }
 });
 
-function onceEvery(fn, repeat = 4) {
-  let called = 0;
-  return (...args) => {
-    if (called === 0) fn(...args);
-    called += 1;
-    if (called >= repeat) called = 0;
-  }
-}
-
 new p5((p) => {
-  let loops;
-  let sparrow;
-  let drawSparrow;
-
   // COLORS
   const perchOrange = p.color('#ff654a');
   const perchGreen1 = p.color('#00ae62');
@@ -88,14 +78,8 @@ new p5((p) => {
     return ((f - start) / duration);
   }
 
-  p.preload = () => {
-    loops = p.loadAnimationLoopMap(config, {
-      fill: perchOrange,
-    });
-  }
-
   p.setup = () => {
-    p.frameRate(30);
+    p.frameRate(60);
     updateBoxes();
     splash.style.position = 'relative';
     p.createCanvas(splashBox.width, splashBox.height);
@@ -106,21 +90,6 @@ new p5((p) => {
     p.canvas.style.bottom = '0';
     p.canvas.style.pointerEvents = 'none';
     resizeObserver.observe(splash);
-
-    sparrow = createSparrow({
-      render: loops,
-      x: contentBox.left + 160,
-      y: contentBox.top,
-      scale: 0.4,
-      repeatFrames: 4,
-    });
-
-    // sparrow.addPerch(0, ground, 455);
-
-    // p.updateFontVariables('Literata', {
-    //   ital: 1,
-    //   wght: 220,
-    // });
   }
 
   function perchLine(x1, y1, x2, y2, t = 1, c = perchGreen1) {
@@ -139,24 +108,6 @@ new p5((p) => {
     p.pop();
   }
 
-  function questionBoxes(left, top, width, height, t = 1, vert, reverse) {
-    t = smoothstep(t);
-    let divisions = 3;
-    let size = vert ? height / divisions : width / divisions;
-
-    for (let i = 0; i < divisions; i += 1) {
-      if (vert) {
-        let y = p.lerp(0, size * i, t);
-        y = reverse ? top + height - y : top + y;
-        perchLine(left, y, left + width, y);
-      } else {
-        let x = p.lerp(0, size * i, t);
-        x = reverse ? left + width - x : left + x;
-        perchLine(x, top, x, top + height);
-      }
-    }
-  }
-
   p.draw = () => {
     // when the resize observer fires the canvas will no longer match the splashbox
     // and it's time to resize the canvas
@@ -170,43 +121,72 @@ new p5((p) => {
     p.noFill();
     p.noStroke();
 
-    let MX = 40; // margin x around content
-    let MY = 60; // margin y around content
-    let BT = contentBox.top - MY; // content box top
-    let BL = contentBox.left - MX; // content box left
-    let BR = contentBox.right + MX; // content box right
-    let BB = contentBox.bottom + MY; // content box bottom
-
     // FIRST: the main lines...
-    let duration = 30;
-    perchLine(0, BT, BR, BT, getAnimationTime(duration, 0, 0));
-    perchLine(BR, 0, BR, BB, getAnimationTime(duration, 0, duration * 0.5));
-    perchLine(p.width, BB, BL, BB, getAnimationTime(duration, 0, duration * 0.65));
-    perchLine(BL, p.height, BL, BT, getAnimationTime(duration, 0, duration * 0.8));
+    let duration = 90;
+    perchLine(extraBox.left, p.height + 10, extraBox.left, -10, getAnimationTime(duration, 0, 0));
 
-    // THEN: Box divisions...
-    let enterTime = duration / 3;
-    let startTime = duration * 0.85;
-    questionBoxes(0, 0, BR, BT, getAnimationTime(enterTime, startTime), false, false);
-    questionBoxes(BR, 0, p.width - BR, BB, getAnimationTime(enterTime, startTime), true, false);
-    questionBoxes(BL, BB, p.width - BL, p.height - BB, getAnimationTime(enterTime, startTime), false, true);
-    questionBoxes(0, BT, BL, p.height - BT, getAnimationTime(enterTime, startTime), true, true);
+    let lines = 12;
+    let leading = p.height / lines;
+    for (let i = 1; i < lines; i += 1) {
+      let y = p.height - i * leading;
+      perchLine(p.width + 10, y, extraBox.left, y, getAnimationTime(duration * 0.3, 30 + i * 6));
+    }
 
-    // p.fill(perchGreen1);
-    // // p.textStyle(p.ITALIC);
+    if (p.frameCount > 60 * 4) {
+      p.fill('#696d6e');
+      p.drawingContext.font = `normal 350 18px/1.2 Literata`;
+      p.drawingContext.letterSpacing = "-0.03em";
+  
+      for (let i = 1; i <= lines; i += 1) {
+        p.drawingContext.fillText(QUERIES[i + 3], extraBox.left + 20, leading * i - 25);
+      }
+    }
+  }
 
-    // p.drawingContext.font = `normal 200 24px/1.2 Literata`;
-    // p.drawingContext.letterSpacing = "-0.05em";
-    // p.drawingContext.fillText("Hello world", 50, 100);
-    // // p.textSize(26);
-    // // p.textLeading(32);
-    // // p.textAlign(p.LEFT, p.CENTER);
-    // // p.text(QUERIES[1], 100, 290, 250);
-    // // p.text(QUERIES[2], 100, 480, 250);
-    // // p.text(QUERIES[3], 1000, 480, 250);
-    // // p.text(QUERIES[4], 1000, 100, 250);
-    // // p.noLoop();
+}, splash);
 
+
+
+
+
+new p5((p) => {
+  let loops;
+  let sparrow;
+
+  // COLORS
+  const perchOrange = p.color('#ff654a');
+
+  p.preload = () => {
+    loops = p.loadAnimationLoopMap(config, {
+      fill: perchOrange,
+    });
+  }
+
+  p.setup = () => {
+    p.frameRate(20);
+    p.createCanvas(splashBox.width, splashBox.height);
+    p.canvas.style.position = 'absolute';
+    p.canvas.style.top = '0';
+    p.canvas.style.left = '0';
+    p.canvas.style.right = '0';
+    p.canvas.style.bottom = '0';
+    p.canvas.style.pointerEvents = 'none';
+
+    sparrow = createSparrow({
+      render: loops,
+      x: contentBox.left + 160,
+      y: contentBox.top,
+      scale: 0.4,
+      repeatFrames: 4,
+    });
+  }
+
+  p.draw = () => {
+    if (splashBox.width * DPR !== p.canvas.width || splashBox.height * DPR !== p.canvas.height) {
+      p.resizeCanvas(splashBox.width, splashBox.height);
+    }
+
+    p.clear();
     let x = p.constrain(p.mouseX, 50, p.width - 50);
     let y = p.constrain(p.mouseY, 80, p.height - 20);
     sparrow.moveTo(x, y);
