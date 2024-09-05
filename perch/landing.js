@@ -39,15 +39,15 @@ const QUERIES = [
 
 const DPR = window.devicePixelRatio;
 const splash = document.getElementById('splash');
-const splashContent = document.getElementById('splash-content');
-const extraContent = document.getElementById('splash-extra');
+const heroText = document.getElementById('splash-hero');
+const extraContent = document.getElementById('splash-right');
 
 let splashBox;
-let contentBox;
+let heroBox;
 let extraBox;
 function updateBoxes() {
   splashBox = splash.getBoundingClientRect();
-  contentBox = splashContent.getBoundingClientRect();
+  heroBox = heroText.getBoundingClientRect();
   extraBox = extraContent.getBoundingClientRect();
 }
 
@@ -62,15 +62,8 @@ const resizeObserver = new ResizeObserver((entries) => {
 new p5((p) => {
   // COLORS
   const perchOrange = p.color('#ff654a');
-  const perchGreen1 = p.color('#00ae62');
-  const perchWarmGray5 = p.color('#bdb0ae');
 
-  const smoothstep = (t) => {
-    t = p.constrain(t, 0, 1);
-    return t * t * (3.0 - 2.0 * t);
-  }
-
-  const createBubble = (txt, x, y, isSpecial) => {
+  const createBubble = (txt, x = 0, y = 0, isSpecial) => {
     const txtSize = 15;
     const txtLeading = 22;
 
@@ -93,6 +86,10 @@ new p5((p) => {
     let loopOffset = p.random(0, 40);
 
     return {
+      move(nx, ny) {
+        x = nx;
+        y = ny;
+      },
       isOpen() {
         return open;
       },
@@ -106,15 +103,17 @@ new p5((p) => {
         txtW = w;
       },
       render() {
+
         p.push();
 
         let ry = y + (p.sin((p.frameCount + loopOffset) / 15) * 6);
+        ry = y // debug
         
         p.rectMode(p.CENTER);
         p.noStroke();
         p.fill('#fff');
         if (open) {
-          p.rect(x, ry, txtW + 30, txtLeading * 3, 8);
+          p.rect(x, ry, txtW + 40, txtLeading * 3, 8);
         } else {
           p.rect(x, ry, 10, 10, 5);
         }
@@ -131,12 +130,7 @@ new p5((p) => {
     }
   }
 
-  let testBubble;
-  let testBubble2;
-  let testBubble3;
-  let testBubble4;
-  let testBubble5;
-  let testBubble6;
+  let bubbles;
 
   p.setup = () => {
     p.frameRate(60);
@@ -151,19 +145,8 @@ new p5((p) => {
     p.canvas.style.pointerEvents = 'none';
     resizeObserver.observe(splash);
 
-    testBubble = createBubble(QUERIES[0], p.width * 2 / 3, p.height * 1 / 3);
-    testBubble2 = createBubble(QUERIES[1], p.width * 2 / 3 - 150, p.height * 1 / 3 + 170);
-    testBubble3 = createBubble(QUERIES[4], p.width * 2 / 3 + 250, p.height * 1 / 3 + 100);
-    testBubble4 = createBubble('Ask perch anything you want to know...', p.width * 2 / 3 + 160, p.height * 1 / 3 + 320, true);
-    testBubble5 = createBubble(QUERIES[5], p.width * 2 / 3 - 450, p.height * 1 / 3 - 100);
-    testBubble6 = createBubble(QUERIES[6], p.width * 2 / 3 - 350, p.height * 1 / 3 + 370);
-
-    testBubble.open();
-    testBubble2.open();
-    testBubble3.open();
-    testBubble4.open();
-    testBubble5.open();
-    testBubble6.open();
+    bubbles = QUERIES.slice(0, 9).map((q, i) => createBubble(q));
+    bubbles.forEach(b => b.open());
   }
 
   p.draw = () => {
@@ -174,12 +157,16 @@ new p5((p) => {
     }
     p.clear();
 
-    testBubble.render();
-    testBubble2.render();
-    testBubble3.render();
-    testBubble4.render();
-    testBubble5.render();
-    testBubble6.render();
+    let l = extraBox.left;
+    let t = extraBox.top;
+    let dx = (extraBox.right - extraBox.left) / 3;
+    let dy = (extraBox.bottom - extraBox.top) / 3;
+    bubbles.forEach((b, i) => {
+      let bx = l + (dx / 2) + ((i % 3) * dx);
+      let by = t + (dy / 2) + (((i / 3) >> 0) * dy);
+      b.move(bx, by)
+    });
+    bubbles.forEach(b => b.render());
   }
 
 }, splash);
@@ -220,13 +207,12 @@ new p5((p) => {
     if (splashBox.width * DPR !== p.canvas.width || splashBox.height * DPR !== p.canvas.height) {
       p.resizeCanvas(splashBox.width, splashBox.height);
     }
-
     p.clear();
 
     if (p.frameCount > 0) {
       let x = p.constrain(p.mouseX, 50, p.width - 50);
       let y = p.constrain(p.mouseY, 80, p.height - 20);
-      sparrow.moveTo(170, 320);
+      sparrow.moveTo(heroBox.left + heroBox.width * 1 / 3, heroBox.top);
     } else {
       sparrow.moveTo(-60, 160);
     }

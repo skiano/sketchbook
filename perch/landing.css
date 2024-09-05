@@ -10,7 +10,7 @@ html {
 }
 
 body {
-  min-height: 200vh;
+  min-height: 100vh;
   background: #ede5e4;
 }
 
@@ -19,29 +19,46 @@ body {
 }
 
 #splash {
-  margin: 0 auto;
-  display: flex;
-  align-items: stretch;
-  justify-content: stretch;
   height: 100vh;
   width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #f9efee;
 }
 
-.splash-left {
+#splash-wrap {
+  flex-grow: 1;
+  outline: 1px solid red;
+  max-width: 1600px;
+  max-height: 1000px;
+  height: 100%;
+  display: flex;
+  justify-content: stretch;
+}
+
+#splash-left {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  /* justify-content: space-between; */
   justify-content: center;
-  /* align-items: center; */
-  padding: 80px;
-
+  align-items: center;
+  flex-basis: 100px;
+  outline: 1px solid orange;
 }
 
-.splash-right {
-  flex-grow: 1;
+#splash-right {
+  flex-grow: 2;
   flex-basis: 350px;
+  outline: 1px solid blue;
+}
+
+#splash-hero {
+  position: relative;
+  cursor: default;
+  max-width: 300px;
+  outline: 1px solid pink;
+  padding: 24px 0 30px;
 }
 
 #splash-content {
@@ -49,19 +66,11 @@ body {
   cursor: default;
 }
 
-.main-info {
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  /* gap: 8px; */
-}
-
 .perch-logo-phrase {
   font-size: 28px;
   letter-spacing: -0.016em;
   line-height: 1.16;
   font-weight: 300;
-  /* color: #736a68; */
   word-spacing: -0.03em;
 }
 
@@ -82,51 +91,11 @@ body {
   font-size: 30px;
 }
 
-.perch-h2 {
-  font-family: "Albert Sans";
-  font-size: 49px;
-  font-weight: 344;
-  letter-spacing: -0.034em;
-  line-height: 1.04;
-}
-
-.perch-h3 {
-  font-size: 42px;
-  font-weight: 388;
-  letter-spacing: -0.028em;
-  line-height: 1.08;
-}
-
-.perch-h4 {
-  font-family: "Albert Sans";
-  font-size: 35px;
-  font-weight: 432;
-  letter-spacing: -0.022em;
-  line-height: 1.12;
-}
-
-.perch-p,
-.splash-input {
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 460;
-  letter-spacing: -0.008em;
-  word-spacing: -0.07em;
-  color: #696d6e;
-}
-
-
-.fade-in,
-.splash-input.fade-in {
+.fade-in {
   opacity: 0; /* Start hidden */
-  transform: translate(0, 10px);
+  transform: translate(0, 0px);
   animation: fadeIn 400ms ease forwards; /* 2 seconds fade-in, runs once */
 }
-
-.fade-in:nth-child(4n + 1) { animation-delay: 1000ms; animation-duration: 500ms; }
-.fade-in:nth-child(4n + 2) { animation-delay: 2000ms; animation-duration: 700ms; }
-.fade-in:nth-child(4n + 3) { animation-delay: 900ms; animation-duration: 1000ms; }
-.fade-in:nth-child(4n + 4) { animation-delay: 1200ms; animation-duration: 1400ms; }
 
 @keyframes fadeIn {
   from {
@@ -137,22 +106,4 @@ body {
     opacity: 1;
     transform: translate3d(0, 0);
   }
-}
-
-.perch-mb-lg {
-  margin-bottom: 24px;
-}
-
-.splash-input {
-  display: block;
-  margin-top: 24px;
-  padding: 8px 8px;
-  border-radius: 4px;
-  border: none;
-  outline: 1px solid #dbd1cf;
-  transition: outline 250ms ease;
-}
-
-.splash-input:focus {
-  outline: 1px solid #415053;
 }
