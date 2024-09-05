@@ -42,6 +42,7 @@ body {
 
 #splash-content {
   position: relative;
+  cursor: default;
 }
 
 .main-info {

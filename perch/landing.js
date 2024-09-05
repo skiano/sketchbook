@@ -163,7 +163,7 @@ new p5((p) => {
   }
 
   p.setup = () => {
-    p.frameRate(20);
+    p.frameRate(15);
     p.createCanvas(splashBox.width, splashBox.height);
     p.canvas.style.position = 'absolute';
     p.canvas.style.top = '0';
@@ -174,8 +174,8 @@ new p5((p) => {
 
     sparrow = createSparrow({
       render: loops,
-      x: contentBox.left + 160,
-      y: contentBox.top,
+      x: 0,
+      y: -60,
       scale: 0.4,
       repeatFrames: 4,
     });
@@ -187,9 +187,16 @@ new p5((p) => {
     }
 
     p.clear();
-    let x = p.constrain(p.mouseX, 50, p.width - 50);
-    let y = p.constrain(p.mouseY, 80, p.height - 20);
-    sparrow.moveTo(x, y);
+
+    if (p.frameCount > 2 * 20) {
+      let x = p.constrain(p.mouseX, 50, p.width - 50);
+      let y = p.constrain(p.mouseY, 80, p.height - 20);
+      sparrow.moveTo(x, y);
+    } else {
+      sparrow.moveTo(p.width * 2/3, -60);
+    }
+    
+    
     sparrow.render();
   }
 
