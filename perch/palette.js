@@ -77,8 +77,8 @@ secondaryColors.forEach(previewSecondary);
 [...tertiaryColors].reverse().forEach(previewSecondary);
 
 function makeGrays(col, strength = 1) {
-  let lumPattern = [0.93, 0.88, 0.8, 0.65, 0.45, 0.15, 0.075, 0.03, 0.012, 0.005];
-  let satPattern = [40, 55, 80, 85, 90, 95, 85, 80, 70, 40];
+  let lumPattern = [0.93, 0.88, 0.8, 0.65, 0.45, 0.35, 0.15, 0.075, 0.03, 0.012, 0.005];
+  let satPattern = [40, 55, 80, 85, 90, 93, 95, 85, 80, 70, 40];
   return lumPattern.map((l, i) => matchLuminance(col.clone().desaturate(satPattern[i] * strength), l));
 }
 

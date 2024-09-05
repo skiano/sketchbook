@@ -70,13 +70,73 @@ new p5((p) => {
     return t * t * (3.0 - 2.0 * t);
   }
 
-  const getAnimationTime = (duration, start = 0, delay = 0) => {
-    duration = duration - delay;
-    start = start + delay;
-    let end = start + duration;
-    let f = p.constrain(p.frameCount, start, end);
-    return ((f - start) / duration);
+  const createBubble = (txt, x, y, isSpecial) => {
+    const txtSize = 15;
+    const txtLeading = 22;
+
+    // super naive wrap into two lines...
+    const words = txt.split(' ');
+    const lines = [
+      words.slice(0, p.ceil(words.length / 2)).join(' '),
+      words.slice(p.ceil(words.length / 2)).join(' '),
+    ];
+
+    const setFont = () => {
+      p.textFont('Literata');
+      p.textSize(txtSize);
+      p.textLeading(txtLeading);
+    }
+
+    let open = true;
+    let txtW = 0;
+    let width = 0;
+    let loopOffset = p.random(0, 40);
+
+    return {
+      isOpen() {
+        return open;
+      },
+      open() {
+        open = true;
+        setFont();
+        let w = Math.max(
+          p.textWidth(lines[0]),
+          p.textWidth(lines[1])
+        );
+        txtW = w;
+      },
+      render() {
+        p.push();
+
+        let ry = y + (p.sin((p.frameCount + loopOffset) / 15) * 6);
+        
+        p.rectMode(p.CENTER);
+        p.noStroke();
+        p.fill('#fff');
+        if (open) {
+          p.rect(x, ry, txtW + 30, txtLeading * 3, 8);
+        } else {
+          p.rect(x, ry, 10, 10, 5);
+        }
+        p.pop();
+
+        p.push();
+        p.fill(isSpecial ? perchOrange : '#9aa1a2')
+        p.textAlign(p.LEFT, p.CENTER);
+        setFont();
+        p.text(lines[0], x - (txtW / 2), ry - txtLeading / 2, txtW + 15);
+        p.text(lines[1], x - (txtW / 2), ry + txtLeading / 2, txtW + 15);
+        p.pop();
+      },
+    }
   }
+
+  let testBubble;
+  let testBubble2;
+  let testBubble3;
+  let testBubble4;
+  let testBubble5;
+  let testBubble6;
 
   p.setup = () => {
     p.frameRate(60);
@@ -90,22 +150,20 @@ new p5((p) => {
     p.canvas.style.bottom = '0';
     p.canvas.style.pointerEvents = 'none';
     resizeObserver.observe(splash);
-  }
 
-  function perchLine(x1, y1, x2, y2, t = 1, c = perchGreen1) {
-    t = smoothstep(t);
-    x2 = p.lerp(x1, x2, t);
-    y2 = p.lerp(y1, y2, t);
+    testBubble = createBubble(QUERIES[0], p.width * 2 / 3, p.height * 1 / 3);
+    testBubble2 = createBubble(QUERIES[1], p.width * 2 / 3 - 150, p.height * 1 / 3 + 170);
+    testBubble3 = createBubble(QUERIES[4], p.width * 2 / 3 + 250, p.height * 1 / 3 + 100);
+    testBubble4 = createBubble('Ask perch anything you want to know...', p.width * 2 / 3 + 160, p.height * 1 / 3 + 320, true);
+    testBubble5 = createBubble(QUERIES[5], p.width * 2 / 3 - 450, p.height * 1 / 3 - 100);
+    testBubble6 = createBubble(QUERIES[6], p.width * 2 / 3 - 350, p.height * 1 / 3 + 370);
 
-    p.push();
-    p.strokeWeight(1);
-    p.stroke(c);
-    p.line(x1, y1, x2, y2);
-    p.noStroke();
-    p.fill(c);
-    p.circle(x1, y1, 7);
-    p.circle(x2, y2, 7);
-    p.pop();
+    testBubble.open();
+    testBubble2.open();
+    testBubble3.open();
+    testBubble4.open();
+    testBubble5.open();
+    testBubble6.open();
   }
 
   p.draw = () => {
@@ -114,40 +172,17 @@ new p5((p) => {
     if (splashBox.width * DPR !== p.canvas.width || splashBox.height * DPR !== p.canvas.height) {
       p.resizeCanvas(splashBox.width, splashBox.height);
     }
+    p.clear();
 
-    // // clear the background
-    // // and unset the defaults
-    // p.clear();
-    // p.noFill();
-    // p.noStroke();
-
-    // // FIRST: the main lines...
-    // let duration = 90;
-    // perchLine(extraBox.left, p.height + 10, extraBox.left, -10, getAnimationTime(duration, 0, 0));
-
-    // let lines = 12;
-    // let leading = p.height / lines;
-    // for (let i = 1; i < lines; i += 1) {
-    //   let y = p.height - i * leading;
-    //   perchLine(p.width + 10, y, extraBox.left, y, getAnimationTime(duration * 0.3, 30 + i * 6));
-    // }
-
-    // if (p.frameCount > 60 * 4) {
-    //   p.fill('#696d6e');
-    //   p.drawingContext.font = `normal 350 18px/1.2 Literata`;
-    //   p.drawingContext.letterSpacing = "-0.03em";
-  
-    //   for (let i = 1; i <= lines; i += 1) {
-    //     p.drawingContext.fillText(QUERIES[i + 3], extraBox.left + 20, leading * i - 25);
-    //   }
-    // }
+    testBubble.render();
+    testBubble2.render();
+    testBubble3.render();
+    testBubble4.render();
+    testBubble5.render();
+    testBubble6.render();
   }
 
 }, splash);
-
-
-
-
 
 new p5((p) => {
   let loops;
@@ -195,7 +230,6 @@ new p5((p) => {
     } else {
       sparrow.moveTo(-60, 160);
     }
-    
     
     sparrow.render();
   }
