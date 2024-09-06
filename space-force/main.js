@@ -715,3 +715,91 @@ addCanvas((p5) => {
     // p5.noLoop();
   }
 }, { fps: 60, prepend: true });
+
+addCanvas((p5) => {
+  let boxes = [];
+  let centerParticle;
+  let otherCenter;
+  let thirdCenter;
+
+  const renderBox = (box) => {
+    if (box.width < 1 || box.height < 1) return;
+    p5.push();
+    p5.noStroke();
+    p5.fill(box.fill || '#fff');
+    p5.rectMode(p5.CENTER);
+    p5.rect(box.x, box.y, box.width, box.height, 8);
+    p5.pop();
+  }
+
+  const makeBox = (x, y, color) => {
+    const b = box(
+      x || p5.randomGaussian(p5.width / 2, 60),
+      y || p5.randomGaussian(p5.width / 2, 60),
+      0,
+      0,
+      0.2,
+      0.75,
+    );
+    b.fill = color;
+    return b;
+  }
+
+  p5.setup = () => {
+    let focalX = p5.randomGaussian(p5.width * 0.6, 10);
+    let focalY = p5.randomGaussian(p5.height * 0.6, 10);
+
+    centerParticle = particle(focalX, focalY);
+    centerParticle.rx = 30;
+    centerParticle.ry = 30;
+
+    otherCenter = particle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2));
+    centerParticle.rx = 15;
+    centerParticle.ry = 15;
+
+    thirdCenter = particle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2));
+    thirdCenter.rx = 6;
+    thirdCenter.ry = 6;
+
+    boxes.push(makeBox(focalX, focalY, 'yellow'));
+    for (let i = 0; i < 11; i += 1) {
+      boxes.push(makeBox());
+    }
+  }
+
+  p5.draw = () => {
+    p5.background('#333');
+
+    boxes.forEach((bx1) => {
+      // accumulate global forces
+      pressureBox(bx1, p5, 0.05, 30);
+      vacuumPoint(bx1, centerParticle, 0.06);
+      vacuumPoint(bx1, otherCenter, 0.02);
+      vacuumPoint(bx1, thirdCenter, 0.01);
+
+      // pairwise forces
+      boxes.forEach((bx2) => {
+        if (bx1 !== bx2) {
+          pressureForce(bx1, bx2, 15, 0.4);
+        }
+      });
+
+      // collisions?
+    });
+
+    // render and update boxes
+    boxes.forEach((bx, i) => {
+      renderBox(bx);
+      bx.update();
+      // also update box size
+      let popTime = 10;
+      let t = smoothstep((p5.frameCount - (i * 2)) / popTime);
+      bx.resize(
+        p5.lerp(0, 100, t),
+        p5.lerp(0, 40, t),
+      );
+    });
+
+    // p5.noLoop();
+  }
+}, { fps: 60, prepend: true });
