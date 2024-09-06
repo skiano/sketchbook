@@ -304,18 +304,21 @@ addCanvas((p) => {
 // REFINED PARTICLE APPROACH
 // -------------------------
 
+const smoothstep = (t) => {
+  t = Math.max(Math.min(t, 1), 0);
+  return t * t * (3.0 - 2.0 * t);
+}
+
 // An improved version of node
 // that allows for mass and damping
 // as well as accumulation of force during a frame
-const particle = (xi = 0, yi = 0, vxi = 0, vyi = 0, axi = 1, ayi = 1) => {
+const particle = (xi = 0, yi = 0, vxi = 0, vyi = 0) => {
   let mass = 1;
   let damping = 1;
   let x = xi;
   let y = yi;
   let vx = vxi;
   let vy = vyi;
-  let ax = axi;
-  let ay = ayi;
   let fx = 0;
   let fy = 0;
   let nextX = x + vxi;
@@ -331,10 +334,6 @@ const particle = (xi = 0, yi = 0, vxi = 0, vyi = 0, axi = 1, ayi = 1) => {
       vx = nvx;
       vy = nvy;
     },
-    acceleration(nax, nay) {
-      ax = nax;
-      ay = nay;
-    },
     force(addedfx, addedfy) {
       fx += addedfx;
       fy += addedfy;
@@ -347,10 +346,6 @@ const particle = (xi = 0, yi = 0, vxi = 0, vyi = 0, axi = 1, ayi = 1) => {
       // Damping for velocity if needed
       vx *= damping;
       vy *= damping;
-
-      // stop very slow moving particles
-      vx = stopper(vx * ax);
-      vy = stopper(vy * ay);
 
       // update position
       x = x + vx;
@@ -391,10 +386,9 @@ const particle = (xi = 0, yi = 0, vxi = 0, vyi = 0, axi = 1, ayi = 1) => {
         case 'update':
         case 'position':
         case 'velocity':
-        case 'acceleration':
           throw new Error(`Cannot set [${key}] directly on a node`);
         case 'mass':
-          mass = val;
+          mass = Math.max(val, 1);
           break;
         case 'damping':
           damping = val;
@@ -415,15 +409,16 @@ const particle = (xi = 0, yi = 0, vxi = 0, vyi = 0, axi = 1, ayi = 1) => {
 
 const box = (cx, cy, width, height, density = 0.1, damping = 0.99) => {
   const p = particle(cx, cy);
-  // particle props
-  p.mass = width * height * density;
-  p.damping = damping;
-  p.rx = width / 2;
-  p.ry = height / 2;
-  // additional props...
-  p.width = width;
-  p.height = height;
   p.isBox = true;
+  p.damping = damping;
+  p.resize = (w, h) => {
+    p.width = w;
+    p.height = h;
+    p.rx = Math.max(w / 2, 10);
+    p.ry = Math.max(h / 2, 10);
+    p.mass = Math.max(width * height * density, 100);
+  }
+  p.resize(width, height);
   return p;
 }
 
@@ -553,75 +548,6 @@ addCanvas((p5) => {
   }
 }, { fps: 60, prepend: true });
 
-
-addCanvas((p5) => {
-  let boxes = [];
-  let centerParticle;
-
-  const renderBox = (box) => {
-    p5.push();
-    p5.noFill();
-    p5.stroke('#fff');
-    p5.fill('rgba(255, 255, 255, 0.3)')
-    p5.rectMode(p5.CENTER);
-    p5.rect(box.x, box.y, box.width, box.height, 4);
-    p5.pop();
-  }
-
-  const renderParticle = (p) => {
-    p5.push();
-    p5.noStroke();
-    p5.fill('#fff');
-    p5.circle(p.x, p.y, Math.max(p.rx, 6), Math.max(p.ry, 6));
-    p5.pop();
-  }
-
-  const randomBox = () => {
-    return box(
-      p5.randomGaussian(p5.width / 2, 60),
-      p5.randomGaussian(p5.width / 2, 60),
-      100,
-      30,
-      0.2,
-    )
-  }
-
-  p5.setup = () => {
-    centerParticle = particle(p5.random(20, p5.width - 20), p5.random(20, p5.height - 20));
-
-    for (let i = 0; i < 12; i += 1) {
-      boxes.push(randomBox());
-    }
-  }
-
-  p5.draw = () => {
-    p5.background('#333');
-
-    boxes.forEach((bx1) => {
-      // accumulate global forces
-      pressureBox(bx1, p5, 2);
-      springPoint(bx1, centerParticle, 6, 0.3);
-
-      // pairwise forces
-      boxes.forEach((bx2) => {
-        if (bx1 !== bx2) {
-          pressureForce(bx1, bx2, 5, 30);
-        }
-      });
-
-      // collisions?
-    });
-
-    // render and update boxes
-    boxes.forEach((bx) => {
-      renderBox(bx);
-      bx.update();
-    });
-
-    renderParticle(centerParticle);
-  }
-}, { fps: 60, prepend: true });
-
 addCanvas((p5) => {
   let boxes = [];
   let centerParticle;
@@ -688,7 +614,7 @@ addCanvas((p5) => {
       // pairwise forces
       boxes.forEach((bx2) => {
         if (bx1 !== bx2) {
-          pressureForce(bx1, bx2, 10, 0.4);
+          pressureForce(bx1, bx2, 15, 0.4);
         }
       });
 
@@ -704,5 +630,88 @@ addCanvas((p5) => {
     renderParticle(centerParticle);
     renderParticle(otherCenter);
     renderParticle(thirdCenter);
+  }
+}, { fps: 60, prepend: true });
+
+addCanvas((p5) => {
+  let boxes = [];
+  let centerParticle;
+  let otherCenter;
+  let thirdCenter;
+
+  const renderBox = (box) => {
+    // if (box.width < 1 || box.height < 1) return;
+    p5.push();
+    p5.noFill();
+    p5.stroke('#fff');
+    p5.fill('rgba(255, 255, 255, 1)')
+    p5.rectMode(p5.CENTER);
+    p5.rect(box.x, box.y, box.width + 10, box.height + 10, 8);
+    p5.pop();
+  }
+
+  const randomBox = () => {
+    return box(
+      p5.randomGaussian(p5.width / 2, 60),
+      p5.randomGaussian(p5.width / 2, 60),
+      0,
+      0,
+      0.2,
+      0.75,
+    )
+  }
+
+  p5.setup = () => {
+    centerParticle = particle(p5.random(20, p5.width - 20), p5.random(20, p5.height - 20));
+    centerParticle.rx = 30;
+    centerParticle.ry = 30;
+
+    otherCenter = particle(p5.random(20, p5.width - 20), p5.random(20, p5.height - 20));
+    centerParticle.rx = 15;
+    centerParticle.ry = 15;
+
+    thirdCenter = particle(p5.random(20, p5.width - 20), p5.random(20, p5.height - 20));
+    thirdCenter.rx = 6;
+    thirdCenter.ry = 6;
+
+    for (let i = 0; i < 12; i += 1) {
+      boxes.push(randomBox());
+    }
+  }
+
+  p5.draw = () => {
+    p5.background('#333');
+
+    boxes.forEach((bx1) => {
+      // accumulate global forces
+      pressureBox(bx1, p5, 0.05, 30);
+      vacuumPoint(bx1, centerParticle, 0.06);
+      vacuumPoint(bx1, otherCenter, 0.02);
+      vacuumPoint(bx1, thirdCenter, 0.01);
+
+      // pairwise forces
+      boxes.forEach((bx2) => {
+        if (bx1 !== bx2) {
+          pressureForce(bx1, bx2, 15, 0.4);
+        }
+      });
+
+      // collisions?
+    });
+
+    // render and update boxes
+    boxes.forEach((bx, i) => {
+      renderBox(bx);
+      bx.update();
+      // also update box size
+      let popTime = 10;
+      let t = smoothstep((p5.frameCount - 0) / popTime);
+      bx.resize(
+        p5.lerp(0, 100, t),
+        p5.lerp(0, 30, t),
+      );
+    });
+
+    // p5.noLoop();
   }
 }, { fps: 60, prepend: true });
