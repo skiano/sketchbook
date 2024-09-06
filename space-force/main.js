@@ -95,7 +95,7 @@ addCanvas((p) => {
   p.setup = () => {
     loopIt = (x, y) => [x % p.width, y % p.width];
     nodes = [...Array(8)].map(_ => (
-      node(p.random(p.width), p.height, p.random(-10, 10), p.random(-10, -20))
+      node(p.random(p.width), p.height * 2 / 3, p.random(-5, 5), p.random(-6, -18))
     ));
   }
 
@@ -121,10 +121,19 @@ addCanvas((p) => {
 
   p.setup = () => {
     loopIt = (x, y) => [x % p.width, y % p.width];
-    let total = 35;
+    let total = 12;
+    let da = p.TAU / total;
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let r = 20;
     nodes = [...Array(total)].map((_, i) => {
-      let x = (p.width / total) * i;
-      return node(x, 50 + p.sin(x / total) * 45, 0, 0)
+      let a = da * i;
+      let x = p.cos(a);
+      let y = p.sin(a);
+      let n = node(p.randomGaussian(cx + x * r, r / 6), p.randomGaussian(cy + y * r, r / 6));
+      n.acceleration(0.998, 0.998);
+      n.mass = 1;
+      return n;
     });
   }
 
@@ -133,13 +142,28 @@ addCanvas((p) => {
     p.noStroke();
     p.fill('#fff');
 
-    nodes.forEach(n => {
+    nodes.forEach((n) => {
       let [x, y] = loopIt(n.x, n.y);
       p.circle(x, y, 10);
       n.render();
-      n.velocity(n.vx, n.vy + 0.25)
-      if (n.nextX > p.width || n.nextX < 0) n.velocity(-n.vx * 0.9, n.vy);
-      if (n.nextY > p.height || n.nextY < 0) n.velocity(n.vx, -n.vy * 0.92);
+
+      // repulsion
+      nodes.forEach((other) => {
+        let dx = other.nextX - n.nextX;
+        let dy = other.nextY - n.nextY;
+        let minDistance = 30;
+        let d = Math.max(Math.sqrt(dx * dx + dy * dy), minDistance);
+        let strength = 100 / (d * d);
+        let fx = (dx / d) * strength;
+        let fy = (dy / d) * strength;
+        other.velocity(
+          other.vx + fx / (other.mass || 1),
+          other.vy + fy / (other.mass || 1)
+        );
+      });
+
+      if (n.nextX > p.width || n.nextX < 0) n.velocity(-n.vx, n.vy);
+      if (n.nextY > p.height || n.nextY < 0) n.velocity(n.vx, -n.vy);
     });
   }
 }, { fps: 60 });
