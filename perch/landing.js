@@ -85,7 +85,13 @@ new p5((p) => {
     let width = 0;
     let loopOffset = p.random(0, 40);
 
+    let randomFactorX = p.randomGaussian(0.8, 0.1);
+    let randomFactorY = p.randomGaussian(0.8, 0.1);
+
     return {
+      getRandomFactor() {
+        return [randomFactorX, randomFactorY];
+      },
       move(nx, ny) {
         x = nx;
         y = ny;
@@ -157,14 +163,13 @@ new p5((p) => {
     }
     p.clear();
 
-    let l = extraBox.left;
-    let t = extraBox.top;
-    let dx = (extraBox.right - extraBox.left) / 3;
-    let dy = (extraBox.bottom - extraBox.top) / 3;
+    let cx = extraBox.left + (extraBox.right - extraBox.left) / 2;
+    let cy = extraBox.top + (extraBox.bottom - extraBox.top) / 2;
+    let rx = extraBox.width / 6;
+    let ry = extraBox.height / 6;
     bubbles.forEach((b, i) => {
-      let bx = l + (dx / 2) + ((i % 3) * dx);
-      let by = t + (dy / 2) + (((i / 3) >> 0) * dy);
-      b.move(bx, by)
+      let a = i / bubbles.length * p.TAU;
+      b.move(cx + p.cos(a) * rx, cy + p.sin(a) * ry);
     });
     bubbles.forEach(b => b.render());
   }
