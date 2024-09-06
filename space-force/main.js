@@ -436,6 +436,19 @@ const pressureForce = (p1, p2, k = 1, margin = 10) => {
   }
 }
 
+const tidalForce = (p1, time, period = 8, amp = 13, offset = 0) => {
+  let fy = Math.sin((time + offset) / period) * amp;
+  p1.force(0, fy);
+}
+
+// maybe i need time and some perlin/simplex noise...
+const brownianForce = (p, size = 100) => {
+  p.force(
+    (-size + Math.random() * size * 2),
+    (-size + Math.random() * size * 2)
+  );
+}
+
 const relativeGravity = (p1, p2, k = 100) => {
   const dx = p1.nextX - p2.nextX;
   const dy = p1.nextY - p2.nextY;
@@ -732,16 +745,18 @@ addCanvas((p5) => {
     p5.pop();
   }
 
-  const makeBox = (x, y, color) => {
+  const makeBox = (x, y, color, targetWidth) => {
     const b = box(
       x || p5.randomGaussian(p5.width / 2, 60),
       y || p5.randomGaussian(p5.width / 2, 60),
       0,
       0,
       0.2,
-      0.75,
+      0.5,
     );
     b.fill = color;
+    b.madeAt = p5.frameCount;
+    b.targetWidth = targetWidth || p5.randomGaussian(100, 20);
     return b;
   }
 
@@ -761,8 +776,8 @@ addCanvas((p5) => {
     thirdCenter.rx = 6;
     thirdCenter.ry = 6;
 
-    boxes.push(makeBox(focalX, focalY, 'yellow'));
-    for (let i = 0; i < 11; i += 1) {
+    boxes.push(makeBox(focalX, focalY, 'yellow', 115));
+    for (let i = 0; i < 2; i += 1) {
       boxes.push(makeBox());
     }
   }
@@ -770,17 +785,17 @@ addCanvas((p5) => {
   p5.draw = () => {
     p5.background('#333');
 
-    boxes.forEach((bx1) => {
+    boxes.forEach((bx1, i) => {
       // accumulate global forces
-      pressureBox(bx1, p5, 0.05, 30);
-      vacuumPoint(bx1, centerParticle, 0.06);
-      vacuumPoint(bx1, otherCenter, 0.02);
-      vacuumPoint(bx1, thirdCenter, 0.01);
+      // brownianForce(bx1);
+      pressureBox(bx1, p5, 0.06, 30);
+      vacuumPoint(bx1, centerParticle, 0.08);
+      vacuumPoint(bx1, i % 2 ? otherCenter : thirdCenter, 0.04);
 
       // pairwise forces
       boxes.forEach((bx2) => {
         if (bx1 !== bx2) {
-          pressureForce(bx1, bx2, 15, 0.4);
+          pressureForce(bx1, bx2, 10, 0.4);
         }
       });
 
@@ -792,14 +807,40 @@ addCanvas((p5) => {
       renderBox(bx);
       bx.update();
       // also update box size
-      let popTime = 10;
-      let t = smoothstep((p5.frameCount - (i * 2)) / popTime);
-      bx.resize(
-        p5.lerp(0, 100, t),
-        p5.lerp(0, 40, t),
-      );
+      let popTime = 18;
+
+      if (bx.destroyAt) {
+        let t = smoothstep((p5.frameCount - bx.destroyAt) / (popTime * 2));
+        bx.resize(
+          p5.lerp(bx.targetWidth, 0, t),
+          p5.lerp(40, 0, t),
+        );
+        if (t === 1) {
+          bx.destroyed = true;
+        }
+      } else {
+        let t = smoothstep((p5.frameCount - bx.madeAt) / popTime);
+        bx.resize(
+          p5.lerp(0, bx.targetWidth, t),
+          p5.lerp(0, 40, t),
+        );
+      }
     });
 
-    // p5.noLoop();
+    if ((p5.frameCount) % Math.min((boxes.length * boxes.length * boxes.length / 3.5) >> 0, 60 * 4) === 0) {
+      // boxes.pop();
+      boxes.push(makeBox(
+        // p5.random(20, p5.width - 20),
+        // p5.random(20, p5.height - 20)
+      ));
+
+      // mark earliest box (after the first...) for destruction
+      if (boxes.length > 10) {
+        boxes[1].destroyAt = p5.frameCount + 0;
+      }
+    }
+
+    boxes = boxes.filter(b => !b.destroyed);
+
   }
 }, { fps: 60, prepend: true });
