@@ -17,13 +17,14 @@ export default function addCanvas(fn, opt) {
     height: 540,
     rootId: 'app',
     background: '#eee',
+    prepend: false,
     ...opt,
   }
   const c = document.createElement('div');
   c.style.width = `${opt.width}px`;
   c.style.height = `${opt.height}px`;
   c.style.background = opt.background;
-  document.getElementById(opt.rootId).append(c);
+  document.getElementById(opt.rootId)[opt.prepend ? 'prepend' : 'append'](c);
   new p5((p) => {
     p._standardSetup = () => {
       p.createCanvas(opt.width, opt.height);
