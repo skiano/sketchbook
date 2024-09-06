@@ -1,6 +1,8 @@
 import p5 from 'p5';
 import addCanvas from '../shared/addP5Canvas.js';
 
+const stopper = v => Math.abs(v) < 0.01 ? 0 : v;
+
 const node = (xi = 0, yi = 0, vxi = 0, vyi = 0, axi = 1, ayi = 1) => {
   let x = xi;
   let y = yi;
@@ -22,10 +24,10 @@ const node = (xi = 0, yi = 0, vxi = 0, vyi = 0, axi = 1, ayi = 1) => {
       ay = nay;
     },
     render() {
-      x += vx;
-      y += vy;
-      vx *= ax;
-      vy *= ay;
+      x = x + vx;
+      y = y + vy;
+      vx = stopper(vx * ax);
+      vy = stopper(vy * ay);
     }
   }, {
     get(target, key) {
@@ -80,8 +82,8 @@ addCanvas((p) => {
       let [x, y] = loopIt(n.x, n.y);
       p.circle(x, y, 10);
       n.render();
-      if (n.nextX > p.width || n.nextX < 0) n.velocity(-n.vx * 0.9, n.vy);
-      if (n.nextY > p.height || n.nextY < 0) n.velocity(n.vx, -n.vy * 0.9);
+      if (n.nextX > p.width || n.nextX < 0) n.velocity(-n.vx, n.vy);
+      if (n.nextY > p.height || n.nextY < 0) n.velocity(n.vx, -n.vy);
     });
   }
 }, { fps: 60 });
@@ -93,7 +95,7 @@ addCanvas((p) => {
   p.setup = () => {
     loopIt = (x, y) => [x % p.width, y % p.width];
     nodes = [...Array(8)].map(_ => (
-      node(p.random(p.width), p.height, p.random(-6, 6), p.random(-12, -26))
+      node(p.random(p.width), p.height, p.random(-10, 10), p.random(-10, -20))
     ));
   }
 
@@ -106,9 +108,38 @@ addCanvas((p) => {
       let [x, y] = loopIt(n.x, n.y);
       p.circle(x, y, 10);
       n.render();
-      n.velocity(n.vx, n.vy + 0.2)
+      n.velocity(n.vx, n.vy + 0.25)
       if (n.nextX > p.width || n.nextX < 0) n.velocity(-n.vx * 0.9, n.vy);
       if (n.nextY > p.height || n.nextY < 0) n.velocity(n.vx, -n.vy * 0.9);
+    });
+  }
+}, { fps: 60 });
+
+addCanvas((p) => {
+  let loopIt;
+  let nodes;
+
+  p.setup = () => {
+    loopIt = (x, y) => [x % p.width, y % p.width];
+    let total = 35;
+    nodes = [...Array(total)].map((_, i) => {
+      let x = (p.width / total) * i;
+      return node(x, 50 + p.sin(x / total) * 45, 0, 0)
+    });
+  }
+
+  p.draw = () => {
+    p.background('#333');
+    p.noStroke();
+    p.fill('#fff');
+
+    nodes.forEach(n => {
+      let [x, y] = loopIt(n.x, n.y);
+      p.circle(x, y, 10);
+      n.render();
+      n.velocity(n.vx, n.vy + 0.25)
+      if (n.nextX > p.width || n.nextX < 0) n.velocity(-n.vx * 0.9, n.vy);
+      if (n.nextY > p.height || n.nextY < 0) n.velocity(n.vx, -n.vy * 0.92);
     });
   }
 }, { fps: 60 });
