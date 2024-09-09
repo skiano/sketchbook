@@ -9,12 +9,11 @@ const smoothstep = (t) => {
   return t * t * (3.0 - 2.0 * t);
 }
 
-// An improved version of node
-// that allows for mass and damping
-// as well as accumulation of force during a frame
 const particle = (xi = 0, yi = 0, vxi = 0, vyi = 0) => {
   let mass = 1;
   let damping = 1;
+  let rx = 0;
+  let ry = 0;
   let x = xi;
   let y = yi;
   let vx = vxi;
@@ -23,8 +22,6 @@ const particle = (xi = 0, yi = 0, vxi = 0, vyi = 0) => {
   let fy = 0;
   let nextX = x + vxi;
   let nextY = y + vyi;
-  let rx = 0;
-  let ry = 0;
   return new Proxy({
     position(nx, ny) {
       x = nx;
@@ -122,6 +119,14 @@ const box = (cx, cy, width, height, density = 0.1, damping = 0.99) => {
   return p;
 }
 
+const sphere = (x = 0, y = 0, r = 1, density = 0.1, damping = 0.99) => {
+  const p = particle(x, y);
+  p.rx = r;
+  p.ry = r;
+  p.mass = Math.pi * r * r * density;
+  return p;
+}
+
 const pressureForce = (p1, p2, k = 1, margin = 10) => {
   const minDistance = Math.max(p1.rx + p1.ry + p2.rx + p2.ry) + margin;
   const dx = p1.nextX - p2.nextX;
@@ -165,13 +170,15 @@ const pressureBox = (p, bbox, k = 0.4, minDist) => {
   p.force(fx * p.mass, fy * p.mass);
 }
 
-addCanvas((p5) => {
-  let boxes = [];
-  let centerParticle;
-  let otherCenter;
-  let thirdCenter;
+const createBubbles = (p5, boundingBox) => {
+  let bubbles = [];
+  let focalX = p5.randomGaussian(p5.width * 0.6, 10);
+  let focalY = p5.randomGaussian(p5.height * 0.6, 10);
+  let center1 = sphere(focalX, focalY, 30);
+  let center2 = sphere(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 30);
+  let center3 = sphere(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 6);
 
-  const renderBox = (box) => {
+  const renderBubble = (box) => {
     if (box.width < 1 || box.height < 1) return;
     p5.push();
     p5.noStroke();
@@ -181,7 +188,8 @@ addCanvas((p5) => {
     p5.pop();
   }
 
-  const makeBox = (x, y, color, targetWidth) => {
+  const makeBubble = (x, y, color, targetWidth) => {
+    // TODO: this should be using the bounding box
     const b = box(
       x || p5.randomGaussian(p5.width / 2, 60),
       y || p5.randomGaussian(p5.width / 2, 60),
@@ -196,87 +204,84 @@ addCanvas((p5) => {
     return b;
   }
 
-  p5.setup = () => {
-    let focalX = p5.randomGaussian(p5.width * 0.6, 10);
-    let focalY = p5.randomGaussian(p5.height * 0.6, 10);
+  bubbles.push(makeBubble(focalX, focalY, 'yellow', 115));
+  for (let i = 0; i < 2; i += 1) {
+    bubbles.push(makeBubble());
+  }
 
-    centerParticle = particle(focalX, focalY);
-    centerParticle.rx = 30;
-    centerParticle.ry = 30;
+  return {
+    draw() {
 
-    otherCenter = particle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2));
-    centerParticle.rx = 15;
-    centerParticle.ry = 15;
+      // 1. Accumulate forces
+      bubbles.forEach((b1, i) => {
+        // accumulate global forces
+        // TODO: brownianForce(b) ?????
+        pressureBox(b1, p5, 0.06, 30);
+        vacuumPoint(b1, center1, 0.08);
+        vacuumPoint(b1, i % 2 ? center2 : center3, 0.04);
+  
+        // pairwise forces
+        bubbles.forEach((b2) => {
+          if (b1 !== b2) {
+            pressureForce(b1, b2, 10, 0.4);
+          }
+        });
+      });
 
-    thirdCenter = particle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2));
-    thirdCenter.rx = 6;
-    thirdCenter.ry = 6;
+      // 2. Render and update
+      bubbles.forEach((b) => {
+        renderBubble(b);
+        b.update();
 
-    boxes.push(makeBox(focalX, focalY, 'yellow', 115));
-    for (let i = 0; i < 2; i += 1) {
-      boxes.push(makeBox());
+        // handle entry and exit animation
+        let popTime = 18;
+        if (b.destroyAt) {
+          let t = smoothstep((p5.frameCount - b.destroyAt) / (popTime * 2));
+          b.resize(
+            p5.lerp(b.targetWidth, 0, t),
+            p5.lerp(40, 0, t),
+          );
+          if (t === 1) {
+            b.destroyed = true;
+          }
+        } else {
+          let t = smoothstep((p5.frameCount - b.madeAt) / popTime);
+          b.resize(
+            p5.lerp(0, b.targetWidth, t),
+            p5.lerp(0, 40, t),
+          );
+        }
+      });
+
+      // 3. Decide if/when to insert more bubbles
+      if ((p5.frameCount) % Math.min((bubbles.length * bubbles.length * bubbles.length / 3.5) >> 0, 60 * 4) === 0) {
+        bubbles.push(makeBubble(
+          // p5.random(20, p5.width - 20),
+          // p5.random(20, p5.height - 20)
+        ));
+  
+        // mark earliest box (after the first...) for destruction
+        if (bubbles.length > 8) {
+          bubbles[1].destroyAt = p5.frameCount + 0;
+        }
+      }
+  
+      // 4. Remove any bubbles that are destroyed
+      bubbles = bubbles.filter(b => !b.destroyed);
     }
+  }
+}
+
+addCanvas((p5) => {
+  let bubbles;
+
+  p5.setup = () => {
+    bubbles = createBubbles(p5);
   }
 
   p5.draw = () => {
     p5.background('#333');
 
-    boxes.forEach((bx1, i) => {
-      // accumulate global forces
-      // brownianForce(bx1);
-      pressureBox(bx1, p5, 0.06, 30);
-      vacuumPoint(bx1, centerParticle, 0.08);
-      vacuumPoint(bx1, i % 2 ? otherCenter : thirdCenter, 0.04);
-
-      // pairwise forces
-      boxes.forEach((bx2) => {
-        if (bx1 !== bx2) {
-          pressureForce(bx1, bx2, 10, 0.4);
-        }
-      });
-
-      // collisions?
-    });
-
-    // render and update boxes
-    boxes.forEach((bx, i) => {
-      renderBox(bx);
-      bx.update();
-      // also update box size
-      let popTime = 18;
-
-      if (bx.destroyAt) {
-        let t = smoothstep((p5.frameCount - bx.destroyAt) / (popTime * 2));
-        bx.resize(
-          p5.lerp(bx.targetWidth, 0, t),
-          p5.lerp(40, 0, t),
-        );
-        if (t === 1) {
-          bx.destroyed = true;
-        }
-      } else {
-        let t = smoothstep((p5.frameCount - bx.madeAt) / popTime);
-        bx.resize(
-          p5.lerp(0, bx.targetWidth, t),
-          p5.lerp(0, 40, t),
-        );
-      }
-    });
-
-    if ((p5.frameCount) % Math.min((boxes.length * boxes.length * boxes.length / 3.5) >> 0, 60 * 4) === 0) {
-      // boxes.pop();
-      boxes.push(makeBox(
-        // p5.random(20, p5.width - 20),
-        // p5.random(20, p5.height - 20)
-      ));
-
-      // mark earliest box (after the first...) for destruction
-      if (boxes.length > 8) {
-        boxes[1].destroyAt = p5.frameCount + 0;
-      }
-    }
-
-    boxes = boxes.filter(b => !b.destroyed);
-
+    bubbles.draw();
   }
 }, { fps: 60 });
