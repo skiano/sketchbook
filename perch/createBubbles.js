@@ -193,18 +193,16 @@ export default function createBubbles(p5, opt) {
     bbox: null,
     measureBubble: () => ({ width: p5.randomGaussian(160, 20), height: 60 }),
     renderBubble: () => {},
+    onHover: (b) => { console.log('hover', b); },
+    onLeave: (b) => { console.log('leave', b); },
     focalPosition: [0.6, 0.6],
     focalWeight: 30,
     ...opt,
   }
 
-  const getRelX = (x) => {
-    return (bbox.left || 0) + (x * bbox.width);
-  }
-
-  const getRelY = (y) => {
-    return (bbox.top || 0) + (y * bbox.height);
-  }
+  // Convert a percentage 0-1 to an absolute position inside the bounding box
+  const getRelX = (x) => (bbox.left || 0) + (x * bbox.width);
+  const getRelY = (y) => (bbox.top || 0) + (y * bbox.height);
 
   let bubbles = [];
   let bbox = opt.bbox || p5;
@@ -303,10 +301,16 @@ export default function createBubbles(p5, opt) {
           b1.y - b1.ry < p5.mouseY &&
           b1.y + b1.ry > p5.mouseY
         ) {
-          b1.hover = true;
-          b1.hoverAt = b1.hoverAt || p5.frameCount;
+          if (!b1.hover) {
+            b1.hover = true;
+            b1.hoverAt = p5.frameCount;
+            opt.onHover(b1);
+          }
           p5.cursor(p5.HAND);
         } else {
+          if (b1.hover) {
+            opt.onLeave(b1);
+          }
           b1.hover = false;
           b1.hoverAt = undefined;
         }
