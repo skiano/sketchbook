@@ -7,13 +7,6 @@ import createSparrow from './createSparrow.js';
 p5FontVariables(p5);
 addAnimationLoops(p5);
 
-// // TEMP: just forcing the font to load
-// const c = document.createElement('canvas');
-// const ctx = c.getContext('2d');
-// ctx.font = `200 100px Literata`;
-// ctx.fillText( "hello", 50, 50 );
-// document.body.append(c);
-
 const QUERIES = [
   'What are the average home prices in this neighborhood?',
   'How have property values changed in the last 5 years?',
@@ -42,15 +35,26 @@ const splash = document.getElementById('splash');
 const heroText = document.getElementById('splash-hero');
 const extraContent = document.getElementById('splash-right');
 
-let splashBox;
-let heroBox;
-let extraBox;
-function updateBoxes() {
-  splashBox = splash.getBoundingClientRect();
-  heroBox = heroText.getBoundingClientRect();
-  extraBox = extraContent.getBoundingClientRect();
+// NOTE: I am updating these objects, rather than recreating them
+// because they are only passed once to the bubble system
+// and I don't want them to go stale for the bubbles
+let splashBox = {};
+let heroBox = {};
+let extraBox = {};
+function updateBox(bbox, elm) {
+  const r = elm.getBoundingClientRect()
+  bbox.top = r.top;
+  bbox.left = r.left;
+  bbox.right = r.right;
+  bbox.bottom = r.bottom;
+  bbox.width = r.width;
+  bbox.height = r.height;
 }
-
+function updateBoxes() {
+  updateBox(splashBox, splash);
+  updateBox(heroBox, heroText);
+  updateBox(extraBox, extraContent);
+}
 const resizeObserver = new ResizeObserver((entries) => {
   for (const entry of entries) {
     if (entry.target === splash) {
