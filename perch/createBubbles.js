@@ -218,29 +218,32 @@ export default function createBubbles(p5, opt) {
     p5.pop();
   }
 
-  const makeBubble = (x, y) => {
+  const createBubble = () => {
+    // Decide which content to use
     let content = opt.content[bubbleIdx % opt.content.length];
     bubbleIdx += 1;
-    if (content.onScreen) return; // do not create something already on screen
+    // Prevent creation of content already on screen
+    if (content.onScreen) return;
 
-    // TODO: this should be using the bounding box
-    const b = boxParticle(
-      x || p5.randomGaussian(p5.width / 2, 60),
-      y || p5.randomGaussian(p5.width / 2, 60),
-      0,
-      0,
-      0.2,
-      0.5, // TODO: would randomising the damping and density a bit make a more organic layout?
-    );
+    // Set the initial position
+    let [x, y] = content.position ? [
+      content.position[0] * p5.width,
+      content.position[1] * p5.height,
+    ] : [
+      p5.randomGaussian(p5.width / 2, 60),
+      p5.randomGaussian(p5.height / 2, 60),
+    ]
 
-    // mark the creation time
+    // Create a box particle to hold the content
+    // TODO: would randomising the damping and density a bit make a more organic layout?
+    const b = boxParticle(x, y, 0, 0, 0.2, 0.5);
+
+    // Mark the creation time and attach content
     b.madeAt = p5.frameCount;
-
-    // attach the content
     b.content = content;
     b.content.onScreen = true;
 
-    // save the measurement for animating in and out
+    // Save the measurement for animating in and out
     const { width, height } = opt.measureBubble(b);
     b.targetWidth = width;
     b.targetHeight = height;
@@ -256,7 +259,7 @@ export default function createBubbles(p5, opt) {
     insertBubbles(total = 1) {
       for (let i = 0; i < opt.content.length; i += 1) {
         if (!total) break;
-        const b = makeBubble();
+        const b = createBubble();
         if (b) {
           bubbles.push(b);
           total -= 1;

@@ -45,7 +45,11 @@
 
         p.setup = () => {
           bubbles = createBubbles(p, {
-            content: Array.from(new Array(15)).map((_, i) => ({ text: `${i} - ${prefixes[i % prefixes.length]}`, permanent: i === 0 })),
+            content: Array.from(new Array(15)).map((_, i) => ({
+              text: `${i} - ${prefixes[i % prefixes.length]}`,
+              permanent: i === 0,
+              position: i === 0 ? [2 / 3, 2 /3] : null,
+            })),
             measureBubble(b) {
               let width;
               p.push();
