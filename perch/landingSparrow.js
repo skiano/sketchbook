@@ -24,7 +24,7 @@ export default function createLandingSparrow(opt) {
         render: loops,
         x: 0,
         y: -60,
-        scale: 0.4,
+        scale: 0.45,
       });
       currentX = -60;
       currentY = p5.height / 5;
@@ -48,11 +48,14 @@ export default function createLandingSparrow(opt) {
       followX = true;
     },
     addBubblePerch(bubble) {
-      sparrow.addPerch(bubble.x - bubble.rx, bubble.y - bubble.ry, bubble.width);
+      bubble.perch = sparrow.addPerch(bubble.x - bubble.rx, bubble.y - bubble.ry, bubble.width);
+    },
+    removeBubblePerch(bubble) {
+      sparrow.removePerch(bubble.perch);
     },
     draw(p5) {
-      if (followX) currentX = p5.lerp(currentX, p5.mouseX, 0.3);
-      if (followY) currentY = p5.lerp(currentY, p5.mouseY, 0.3);
+      if (followX && p5.mouseX > 0) currentX = p5.lerp(currentX, p5.mouseX, 0.3);
+      if (followY && p5.mouseY > 0) currentY = p5.lerp(currentY, p5.mouseY, 0.3);
       sparrow.moveTo(currentX, currentY);
       sparrow.render();
     },

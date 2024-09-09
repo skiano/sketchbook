@@ -88,18 +88,27 @@ body {
 }
 
 .fade-in {
+  opacity: 0;
+}
+
+.ready-to-fade .fade-in {
   opacity: 0; /* Start hidden */
-  transform: translate(0, 0px);
+  transform: translate3d(0, 10px, 0);
   animation: fadeIn 400ms ease forwards; /* 2 seconds fade-in, runs once */
+}
+
+.ready-to-fade .fade-in:nth-child(2n) {
+  animation-delay: 1200ms;
+  animation-duration: 700ms;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translate3d(0, 10px);
+    transform: translate3d(0, 10px, 0);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0);
+    transform: translate3d(0, 0, 0);
   }
 }

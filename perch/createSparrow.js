@@ -108,7 +108,12 @@ export default function createSparrow(opt) {
 
   return new Proxy({
     addPerch(x, y, w, magnet = 30) {
-      perches.push([x, y, w, magnet * scale]);
+      const p = [x, y, w, magnet * scale];
+      perches.push(p);
+      return p; // makes it easier (though more bug prone) for other code to remove perch
+    },
+    removePerch(p) {
+      perches.splice(perches.indexOf(p), 1);
     },
     eachPerch(fn) {
       perches.forEach(p => fn(...p));

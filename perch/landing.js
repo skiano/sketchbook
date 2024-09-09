@@ -87,16 +87,21 @@ const landingBubbles = createLandingBubbles({
   onHover(bubble) {
     landingSparrow.goTo(bubble.x, bubble.y - bubble.ry);
     landingSparrow.followX();
+    document.body.style.cursor = 'pointer';
   },
   onSettle(bubble) {
     landingSparrow.addBubblePerch(bubble);
   },
-  onLeave() {
+  onLeave(bubble) {
+    landingSparrow.removeBubblePerch(bubble)
     landingSparrow.follow();
+    document.body.style.cursor = 'default';
   },
 });
 
 new p5((p) => {
+  let hasMoved = false;
+
   p.setup = () => {
     p.frameRate(60);
     updateBoxes();
@@ -105,6 +110,7 @@ new p5((p) => {
     resizeObserver.observe(splash);
     landingBubbles.setup(p);
   }
+
   p.draw = () => {
     // when the resize observer fires the canvas will no longer match the splashbox
     // and it's time to resize the canvas
@@ -113,6 +119,22 @@ new p5((p) => {
     }
     p.clear();
     landingBubbles.draw(p);
+
+    // KINDA FINICKY, but just gonna stick some keyframe logic here
+    if (p.frameCount === 2) {
+      heroText.classList.add('ready-to-fade');
+    }
+
+    if (p.frameCount === 30) {
+      landingSparrow.start();
+    }
+  }
+
+  p.mouseMoved = () => {
+    if (!hasMoved && p.frameCount > 90) {
+      landingSparrow.follow();
+      hasMoved = true;
+    }
   }
 }, splash);
 
@@ -126,7 +148,6 @@ new p5((p) => {
     p.createCanvas(splashBox.width, splashBox.height);
     affixCanvas(splash, p.canvas);
     landingSparrow.setup(p);
-    landingSparrow.start();
   }
 
   p.draw = () => {

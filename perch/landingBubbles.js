@@ -67,14 +67,14 @@ export default function createLandingBubbles(opt) {
     draw(p5) {
       bubbles.render();
 
-      if (p5.frameCount === 30) {
+      if (p5.frameCount === 100) {
         bubbles.insertBubbles(8);
       }
 
-      if (p5.frameCount % (60 * 4) === 0) {
-        bubbles.removeBubbles(3);
-        bubbles.insertBubbles(3);
-      }
+      // if (p5.frameCount % (60 * 4) === 0 && !bubbles.isHovering()) {
+      //   bubbles.removeBubbles(3);
+      //   bubbles.insertBubbles(3);
+      // }
     },
   }
 }

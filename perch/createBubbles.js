@@ -216,6 +216,7 @@ export default function createBubbles(p5, opt) {
   let center2 = sphereParticle(p5.random(20, getRelX(0.5)), p5.random(20, getRelY(0.5)), opt.focalWeight);
   let center3 = sphereParticle(p5.random(20, getRelX(0.5)), p5.random(20, getRelY(0.5)), opt.focalWeight);
   let bubbleIdx = 0;
+  let isHovering = false;
 
   const renderBubble = (b) => {
     if (b.width < 1 || b.height < 1) return;
@@ -269,6 +270,9 @@ export default function createBubbles(p5, opt) {
   }
 
   return {
+    isHovering() {
+      return isHovering;
+    },
     insertBubbles(total = 1) {
       for (let i = 0; i < opt.content.length; i += 1) {
         if (!total) break;
@@ -294,6 +298,7 @@ export default function createBubbles(p5, opt) {
     },
     render() {
       p5.cursor(p5.ARROW);
+      isHovering = false;
 
       // 1. Accumulate forces
       bubbles.forEach((b1, i) => {
@@ -314,6 +319,7 @@ export default function createBubbles(p5, opt) {
             opt.onSettle(b1);
             b1.hasSettled = true;
           }
+          isHovering = true;
           p5.cursor(p5.HAND);
         } else {
           if (b1.hover) {
