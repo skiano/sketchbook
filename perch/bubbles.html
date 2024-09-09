@@ -45,7 +45,7 @@
 
         p.setup = () => {
           bubbles = createBubbles(p, {
-            content: Array.from(new Array(15)).map((_, i) => ({ text: `${i} - ${prefixes[i % prefixes.length]}`, isPrimary: i === 0 })),
+            content: Array.from(new Array(15)).map((_, i) => ({ text: `${i} - ${prefixes[i % prefixes.length]}`, permanent: i === 0 })),
             measureBubble(b) {
               let width;
               p.push();
@@ -63,7 +63,7 @@
               p.fill(
                 b.hover
                   ? '#ff654a'
-                  : (b.content.isPrimary ? '#ff654a' : '#9aa1a2')
+                  : (b.content.permanent ? '#ff654a' : '#9aa1a2')
               );
               p.textAlign(p.CENTER, p.CENTER);
               p.text(b.content.text, b.x, b.y);
@@ -74,6 +74,15 @@
         p.draw = () => {
           p.background('#f9efee');
           bubbles.render();
+
+          if (p.frameCount === 30) {
+            bubbles.insertBubbles(8);
+          }
+
+          if (p.frameCount % (60 * 4) === 0) {
+            bubbles.removeBubbles(3);
+            bubbles.insertBubbles(3);
+          }
         }
       }, {
         fps: 60,

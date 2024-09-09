@@ -218,7 +218,11 @@ export default function createBubbles(p5, opt) {
     p5.pop();
   }
 
-  const makeBubble = (x, y, color) => {
+  const makeBubble = (x, y) => {
+    let content = opt.content[bubbleIdx % opt.content.length];
+    bubbleIdx += 1;
+    if (content.onScreen) return; // do not create something already on screen
+
     // TODO: this should be using the bounding box
     const b = boxParticle(
       x || p5.randomGaussian(p5.width / 2, 60),
@@ -228,12 +232,13 @@ export default function createBubbles(p5, opt) {
       0.2,
       0.5, // TODO: would randomising the damping and density a bit make a more organic layout?
     );
-    b.fill = color;
+
+    // mark the creation time
     b.madeAt = p5.frameCount;
 
     // attach the content
-    b.content = opt.content[bubbleIdx % opt.content.length];
-    bubbleIdx += 1;
+    b.content = content;
+    b.content.onScreen = true;
 
     // save the measurement for animating in and out
     const { width, height } = opt.measureBubble(b);
@@ -242,12 +247,35 @@ export default function createBubbles(p5, opt) {
     return b;
   }
 
-  bubbles.push(makeBubble(focalX, focalY, 'yellow'));
-  for (let i = 0; i < 8; i += 1) {
-    bubbles.push(makeBubble());
+  const destroyBubble = (b) => {
+    b.destroyAt = p5.frameCount;
+    b.content.onScreen = false;
   }
 
   return {
+    insertBubbles(total = 1) {
+      for (let i = 0; i < opt.content.length; i += 1) {
+        if (!total) break;
+        const b = makeBubble();
+        if (b) {
+          bubbles.push(b);
+          total -= 1;
+        }
+      }
+    },
+    removeBubbles(total = 1) {
+      for (let i = 0; i < bubbles.length; i += 1) {
+        let b = bubbles[i];
+        if (!total) break;
+        if (
+          b.hover ||
+          b.content.permanent ||
+          !b.content.onScreen
+        ) continue;
+        destroyBubble(b);
+        total -= 1;
+      }
+    },
     render() {
       p5.cursor(p5.ARROW);
 
@@ -305,16 +333,6 @@ export default function createBubbles(p5, opt) {
           if (t === 1) b.isReady = true;
         }
       });
-
-      // 3. Decide if/when to insert more bubbles
-      if ((p5.frameCount) % Math.min((bubbles.length * bubbles.length * bubbles.length / 3.5) >> 0, 60 * 4) === 0) {
-        bubbles.push(makeBubble());
-  
-        // mark earliest box (after the first...) for destruction
-        if (bubbles.length > 10) {
-          bubbles[1].destroyAt = p5.frameCount + 0;
-        }
-      }
   
       // 4. Remove any bubbles that are destroyed
       bubbles = bubbles.filter(b => !b.destroyed);
