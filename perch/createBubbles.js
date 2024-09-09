@@ -129,6 +129,9 @@ const sphereParticle = (x = 0, y = 0, r = 1, density = 0.1, damping = 0.99) => {
 // areas as if suspended in a liquid
 const pressureForce = (p1, p2, k = 1, margin = 10) => {
   const minDistance = Math.max(p1.rx + p1.ry + p2.rx + p2.ry) + margin;
+
+  // TODO: I really need to figure out how to make this different along x and y direction
+
   const dx = p1.nextX - p2.nextX;
   const dy = p1.nextY - p2.nextY;
   const d = Math.sqrt(dx * dx + dy * dy);
@@ -194,6 +197,7 @@ export default function createBubbles(p5, opt) {
     measureBubble: () => ({ width: p5.randomGaussian(160, 20), height: 60 }),
     renderBubble: () => {},
     onHover: (b) => { console.log('hover', b); },
+    onSettle: (b) => { console.log('settle', b); },
     onLeave: (b) => { console.log('leave', b); },
     focalPosition: [0.6, 0.6],
     focalWeight: 30,
@@ -306,12 +310,17 @@ export default function createBubbles(p5, opt) {
             b1.hoverAt = p5.frameCount;
             opt.onHover(b1);
           }
+          if (b1.shouldSettle && !b1.hasSettled) {
+            opt.onSettle(b1);
+            b1.hasSettled = true;
+          }
           p5.cursor(p5.HAND);
         } else {
           if (b1.hover) {
             opt.onLeave(b1);
           }
           b1.hover = false;
+          b1.hasSettled = false;
           b1.hoverAt = undefined;
         }
 
@@ -329,7 +338,9 @@ export default function createBubbles(p5, opt) {
         });
 
         if (b1.hover) {
-          stubbornPoint(b1, p5.min((p5.frameCount - b1.hoverAt) / 15, 1));
+          let st = p5.min((p5.frameCount - b1.hoverAt) / 15, 1);
+          stubbornPoint(b1, st);
+          b1.shouldSettle = st === 1;
         }
       });
 

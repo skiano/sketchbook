@@ -29,7 +29,6 @@ body {
 
 #splash-wrap {
   flex-grow: 1;
-  outline: 1px solid red;
   max-width: 1600px;
   max-height: 1000px;
   height: 100%;
@@ -44,20 +43,17 @@ body {
   justify-content: center;
   align-items: center;
   flex-basis: 100px;
-  outline: 1px solid orange;
 }
 
 #splash-right {
   flex-grow: 2;
   flex-basis: 350px;
-  outline: 1px solid blue;
 }
 
 #splash-hero {
   position: relative;
   cursor: default;
   max-width: 300px;
-  outline: 1px solid pink;
   padding: 24px 0 30px;
 }
 
