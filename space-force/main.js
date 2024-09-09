@@ -835,7 +835,7 @@ addCanvas((p5) => {
       ));
 
       // mark earliest box (after the first...) for destruction
-      if (boxes.length > 10) {
+      if (boxes.length > 8) {
         boxes[1].destroyAt = p5.frameCount + 0;
       }
     }
