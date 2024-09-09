@@ -59,6 +59,8 @@ const particle = (xi = 0, yi = 0, vxi = 0, vyi = 0) => {
         case 'vy': return vy;
         case 'rx': return rx;
         case 'ry': return ry;
+        case 'fx': return fx;
+        case 'fy': return fy;
         case 'mass': return mass;
         case 'nextX': return nextX;
         case 'nextY': return nextY;
@@ -176,6 +178,13 @@ const pressureBox = (p, bbox, k = 0.4, minDist) => {
   p.force(fx * p.mass, fy * p.mass);
 }
 
+// this force makes the particle resist
+// all forces and come to a quick stop
+// it is used on hover to stop the bubble
+const stubbornPoint = (p, k = 1) => {
+  p.force(-p.fx * k, -p.fy * k);
+}
+
 // createBubbles creates a bubble system bound
 // to a specific p5 instance and bounded by a box
 export default function createBubbles(p5, opt) {
@@ -194,7 +203,6 @@ export default function createBubbles(p5, opt) {
   let center2 = sphereParticle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 30);
   let center3 = sphereParticle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 6);
   let bubbleIdx = 0;
-  let currentBubble;
 
   const renderBubble = (b) => {
     if (b.width < 1 || b.height < 1) return;
@@ -241,7 +249,6 @@ export default function createBubbles(p5, opt) {
 
   return {
     render() {
-      currentBubble = null;
       p5.cursor(p5.ARROW);
 
       // 1. Accumulate forces
@@ -255,10 +262,11 @@ export default function createBubbles(p5, opt) {
           b1.y + b1.ry > p5.mouseY
         ) {
           b1.hover = true;
-          currentBubble = b1;
+          b1.hoverAt = b1.hoverAt || p5.frameCount;
           p5.cursor(p5.HAND);
         } else {
           b1.hover = false;
+          b1.hoverAt = undefined;
         }
 
         // accumulate global forces
@@ -273,6 +281,10 @@ export default function createBubbles(p5, opt) {
             pressureForce(b1, b2, 10, 0.4);
           }
         });
+
+        if (b1.hover) {
+          stubbornPoint(b1, p5.min((p5.frameCount - b1.hoverAt) / 15, 1));
+        }
       });
 
       // 2. Render and update
@@ -299,7 +311,7 @@ export default function createBubbles(p5, opt) {
         bubbles.push(makeBubble());
   
         // mark earliest box (after the first...) for destruction
-        if (bubbles.length > 8) {
+        if (bubbles.length > 10) {
           bubbles[1].destroyAt = p5.frameCount + 0;
         }
       }
