@@ -7,6 +7,8 @@
     <title>Skiano | Graph Paper</title>
     <link rel="stylesheet" href="../shared/reset.css">
     <link rel="stylesheet" href="../shared/base.css">
+    <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&display=swap" rel="stylesheet">
   </head>
   <style>
     #app {
@@ -29,16 +31,52 @@
     <script type="module">
       import addCanvas from '../shared/addP5Canvas.js';
       import createBubbles from './createBubbles.js';
-      addCanvas((p5) => {
+
+      let prefixes = ['Message', 'Nice', 'Cool Thing'];
+
+      addCanvas((p) => {
         let bubbles;
-        p5.setup = () => {
-          bubbles = createBubbles(p5);
+
+        let setBubbleFont = () => {
+          p.textFont('Literata');
+          p.textSize(15);
+          p.textLeading(22);
         }
-        p5.draw = () => {
-          p5.background('#333');
+
+        p.setup = () => {
+          bubbles = createBubbles(p, {
+            content: Array.from(new Array(15)).map((_, i) => ({ text: `${i} - ${prefixes[i % prefixes.length]}`, isPrimary: i === 0 })),
+            measureBubble(b) {
+              let width;
+              p.push();
+              setBubbleFont();
+              console.log(p.textWidth(b.content.text));
+              width = p.textWidth(b.content.text);
+              p.pop();
+              return {
+                width: width + 50,
+                height: 55,
+              }
+            },
+            renderBubble(b) {
+              p.push();
+              setBubbleFont();
+              p.fill(b.content.isPrimary ? 'red' : '#666');
+              p.textAlign(p.CENTER, p.CENTER);
+              p.text(b.content.text, b.x, b.y);
+              p.pop();
+            },
+          });
+        }
+        p.draw = () => {
+          p.background('#f9efee');
           bubbles.render();
         }
-      }, { fps: 60 });
+      }, {
+        fps: 60,
+        width: 850,
+        height: 650
+      });
     </script>
   </body>
 </html>

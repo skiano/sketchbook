@@ -118,6 +118,7 @@ const sphereParticle = (x = 0, y = 0, r = 1, density = 0.1, damping = 0.99) => {
   p.rx = r;
   p.ry = r;
   p.mass = Math.pi * r * r * density;
+  p.damping = damping;
   return p;
 }
 
@@ -177,25 +178,38 @@ const pressureBox = (p, bbox, k = 0.4, minDist) => {
 
 // createBubbles creates a bubble system bound
 // to a specific p5 instance and bounded by a box
-export default function createBubbles(p5, boundingBox) {
+export default function createBubbles(p5, opt) {
+  opt = {
+    boundingBox: p5,
+    renderBubble: () => {},
+    measureBubble: () => ({ width: p5.randomGaussian(160, 20), height: 60 }),
+    content: [],
+    ...opt,
+  }
+
   let bubbles = [];
   let focalX = p5.randomGaussian(p5.width * 0.6, 10);
   let focalY = p5.randomGaussian(p5.height * 0.6, 10);
   let center1 = sphereParticle(focalX, focalY, 30);
   let center2 = sphereParticle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 30);
   let center3 = sphereParticle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 6);
+  let bubbleIdx = 0;
 
-  const renderBubble = (box) => {
-    if (box.width < 1 || box.height < 1) return;
+  const renderBubble = (b) => {
+    if (b.width < 1 || b.height < 1) return;
     p5.push();
     p5.noStroke();
-    p5.fill(box.fill || '#fff');
+    p5.fill('#fff');
     p5.rectMode(p5.CENTER);
-    p5.rect(box.x, box.y, box.width, box.height, 8);
+    p5.rect(b.x, b.y, b.width, b.height, 8);
+    // TODO: handle the fade in here so that render doesn't need to know about it
+    if (b.width / b.targetWidth > 0.9) {
+      opt.renderBubble(b);
+    }
     p5.pop();
   }
 
-  const makeBubble = (x, y, color, targetWidth) => {
+  const makeBubble = (x, y, color) => {
     // TODO: this should be using the bounding box
     const b = boxParticle(
       x || p5.randomGaussian(p5.width / 2, 60),
@@ -203,15 +217,23 @@ export default function createBubbles(p5, boundingBox) {
       0,
       0,
       0.2,
-      0.5,
+      0.5, // TODO: would randomising the damping and density a bit make a more organic layout?
     );
     b.fill = color;
     b.madeAt = p5.frameCount;
-    b.targetWidth = targetWidth || p5.randomGaussian(100, 20);
+
+    // attach the content
+    b.content = opt.content[bubbleIdx % opt.content.length];
+    bubbleIdx += 1;
+
+    // save the measurement for animating in and out
+    const { width, height } = opt.measureBubble(b);
+    b.targetWidth = width;
+    b.targetHeight = height;
     return b;
   }
 
-  bubbles.push(makeBubble(focalX, focalY, 'yellow', 115));
+  bubbles.push(makeBubble(focalX, focalY, 'yellow'));
   for (let i = 0; i < 8; i += 1) {
     bubbles.push(makeBubble());
   }
@@ -240,23 +262,15 @@ export default function createBubbles(p5, boundingBox) {
         renderBubble(b);
         b.update();
 
-        // handle entry and exit animation
+        // handle exit and entry animation
         let popTime = 18;
         if (b.destroyAt) {
           let t = smoothstep((p5.frameCount - b.destroyAt) / (popTime * 2));
-          b.resize(
-            p5.lerp(b.targetWidth, 0, t),
-            p5.lerp(40, 0, t),
-          );
-          if (t === 1) {
-            b.destroyed = true;
-          }
+          b.resize(p5.lerp(b.targetWidth, 0, t), p5.lerp(b.targetHeight, 0, t));
+          if (t === 1) b.destroyed = true;
         } else {
           let t = smoothstep((p5.frameCount - b.madeAt) / popTime);
-          b.resize(
-            p5.lerp(0, b.targetWidth, t),
-            p5.lerp(0, 40, t),
-          );
+          b.resize(p5.lerp(0, b.targetWidth, t), p5.lerp(0, b.targetHeight, t));
         }
       });
 
