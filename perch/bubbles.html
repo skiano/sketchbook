@@ -61,7 +61,11 @@
             renderBubble(b) {
               p.push();
               setBubbleFont();
-              p.fill(b.content.isPrimary ? 'red' : '#666');
+              p.fill(
+                b.hover
+                  ? '#ff654a'
+                  : (b.content.isPrimary ? '#ff654a' : '#9aa1a2')
+              );
               p.textAlign(p.CENTER, p.CENTER);
               p.text(b.content.text, b.x, b.y);
               p.pop();

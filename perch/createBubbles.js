@@ -194,6 +194,7 @@ export default function createBubbles(p5, opt) {
   let center2 = sphereParticle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 30);
   let center3 = sphereParticle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 6);
   let bubbleIdx = 0;
+  let currentBubble;
 
   const renderBubble = (b) => {
     if (b.width < 1 || b.height < 1) return;
@@ -240,9 +241,26 @@ export default function createBubbles(p5, opt) {
 
   return {
     render() {
+      currentBubble = null;
+      p5.cursor(p5.ARROW);
 
       // 1. Accumulate forces
       bubbles.forEach((b1, i) => {
+        // check for hover state
+        if (
+          b1.isReady &&
+          b1.x - b1.rx < p5.mouseX &&
+          b1.x + b1.rx > p5.mouseX &&
+          b1.y - b1.ry < p5.mouseY &&
+          b1.y + b1.ry > p5.mouseY
+        ) {
+          b1.hover = true;
+          currentBubble = b1;
+          p5.cursor(p5.HAND);
+        } else {
+          b1.hover = false;
+        }
+
         // accumulate global forces
         // TODO: brownianForce(b) ?????
         pressureBox(b1, p5, 0.06, 30);
@@ -258,19 +276,21 @@ export default function createBubbles(p5, opt) {
       });
 
       // 2. Render and update
-      bubbles.forEach((b) => {
+      bubbles.forEach((b, i) => {
         renderBubble(b);
         b.update();
 
         // handle exit and entry animation
         let popTime = 18;
         if (b.destroyAt) {
+          b.isReady = false;
           let t = smoothstep((p5.frameCount - b.destroyAt) / (popTime * 2));
           b.resize(p5.lerp(b.targetWidth, 0, t), p5.lerp(b.targetHeight, 0, t));
           if (t === 1) b.destroyed = true;
         } else {
           let t = smoothstep((p5.frameCount - b.madeAt) / popTime);
           b.resize(p5.lerp(0, b.targetWidth, t), p5.lerp(0, b.targetHeight, t));
+          if (t === 1) b.isReady = true;
         }
       });
 
