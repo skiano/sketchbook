@@ -1,9 +1,3 @@
-import addCanvas from '../shared/addP5Canvas.js';
-
-// -------------------------
-// REFINED PARTICLE APPROACH
-// -------------------------
-
 const smoothstep = (t) => {
   t = Math.max(Math.min(t, 1), 0);
   return t * t * (3.0 - 2.0 * t);
@@ -104,7 +98,7 @@ const particle = (xi = 0, yi = 0, vxi = 0, vyi = 0) => {
   });
 }
 
-const box = (cx, cy, width, height, density = 0.1, damping = 0.99) => {
+const boxParticle = (cx, cy, width, height, density = 0.1, damping = 0.99) => {
   const p = particle(cx, cy);
   p.isBox = true;
   p.damping = damping;
@@ -119,7 +113,7 @@ const box = (cx, cy, width, height, density = 0.1, damping = 0.99) => {
   return p;
 }
 
-const sphere = (x = 0, y = 0, r = 1, density = 0.1, damping = 0.99) => {
+const sphereParticle = (x = 0, y = 0, r = 1, density = 0.1, damping = 0.99) => {
   const p = particle(x, y);
   p.rx = r;
   p.ry = r;
@@ -127,6 +121,9 @@ const sphere = (x = 0, y = 0, r = 1, density = 0.1, damping = 0.99) => {
   return p;
 }
 
+// pressure force is a pairwise force
+// that encourages particles to spread to low density
+// areas as if suspended in a liquid
 const pressureForce = (p1, p2, k = 1, margin = 10) => {
   const minDistance = Math.max(p1.rx + p1.ry + p2.rx + p2.ry) + margin;
   const dx = p1.nextX - p2.nextX;
@@ -136,11 +133,17 @@ const pressureForce = (p1, p2, k = 1, margin = 10) => {
     const forceMagnitude = k * (minDistance - d);
     const forceX = (dx / d) * forceMagnitude;
     const forceY = (dy / d) * forceMagnitude;
-    // Apply force to one particle (the loop should ensure that the other particle gets the symetric force)
+    // Apply force to one particle 
+    // (the loop should ensure that the other particle gets the symetric force)
     p1.force(forceX, forceY);
   }
 }
 
+// vacuum applies a force directly proportional
+// to the distance between the points
+// In this case I am applying it to the boxParticles
+// but not the sphereParticles that act as control points
+// so that they act like anchors
 const vacuumPoint = (p1, p2, k = 1) => {
   const dx = p1.nextX - p2.nextX;
   const dy = p1.nextY - p2.nextY;
@@ -153,6 +156,8 @@ const vacuumPoint = (p1, p2, k = 1) => {
   p1.force(fx, fy);
 }
 
+// pressure box applies a force inward
+// to keep the boxParticles from going out of bounds
 const pressureBox = (p, bbox, k = 0.4, minDist) => {
   const top = bbox.top || 0;
   const left = bbox.left || 0;
@@ -170,13 +175,15 @@ const pressureBox = (p, bbox, k = 0.4, minDist) => {
   p.force(fx * p.mass, fy * p.mass);
 }
 
-const createBubbles = (p5, boundingBox) => {
+// createBubbles creates a bubble system bound
+// to a specific p5 instance and bounded by a box
+export default function createBubbles(p5, boundingBox) {
   let bubbles = [];
   let focalX = p5.randomGaussian(p5.width * 0.6, 10);
   let focalY = p5.randomGaussian(p5.height * 0.6, 10);
-  let center1 = sphere(focalX, focalY, 30);
-  let center2 = sphere(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 30);
-  let center3 = sphere(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 6);
+  let center1 = sphereParticle(focalX, focalY, 30);
+  let center2 = sphereParticle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 30);
+  let center3 = sphereParticle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 6);
 
   const renderBubble = (box) => {
     if (box.width < 1 || box.height < 1) return;
@@ -190,7 +197,7 @@ const createBubbles = (p5, boundingBox) => {
 
   const makeBubble = (x, y, color, targetWidth) => {
     // TODO: this should be using the bounding box
-    const b = box(
+    const b = boxParticle(
       x || p5.randomGaussian(p5.width / 2, 60),
       y || p5.randomGaussian(p5.width / 2, 60),
       0,
@@ -205,12 +212,12 @@ const createBubbles = (p5, boundingBox) => {
   }
 
   bubbles.push(makeBubble(focalX, focalY, 'yellow', 115));
-  for (let i = 0; i < 2; i += 1) {
+  for (let i = 0; i < 8; i += 1) {
     bubbles.push(makeBubble());
   }
 
   return {
-    draw() {
+    render() {
 
       // 1. Accumulate forces
       bubbles.forEach((b1, i) => {
@@ -255,10 +262,7 @@ const createBubbles = (p5, boundingBox) => {
 
       // 3. Decide if/when to insert more bubbles
       if ((p5.frameCount) % Math.min((bubbles.length * bubbles.length * bubbles.length / 3.5) >> 0, 60 * 4) === 0) {
-        bubbles.push(makeBubble(
-          // p5.random(20, p5.width - 20),
-          // p5.random(20, p5.height - 20)
-        ));
+        bubbles.push(makeBubble());
   
         // mark earliest box (after the first...) for destruction
         if (bubbles.length > 8) {
@@ -271,17 +275,3 @@ const createBubbles = (p5, boundingBox) => {
     }
   }
 }
-
-addCanvas((p5) => {
-  let bubbles;
-
-  p5.setup = () => {
-    bubbles = createBubbles(p5);
-  }
-
-  p5.draw = () => {
-    p5.background('#333');
-
-    bubbles.draw();
-  }
-}, { fps: 60 });

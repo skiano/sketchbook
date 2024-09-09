@@ -26,6 +26,19 @@
         }
       }
     </script>
-    <script type="module" src="./bubbles.js"></script>
+    <script type="module">
+      import addCanvas from '../shared/addP5Canvas.js';
+      import createBubbles from './createBubbles.js';
+      addCanvas((p5) => {
+        let bubbles;
+        p5.setup = () => {
+          bubbles = createBubbles(p5);
+        }
+        p5.draw = () => {
+          p5.background('#333');
+          bubbles.render();
+        }
+      }, { fps: 60 });
+    </script>
   </body>
 </html>
