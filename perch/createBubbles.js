@@ -189,19 +189,30 @@ const stubbornPoint = (p, k = 1) => {
 // to a specific p5 instance and bounded by a box
 export default function createBubbles(p5, opt) {
   opt = {
-    boundingBox: p5,
-    renderBubble: () => {},
-    measureBubble: () => ({ width: p5.randomGaussian(160, 20), height: 60 }),
     content: [],
+    bbox: null,
+    measureBubble: () => ({ width: p5.randomGaussian(160, 20), height: 60 }),
+    renderBubble: () => {},
+    focalPosition: [0.6, 0.6],
+    focalWeight: 30,
     ...opt,
   }
 
+  const getRelX = (x) => {
+    return (bbox.left || 0) + (x * bbox.width);
+  }
+
+  const getRelY = (y) => {
+    return (bbox.top || 0) + (y * bbox.height);
+  }
+
   let bubbles = [];
-  let focalX = p5.randomGaussian(p5.width * 0.6, 10);
-  let focalY = p5.randomGaussian(p5.height * 0.6, 10);
-  let center1 = sphereParticle(focalX, focalY, 30);
-  let center2 = sphereParticle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 30);
-  let center3 = sphereParticle(p5.random(20, p5.width / 2), p5.random(20, p5.height / 2), 6);
+  let bbox = opt.bbox || p5;
+  let focalX = p5.randomGaussian(getRelX(opt.focalPosition[0]), 10);
+  let focalY = p5.randomGaussian(getRelY(opt.focalPosition[1]), 10);
+  let center1 = sphereParticle(focalX, focalY, opt.focalWeight);
+  let center2 = sphereParticle(p5.random(20, getRelX(0.5)), p5.random(20, getRelY(0.5)), opt.focalWeight);
+  let center3 = sphereParticle(p5.random(20, getRelX(0.5)), p5.random(20, getRelY(0.5)), opt.focalWeight);
   let bubbleIdx = 0;
 
   const renderBubble = (b) => {
@@ -227,11 +238,11 @@ export default function createBubbles(p5, opt) {
 
     // Set the initial position
     let [x, y] = content.position ? [
-      content.position[0] * p5.width,
-      content.position[1] * p5.height,
+      getRelX(content.position[0]),
+      getRelY(content.position[1]),
     ] : [
-      p5.randomGaussian(p5.width / 2, 60),
-      p5.randomGaussian(p5.height / 2, 60),
+      getRelX(p5.randomGaussian(0.5, 0.1)),
+      getRelY(p5.randomGaussian(0.5, 0.1)),
     ]
 
     // Create a box particle to hold the content
