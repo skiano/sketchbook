@@ -386,21 +386,29 @@ export default function createBubbles(p5, opt) {
         // TODO: brownianForce(b) ?????
         pressureBox(b1, bbox);
         vacuumPoint(b1, center1, 0.5);
-        vacuumPoint(b1, i % 2 ? center2 : center2, 0.2);
-  
-        // pairwise forces
-        // NOTE: I am applying this force multiple times each loop
-        // to smooth out the solving...
-        for (let i = 0; i < 30; i += 1) {
+        vacuumPoint(b1, i % 2 ? center2 : center3, 0.2);
+      });
+
+      // 1.2 Pressure force
+      // pairwise forces
+      // NOTE: I am applying this force multiple times each loop
+      // to smooth out the solving...
+      // TODO: weird to iterate inside the pairing... if i do this i think i should move it out
+      // split the phases into three loops
+      for (let i = 0; i < 30; i += 1) {
+        bubbles.forEach((b1) => {
           bubbles.forEach((b2) => {
             if (b1 !== b2) {
               pressureForce(b1, b2, 0.1, 20);
             }
           });
-        }
+        });
+      }
 
+      // 1.3 constraints
+
+      bubbles.forEach((b1) => {
         constrainInBox(b1, bbox);
-
         if (b1.hover) {
           let st = p5.min((p5.frameCount - b1.hoverAt) / 15, 1);
           stubbornPoint(b1, st);
