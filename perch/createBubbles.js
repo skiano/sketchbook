@@ -133,7 +133,7 @@ const pressureForce = (p1, p2, k = 1.5, margin = 40) => {
   const dy = p1.nextY - p2.nextY;
   const d = Math.sqrt(dx * dx + dy * dy);
 
-  const minDistance = Math.max(p1.rx, p1.ry, p2.rx, p2.ry) * 2.2 + margin;
+  const minDistance = Math.max(p1.rx, p1.ry, p2.rx, p2.ry) * 2 + margin;
 
   if (d > 0 && d < minDistance) {
     const ratio1 = p1.targetWidth / p1.targetHeight;
@@ -294,8 +294,8 @@ export default function createBubbles(p5, opt) {
       getRelX(content.position[0]),
       getRelY(content.position[1]),
     ] : [
-      getRelX(p5.random(0.3, 0.7)),
-      getRelY(p5.random(0.3, 0.7)),
+      getRelX(p5.random(0.2, 0.8)),
+      getRelY(p5.random(0.2, 0.8)),
     ]
 
     // Create a box particle to hold the content
@@ -385,15 +385,19 @@ export default function createBubbles(p5, opt) {
         // accumulate global forces
         // TODO: brownianForce(b) ?????
         pressureBox(b1, bbox);
-        vacuumPoint(b1, center1, 0.8);
-        // vacuumPoint(b1, i % 2 ? center2 : center2, 0.05);
+        vacuumPoint(b1, center1, 0.5);
+        vacuumPoint(b1, i % 2 ? center2 : center2, 0.2);
   
         // pairwise forces
-        bubbles.forEach((b2) => {
-          if (b1 !== b2) {
-            pressureForce(b1, b2);
-          }
-        });
+        // NOTE: I am applying this force multiple times each loop
+        // to smooth out the solving...
+        for (let i = 0; i < 30; i += 1) {
+          bubbles.forEach((b2) => {
+            if (b1 !== b2) {
+              pressureForce(b1, b2, 0.1, 20);
+            }
+          });
+        }
 
         constrainInBox(b1, bbox);
 

@@ -48,6 +48,9 @@ body {
 #splash-right {
   flex-grow: 2;
   flex-basis: 350px;
+  /* outline: 1px solid red; */
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 #splash-hero {
