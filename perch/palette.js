@@ -60,7 +60,7 @@ const splitB = matchLuminance(complement.clone().spin(splitAngle), keyColor.getL
 
 const previewPrimary = swatchGroup('Primary');
 previewPrimary(keyColor);
-previewPrimary(keyColorLight);
+// previewPrimary(keyColorLight);
 
 const secondaryColors = [];
 const tertiaryColors = [];

@@ -8,14 +8,14 @@ p5FontVariables(p5);
 const DPR = window.devicePixelRatio;
 const splash = document.getElementById('splash');
 const heroText = document.getElementById('splash-hero');
-const extraContent = document.getElementById('splash-right');
+const splashContent = document.getElementById('splash-wrap');
 
 // NOTE: I am updating these objects, rather than recreating them
 // because they are only passed once to the bubble system
 // and I don't want them to go stale for the bubbles
 let splashBox = {};
+let mainBox = {};
 let heroBox = {};
-let extraBox = {};
 
 const updateBox = (bbox, elm) => {
   const r = elm.getBoundingClientRect()
@@ -29,8 +29,8 @@ const updateBox = (bbox, elm) => {
 
 const updateBoxes = () => {
   updateBox(splashBox, splash);
+  updateBox(mainBox, splashContent);
   updateBox(heroBox, heroText);
-  updateBox(extraBox, extraContent);
 }
 
 const resizeObserver = new ResizeObserver((entries) => {
@@ -55,48 +55,76 @@ const landingSparrow = createLandingSparrow({
   getStartingPosition() {
     return {
       x: heroBox.left + heroBox.width * 1 / 3,
-      y: heroBox.top,
+      y: heroBox.top - 8,
     }
   }
 })
 
-const landingBubbles = createLandingBubbles({
-  bbox: extraBox,
-  queries: [
-    'What are the average home prices in this neighborhood?',
-    'How have property values changed in the last 5 years?',
-    'What is the crime rate in this area?',
-    'How are the local schools rated?',
-    'What is the average commute time to downtown?',
-    'What are the property tax rates in this area?',
-    'How does the cost of living here compare to other neighborhoods?',
-    'What percentage of homes in this area are owner-occupied?',
-    'What amenities are within walking distance?',
-    'What is the average rental income for properties in this area?',
-    'How competitive is the housing market here?',
-    'Are there any planned developments or zoning changes nearby?',
-    'What are the flood or natural disaster risks in this area?',
-    'How does this area’s air quality compare to other parts of the city?',
-    'What is the average household income in this neighborhood?',
-    'How much can I expect to spend on utilities here?',
-    'What public transportation options are available nearby?',
-    'How do home prices here compare to the citywide average?',
-    'What are the noise levels like in this area?',
-    'How long do homes typically stay on the market here?',
-  ],
-  onHover(bubble) {
-    landingSparrow.goTo(bubble.x, bubble.y - bubble.ry);
-    landingSparrow.followX();
-    document.body.style.cursor = 'pointer';
-  },
-  onSettle(bubble) {
-    landingSparrow.addBubblePerch(bubble);
-  },
-  onLeave(bubble) {
-    landingSparrow.removeBubblePerch(bubble)
-    landingSparrow.follow();
-    document.body.style.cursor = 'default';
-  },
+// const landingBubbles = createLandingBubbles({
+//   bbox: extraBox,
+//   queries: [
+//     'What are the average home prices in this neighborhood?',
+//     'How have property values changed in the last 5 years?',
+//     'What is the crime rate in this area?',
+//     'How are the local schools rated?',
+//     'What is the average commute time to downtown?',
+//     'What are the property tax rates in this area?',
+//     'How does the cost of living here compare to other neighborhoods?',
+//     'What percentage of homes in this area are owner-occupied?',
+//     'What amenities are within walking distance?',
+//     'What is the average rental income for properties in this area?',
+//     'How competitive is the housing market here?',
+//     'Are there any planned developments or zoning changes nearby?',
+//     'What are the flood or natural disaster risks in this area?',
+//     'How does this area’s air quality compare to other parts of the city?',
+//     'What is the average household income in this neighborhood?',
+//     'How much can I expect to spend on utilities here?',
+//     'What public transportation options are available nearby?',
+//     'How do home prices here compare to the citywide average?',
+//     'What are the noise levels like in this area?',
+//     'How long do homes typically stay on the market here?',
+//   ],
+//   onHover(bubble) {
+//     landingSparrow.goTo(bubble.x, bubble.y - bubble.ry);
+//     landingSparrow.followX();
+//     document.body.style.cursor = 'pointer';
+//   },
+//   onSettle(bubble) {
+//     landingSparrow.addBubblePerch(bubble);
+//   },
+//   onLeave(bubble) {
+//     landingSparrow.removeBubblePerch(bubble)
+//     landingSparrow.follow();
+//     document.body.style.cursor = 'default';
+//   },
+// });
+
+const queries = [
+  'What are the average home prices in this neighborhood?',
+  'How have property values changed in the last 5 years?',
+  'What is the crime rate in this area?',
+  'How are the local schools rated?',
+  'What is the average commute time to downtown?',
+  'What are the property tax rates in this area?',
+  'How does the cost of living here compare to other neighborhoods?',
+  'What percentage of homes in this area are owner-occupied?',
+  'What amenities are within walking distance?',
+  'What is the average rental income for properties in this area?',
+  'How competitive is the housing market here?',
+  'Are there any planned developments or zoning changes nearby?',
+  'What are the flood or natural disaster risks in this area?',
+  'How does this area’s air quality compare to other parts of the city?',
+  'What is the average household income in this neighborhood?',
+  'How much can I expect to spend on utilities here?',
+  'What public transportation options are available nearby?',
+  'How do home prices here compare to the citywide average?',
+  'What are the noise levels like in this area?',
+  'How long do homes typically stay on the market here?',
+].map(t => ({ text: t }));
+
+queries.push({
+  primary: true,
+  text: 'Ask us anything',
 });
 
 new p5((p) => {
@@ -108,7 +136,6 @@ new p5((p) => {
     p.createCanvas(splashBox.width, splashBox.height);
     affixCanvas(splash, p.canvas);
     resizeObserver.observe(splash);
-    landingBubbles.setup(p);
   }
 
   p.draw = () => {
@@ -118,7 +145,6 @@ new p5((p) => {
       p.resizeCanvas(splashBox.width, splashBox.height);
     }
     p.clear();
-    landingBubbles.draw(p);
 
     // KINDA FINICKY, but just gonna stick some keyframe logic here
     if (p.frameCount === 2) {
@@ -128,6 +154,55 @@ new p5((p) => {
     if (p.frameCount === 30) {
       landingSparrow.start();
     }
+
+    // DRAW SOME BUBBLES...
+
+    let top = mainBox.top;
+    let left = mainBox.left;
+    let right = mainBox.right;
+    let bottom = mainBox.bottom;
+    let qHeight = heroBox.height;
+    let qMargin = 14;
+    let qPadding = 20;
+    let qTextSize = 15;
+    let qLineHeight = 23;
+
+    let y = top;
+    let x = left + heroBox.width + qMargin;
+    // let maxRows = ((mainBox.height + qMargin) / (qHeight + qMargin)) >> 0;
+    let row = 0;
+
+    p.push();
+    p.textFont('Literata');
+    p.textSize(qTextSize);
+    p.textLeading(qLineHeight);
+    for (let q = 0; q < queries.length; q += 1) {
+      let query = queries[q];
+      const words = query.text.split(' ');
+      const lines = [ // super naive wrap into two lines...
+        words.slice(0, Math.ceil(words.length / 2)).join(' '),
+        words.slice(Math.ceil(words.length / 2)).join(' '),
+      ];
+      let textW = query.primary ? 200 : Math.max(...lines.map(l => p.textWidth(l)));
+      let qWidth = textW + qPadding * 2;
+
+      if (x + qWidth > right) {
+        x = left;
+        y += qHeight + qMargin;
+        row += 1;
+      }
+
+      if (y + qHeight > bottom) {
+        break;
+      }
+
+      p.noStroke();
+      p.fill(query.primary ? '#b0f4df' : '#fff');
+      p.rect(x, y, qWidth, qHeight, 28);
+
+      x += qWidth + qMargin;
+    }
+    p.pop();
   }
 
   p.mouseMoved = () => {

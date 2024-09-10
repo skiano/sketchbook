@@ -23,11 +23,11 @@ export default function createLandingSparrow(opt) {
       sparrow = createSparrow({
         render: loops,
         x: 0,
-        y: -60,
+        y: 0,
         scale: 0.45,
       });
       currentX = -60;
-      currentY = p5.height / 5;
+      currentY = 0;
     },
     start() {
       let { x, y } = opt.getStartingPosition();
