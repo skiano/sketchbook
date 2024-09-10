@@ -55,7 +55,7 @@ export default function createLandingBubbles(opt) {
           p5.fill(
             b.hover
               ? '#ff654a'
-              : (b.content.permanent ? '#ff654a' : '#9aa1a2')
+              : (b.content.permanent ? '#ff654a' : '#415053')
           );
           p5.textAlign(p5.LEFT, p5.CENTER);
           p5.text(b.content.lines[0], b.x - b.rx + boxPadding, b.y - (lineHeight / 2));

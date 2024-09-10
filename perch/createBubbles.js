@@ -272,6 +272,7 @@ export default function createBubbles(p5, opt) {
     if (b.width < 1 || b.height < 1) return;
     p5.push();
     p5.noStroke();
+    // p5.fill('#131f21');
     p5.fill('#fff');
     p5.rectMode(p5.CENTER);
     p5.rect(b.x, b.y, b.width, b.height, 8);
