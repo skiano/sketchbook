@@ -32,7 +32,7 @@
       import addCanvas from '../shared/addP5Canvas.js';
       import createBubbles from './createBubbles.js';
 
-      let prefixes = ['Message', 'Nice', 'Cool Thing'];
+      let prefixes = ['A longer Message', 'Nice Message', 'A very Cool Thing'];
 
       addCanvas((p) => {
         let bubbles;
@@ -80,7 +80,7 @@
           bubbles.render();
 
           if (p.frameCount === 30) {
-            bubbles.insertBubbles(8);
+            bubbles.insertBubbles(10);
           }
 
           if (p.frameCount % (60 * 4) === 0) {

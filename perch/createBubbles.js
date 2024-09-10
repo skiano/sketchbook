@@ -127,16 +127,26 @@ const sphereParticle = (x = 0, y = 0, r = 1, density = 0.1, damping = 0.99) => {
 // pressure force is a pairwise force
 // that encourages particles to spread to low density
 // areas as if suspended in a liquid
-const pressureForce = (p1, p2, k = 1, margin = 10) => {
-  const minDistance = Math.max(p1.rx + p1.ry + p2.rx + p2.ry) + margin;
 
-  // TODO: I really need to figure out how to make this different along x and y direction
-
+const pressureForce = (p1, p2, k = 1.5, margin = 40) => {
   const dx = p1.nextX - p2.nextX;
   const dy = p1.nextY - p2.nextY;
   const d = Math.sqrt(dx * dx + dy * dy);
-  if (d < minDistance) {
-    const forceMagnitude = k * (minDistance - d);
+
+  const minDistance = Math.max(p1.rx, p1.ry, p2.rx, p2.ry) * 2.2 + margin;
+
+  if (d > 0 && d < minDistance) {
+    const ratio1 = p1.targetWidth / p1.targetHeight;
+    const ratio2 = p2.targetWidth / p2.targetHeight;
+    const averageRatio = (ratio1 + ratio2) / 2;
+    const angle = Math.atan2(dy, dx); // Gives angle in radians (-π to π)
+    const cosAngle = Math.abs(Math.cos(angle)); // Stronger when horizontally aligned
+    const sinAngle = Math.abs(Math.sin(angle)); // Weaker when vertically aligned
+
+    // Scale the force magnitude based on the width-to-height ratio and the angle
+    const forceMagnitude = k * (minDistance - d) * (cosAngle * averageRatio + sinAngle / averageRatio);
+
+    // const forceMagnitude = k * (minDistance - d);
     const forceX = (dx / d) * forceMagnitude;
     const forceY = (dy / d) * forceMagnitude;
     // Apply force to one particle 
@@ -144,6 +154,23 @@ const pressureForce = (p1, p2, k = 1, margin = 10) => {
     p1.force(forceX, forceY);
   }
 }
+
+// const pressureForce = (p1, p2, k = 1, margin = 10) => {
+//   const dx = p1.nextX - p2.nextX;
+//   const dy = p1.nextY - p2.nextY;
+//   const d = Math.sqrt(dx * dx + dy * dy);
+
+//   const minDistance = Math.max(p1.rx + p1.ry + p2.rx + p2.ry) + margin;
+
+//   if (d > 0 && d < minDistance) {
+//     const forceMagnitude = k * (minDistance - d);
+//     const forceX = (dx / d) * forceMagnitude;
+//     const forceY = (dy / d) * forceMagnitude;
+//     // Apply force to one particle 
+//     // (the loop should ensure that the other particle gets the symetric force)
+//     p1.force(forceX, forceY);
+//   }
+// }
 
 // vacuum applies a force directly proportional
 // to the distance between the points
@@ -164,21 +191,44 @@ const vacuumPoint = (p1, p2, k = 1) => {
 
 // pressure box applies a force inward
 // to keep the boxParticles from going out of bounds
-const pressureBox = (p, bbox, k = 0.4, minDist) => {
+const pressureBox = (p, bbox, k = 0.01) => {
   const top = bbox.top || 0;
   const left = bbox.left || 0;
   const dl = (p.nextX - p.rx) - left;
   const dr = left + bbox.width - (p.nextX + p.rx);
   const dt = (p.nextY - p.ry) - top;
   const db = top + bbox.height - (p.nextY + p.ry);
-  let minD = minDist || ((p.rx + p.ry) / 4);
+  let minDx = bbox.width / 6;
+  let minDy = bbox.height / 12;
   let fx = 0;
   let fy = 0;
-  if (dl < minD) fx += k * (minD - dl);
-  if (dr < minD) fx += -k * (minD - dr);
-  if (dt < minD) fy += k * (minD - dt);
-  if (db < minD) fy += -k * (minD - db);
+  if (dl < minDx) fx += k * (minDx - dl);
+  if (dr < minDx) fx += -k * (minDx - dr);
+  if (dt < minDy) fy += k * (minDy - dt);
+  if (db < minDy) fy += -k * (minDy - db);
   p.force(fx * p.mass, fy * p.mass);
+}
+
+const constrainInBox = (p, bbox, margin = 20) => {
+  const pl = p.nextX - p.rx;
+  const pr = p.nextX + p.rx;
+  const pt = p.nextY - p.ry;
+  const pb = p.nextY + p.ry;
+  const bl = bbox.left + margin;
+  const br = bbox.left + bbox.width - margin;
+  const bt = bbox.top + margin;
+  const bb = bbox.top + bbox.height - margin;
+
+  let kx = 0;
+  let ky = 0;
+
+  if (pl < bl) kx = Math.min(bl - pl / margin, 1);
+  if (pr > br) kx = Math.min(pr - br / margin, 1);
+
+  if (pt < bt) ky = Math.min(bt - pt / margin, 1);
+  if (pb > bb) ky = Math.min(pb - bb / margin, 1);
+
+  p.force(-p.fx * kx, -p.fy * ky);
 }
 
 // this force makes the particle resist
@@ -200,7 +250,6 @@ export default function createBubbles(p5, opt) {
     onSettle: (b) => { console.log('settle', b); },
     onLeave: (b) => { console.log('leave', b); },
     focalPosition: [0.6, 0.6],
-    focalWeight: 30,
     ...opt,
   }
 
@@ -210,11 +259,12 @@ export default function createBubbles(p5, opt) {
 
   let bubbles = [];
   let bbox = opt.bbox || p5;
+  let focalWeight = Math.max(bbox.width, bbox.width) / 4;
   let focalX = p5.randomGaussian(getRelX(opt.focalPosition[0]), 10);
   let focalY = p5.randomGaussian(getRelY(opt.focalPosition[1]), 10);
-  let center1 = sphereParticle(focalX, focalY, opt.focalWeight);
-  let center2 = sphereParticle(p5.random(20, getRelX(0.5)), p5.random(20, getRelY(0.5)), opt.focalWeight);
-  let center3 = sphereParticle(p5.random(20, getRelX(0.5)), p5.random(20, getRelY(0.5)), opt.focalWeight);
+  let center1 = sphereParticle(focalX, focalY, focalWeight);
+  let center2 = sphereParticle(p5.random(20, getRelX(0.5)), p5.random(20, getRelY(0.5)), focalWeight);
+  let center3 = sphereParticle(p5.random(20, getRelX(0.5)), p5.random(20, getRelY(0.5)), focalWeight);
   let bubbleIdx = 0;
   let isHovering = false;
 
@@ -244,13 +294,15 @@ export default function createBubbles(p5, opt) {
       getRelX(content.position[0]),
       getRelY(content.position[1]),
     ] : [
-      getRelX(p5.randomGaussian(0.5, 0.1)),
-      getRelY(p5.randomGaussian(0.5, 0.1)),
+      getRelX(p5.random(0.3, 0.7)),
+      getRelY(p5.random(0.3, 0.7)),
     ]
 
     // Create a box particle to hold the content
     // TODO: would randomising the damping and density a bit make a more organic layout?
-    const b = boxParticle(x, y, 0, 0, 0.2, 0.5);
+    const density = 0.6;
+    const damping = 0.3;
+    const b = boxParticle(x, y, 0, 0, density, damping);
 
     // Mark the creation time and attach content
     b.madeAt = p5.frameCount;
@@ -332,16 +384,18 @@ export default function createBubbles(p5, opt) {
 
         // accumulate global forces
         // TODO: brownianForce(b) ?????
-        pressureBox(b1, p5, 0.06, 30);
-        vacuumPoint(b1, center1, 0.08);
-        vacuumPoint(b1, i % 2 ? center2 : center3, 0.04);
+        pressureBox(b1, bbox);
+        vacuumPoint(b1, center1, 0.8);
+        // vacuumPoint(b1, i % 2 ? center2 : center2, 0.05);
   
         // pairwise forces
         bubbles.forEach((b2) => {
           if (b1 !== b2) {
-            pressureForce(b1, b2, 10, 0.4);
+            pressureForce(b1, b2);
           }
         });
+
+        constrainInBox(b1, bbox);
 
         if (b1.hover) {
           let st = p5.min((p5.frameCount - b1.hoverAt) / 15, 1);
