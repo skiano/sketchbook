@@ -385,8 +385,8 @@ export default function createBubbles(p5, opt) {
         // accumulate global forces
         // TODO: brownianForce(b) ?????
         pressureBox(b1, bbox);
-        vacuumPoint(b1, center1, 0.5);
-        vacuumPoint(b1, i % 2 ? center2 : center3, 0.2);
+        vacuumPoint(b1, center1, 0.6);
+        vacuumPoint(b1, i % 2 ? center2 : center3, 0.3);
       });
 
       // 1.2 Pressure force
@@ -399,7 +399,7 @@ export default function createBubbles(p5, opt) {
         bubbles.forEach((b1) => {
           bubbles.forEach((b2) => {
             if (b1 !== b2) {
-              pressureForce(b1, b2, 0.1, 20);
+              pressureForce(b1, b2, 0.08, 50);
             }
           });
         });
