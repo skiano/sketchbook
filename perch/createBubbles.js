@@ -273,9 +273,9 @@ export default function createBubbles(p5, opt) {
     p5.push();
     p5.noStroke();
     // p5.fill('#131f21');
-    p5.fill('#fff');
+    p5.fill(b.content.permanent ? '#b0f4df' : '#fff');
     p5.rectMode(p5.CENTER);
-    p5.rect(b.x, b.y, b.width, b.height, 8);
+    p5.rect(b.x, b.y, b.width, b.height, 26);
     // TODO: handle the fade in here so that render doesn't need to know about it
     if (b.width / b.targetWidth > 0.9) {
       opt.renderBubble(b);

@@ -48,7 +48,12 @@ export default function createLandingSparrow(opt) {
       followX = true;
     },
     addBubblePerch(bubble) {
-      bubble.perch = sparrow.addPerch(bubble.x - bubble.rx, bubble.y - bubble.ry, bubble.width);
+      let borderR = 25;
+      bubble.perch = sparrow.addPerch(
+        bubble.x - bubble.rx + borderR,
+        bubble.y - bubble.ry,
+        bubble.width - (borderR * 2)
+      );
     },
     removeBubblePerch(bubble) {
       sparrow.removePerch(bubble.perch);

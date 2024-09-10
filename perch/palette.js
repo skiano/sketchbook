@@ -53,13 +53,14 @@ function matchLuminance(input, targetLuminance = 0.5) {
 const splitAngle = 35;
 const keyLuminance = 0.31;
 const keyColor = matchLuminance(tinycolor('#ff8559').spin(-7), keyLuminance);
+const keyColorLight = matchLuminance(keyColor.clone().desaturate(25), ramp(keyLuminance, 1, 0.7));
 const complement = keyColor.clone().spin(180);
 const splitA = matchLuminance(complement.clone().spin(-splitAngle), keyColor.getLuminance());
 const splitB = matchLuminance(complement.clone().spin(splitAngle), keyColor.getLuminance());
 
-
 const previewPrimary = swatchGroup('Primary');
 previewPrimary(keyColor);
+previewPrimary(keyColorLight);
 
 const secondaryColors = [];
 const tertiaryColors = [];
@@ -112,7 +113,7 @@ const octad = tetrad.concat(
 octad.forEach(previewChartColors);
 
 export default {
-  primary: [keyColor.toHexString()],
+  primary: [keyColor.toHexString(), keyColorLight],
   secondary: secondaryColors.map(c => c.toHexString()),
   tertiary: tertiaryColors.map(c => c.toHexString()),
   warm: warmGrays.map(c => c.toHexString()),
