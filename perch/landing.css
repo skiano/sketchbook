@@ -44,9 +44,7 @@ body {
   position: relative;
   cursor: default;
   user-select: none;
-  max-width: 320px;
   padding: 6px;
-  /* outline: 1px solid red; */
 }
 
 .perch-logo-phrase {

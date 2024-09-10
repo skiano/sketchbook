@@ -200,6 +200,13 @@ new p5((p) => {
       p.fill(query.primary ? '#b0f4df' : '#fff');
       p.rect(x, y, qWidth, qHeight, 28);
 
+      if (!query.primary) {
+        p.fill('#696d6e');
+        p.textAlign(p.LEFT, p.CENTER);
+        p.text(lines[0], x + qPadding, y + (qHeight / 2) - (qLineHeight / 2));
+        p.text(lines[1], x + qPadding, y + (qHeight / 2) + (qLineHeight / 2));
+      }
+
       x += qWidth + qMargin;
     }
     p.pop();
