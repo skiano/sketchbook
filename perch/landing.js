@@ -332,7 +332,7 @@ new p5((p) => {
     p.rectMode(p.CENTER)
     p.fill('#b0f4df');
 
-    bubble.hoverColor = p.lerp(bubble.hoverColor || 0, bubble.hoverIntent || 0, 0.2);
+    bubble.hoverColor = p.lerp(bubble.hoverColor || 0, bubble.hoverIntent || 0, 0.1);
     let s1 = p.color('rgba(255, 255, 255, 0)');
     let s2 = p.color('#00ae62');
     let s = p.lerpColor(s1, s2, bubble.hoverColor);
