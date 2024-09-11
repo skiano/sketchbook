@@ -274,7 +274,7 @@ new p5((p) => {
 
   const renderQuery = (bubble, x, y, t, ti) => {
     let t1 = easeOutExpo(p.map(t, 0, 0.4, 0, 1));
-    let t2 = smoothstep(p.map(ti, 0.5, 1, 0, 1));
+    let t2 = smoothstep(p.map(ti, 0.3, 0.6, 0, 1));
     let w = p.lerp(0, bubble.width, t1);
     let h = p.lerp(0, bubble.height, t1);
     x = p.lerp(x - 40, x, t1);
@@ -368,6 +368,13 @@ new p5((p) => {
       bubbleBlock = setupBubbles(queries);
       boxesStartAt = p.frameCount;
     });
+
+    // force literata to load
+    let gfx = p.createGraphics(20, 20);
+    gfx.textFont('Literata');
+    gfx.textSize(15);
+    gfx.textLeading(23);
+    gfx.text('load please...', 0, 0);
   }
 
   p.draw = () => {
@@ -443,12 +450,13 @@ new p5((p) => {
             bubble.hover = false;
           }
 
+          let offsetTime = (i + bidx) * 4;
+
           if (bubble.primary) {
-            let t = p.constrain((p.frameCount - boxesStartAt - 20) / boxEnterTime, 0, 1);
+            let t = p.constrain((p.frameCount - boxesStartAt - offsetTime) / boxEnterTime, 0, 1);
             renderPrimary(bubble, x, y, t);
           } else {
             // Animation time for the bubble
-            let offsetTime = (i + bidx) * 4;
             let inverseOffsetTime = 30 + ((bubbleBlock.rows.length - i) + (row.bubbles.length - bidx)) * 2;
             let t = p.constrain((p.frameCount - boxesStartAt - offsetTime) / boxEnterTime, 0, 1);
             let t2 = p.constrain((p.frameCount - boxesStartAt - inverseOffsetTime) / boxEnterTime, 0, 1);
