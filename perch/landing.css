@@ -18,6 +18,10 @@ body {
   display: none;
 }
 
+#splash-root {
+  position: relative;
+}
+
 #splash {
   height: 100vh;
   width: 100vw;
@@ -45,6 +49,47 @@ body {
   cursor: default;
   user-select: none;
   padding: 6px;
+}
+
+#splash {
+  /* transform: translateX(300px); */
+}
+
+#splash-scrim {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background: rgba(0, 0, 0, 0.15);
+  transition: opacity 250ms cubic-bezier(0.87, 0, 0.13, 1);
+  opacity: 0;
+  pointer-events: none;
+}
+
+#splash-root.open #splash-scrim {
+  opacity: 1;
+  pointer-events: default;
+}
+
+#splash-preview {
+  position: absolute;
+  top: 18px;
+  right: 18px; 
+  bottom: 18px;
+  width: 600px;
+  background: #fff;
+  border-radius: 10px;
+  z-index: 10;
+  transition: transform 350ms cubic-bezier(0.87, 0, 0.13, 1);
+  transform: translate3d(650px, 0, 0);
+  box-shadow:
+    2px 2px 6px -6px rgba(0,0,0,0.5),
+    0px 0px 33px -16px rgba(0,0,0,0.3);
+}
+
+#splash-root.open #splash-preview {
+  transform: translate3d(0, 0, 0);
 }
 
 .perch-logo-phrase {

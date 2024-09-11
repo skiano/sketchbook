@@ -5,6 +5,7 @@ const DPR = window.devicePixelRatio;
 const splash = document.getElementById('splash');
 const heroText = document.getElementById('splash-hero');
 const splashContent = document.getElementById('splash-wrap');
+const splashRoot = document.getElementById('splash-root');
 
 // NOTE: I am updating these objects, rather than recreating them
 // because they are only passed once to the bubble system
@@ -143,6 +144,8 @@ new p5((p) => {
   let boxEnterTime = 70;
   let boxesStartAt;
   let hoverStartAt;
+  let activeBubble;
+  let isPreviewing;
 
   // This promise should resolve at a certain frame
   // AFTER the hero text is read by user
@@ -418,6 +421,7 @@ new p5((p) => {
         }
         row.bubbles.forEach((bubble, bidx) => {
           if (
+            !isPreviewing &&
             bubble.ready &&
             p.mouseX > x &&
             p.mouseX < x + bubble.width &&
@@ -427,8 +431,8 @@ new p5((p) => {
             if (!bubble.hover) {
               hoverStartAt = p.frameCount;
               bubble.hoverIntent = 1;
+              activeBubble = bubble;
             }
-
             // really hovering
             if (p.frameCount - hoverStartAt > 5) {
               document.body.style.cursor = 'pointer';
@@ -440,8 +444,9 @@ new p5((p) => {
           } else {
             if (bubble.hover) {
               document.body.style.cursor = 'default';
+              activeBubble = null;
               bubble.hoverIntent = 0;
-              landingSparrow.follow();
+              if (!isPreviewing) landingSparrow.follow();
               if (currentPerch) {
                 landingSparrow.removeBubblePerch(currentPerch);
                 currentPerch = null;
@@ -476,6 +481,14 @@ new p5((p) => {
     if (!hasMoved && p.frameCount > 90) {
       landingSparrow.follow();
       hasMoved = true;
+    }
+  }
+
+  p.mouseClicked = () => {
+    if (activeBubble) {
+      landingSparrow.unfollow();
+      splashRoot.classList.add('open');
+      isPreviewing = true;
     }
   }
 }, splash);

@@ -51,6 +51,10 @@ export default function createLandingSparrow(opt) {
     followX() {
       followX = true;
     },
+    unfollow() {
+      followX = false;
+      followY = false;
+    },
     addPerch(...args) {
       return sparrow.addPerch(...args);
     },
