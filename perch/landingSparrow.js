@@ -24,7 +24,7 @@ export default function createLandingSparrow(opt) {
         render: loops,
         x: 0,
         y: 0,
-        scale: 0.45,
+        scale: 0.48,
       });
       currentX = -60;
       currentY = 0;
