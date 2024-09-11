@@ -69,7 +69,7 @@ body {
 
 #splash-root.open #splash-scrim {
   opacity: 1;
-  pointer-events: default;
+  pointer-events: all;
 }
 
 #splash-preview {

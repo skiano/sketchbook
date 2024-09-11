@@ -6,6 +6,7 @@ const splash = document.getElementById('splash');
 const heroText = document.getElementById('splash-hero');
 const splashContent = document.getElementById('splash-wrap');
 const splashRoot = document.getElementById('splash-root');
+const splashScrim = document.getElementById('splash-scrim');
 
 // NOTE: I am updating these objects, rather than recreating them
 // because they are only passed once to the bubble system
@@ -310,6 +311,13 @@ new p5((p) => {
     p.pop();
   }
 
+  const closePreview = () => {
+    isPreviewing = false;
+    activeBubble = false;
+    splashRoot.classList.remove('open');
+    landingSparrow.follow();
+  }
+
   const renderPrimary = (bubble, x, y, t) => {
     let t1 = easeOutExpo(p.map(t, 0, 0.4, 0, 1));
     let t2 = smoothstep(p.map(t, 0.5, 0.9, 0, 1));
@@ -371,6 +379,9 @@ new p5((p) => {
       bubbleBlock = setupBubbles(queries);
       boxesStartAt = p.frameCount;
     });
+
+    // time to close the preview
+    splashScrim.addEventListener('click', closePreview);
 
     // force literata to load
     let gfx = p.createGraphics(20, 20);
