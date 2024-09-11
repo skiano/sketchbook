@@ -135,11 +135,15 @@ new p5((p) => {
     p.push();
     setQueryFont();
     const bubbles = interleaveList(texts.map((query) => {
-      const words = query.text.split(' ');
-
-      const lines = [ // super naive wrap into two lines...
-        words.slice(0, Math.ceil(words.length / 2)).join(' '),
-        words.slice(Math.ceil(words.length / 2)).join(' '),
+      // super naive wrap into two lines...
+      // the goal is to give an "attractive" shape to
+      // the centered text in the bubbles
+      let cutter = 0.33;
+      let idealSplit = Math.floor(query.text.length * cutter);
+      let realSplit = query.text.indexOf(' ', idealSplit);
+      const lines = [
+        query.text.slice(0, realSplit),
+        query.text.slice(realSplit + 1),
       ];
 
       let qWidth = primaryWidth;
@@ -191,6 +195,21 @@ new p5((p) => {
 
       // don't allow an unfilled line
       if (!isComplete) return;
+
+      // massage the line by distributng extra width across boxes
+      row.width = row.width - qMargin; // deduct trailing margin
+      let lineFraction = 1;
+      let leftover = lineFraction * (mainBox.width - duductedWidth) - row.width;
+      if (leftover > 0) {
+        let extra = leftover / row.bubbles.length;
+        console.log('add', extra)
+        row.bubbles.forEach((b) => {
+          b.width += extra
+        });
+      }
+
+      // TODO: rerag the text to hide the massaging
+
       return row;
     }
 
@@ -219,11 +238,15 @@ new p5((p) => {
     p.fill(bubble.primary ? '#b0f4df' : '#fff');
     p.rect(x, y, bubble.width, bubble.height, 28);
     p.fill('#696d6e');
-    p.textAlign(p.LEFT, p.CENTER);
-    // TODO: lineheight here is a magic number... (23...)
-    let lineHeight = 23;
-    p.text(bubble.lines[0], x + bubble.padding, y + (bubble.height / 2) - (lineHeight / 2));
-    p.text(bubble.lines[1], x + bubble.padding, y + (bubble.height / 2) + (lineHeight / 2));
+    // p.textAlign(p.LEFT, p.CENTER);
+    // let lineHeight = 23; // TODO: lineheight here is a magic number... (23...)
+    // p.text(bubble.lines[0], x + bubble.padding, y + (bubble.height / 2) - (lineHeight / 2));
+    // p.text(bubble.lines[1], x + bubble.padding, y + (bubble.height / 2) + (lineHeight / 2));
+
+    p.textAlign(p.CENTER, p.CENTER);
+    let lineHeight = 23; // TODO: lineheight here is a magic number... (23...)
+    p.text(bubble.lines[0], x + bubble.width / 2, y + (bubble.height / 2) - (lineHeight / 2));
+    p.text(bubble.lines[1], x + bubble.width / 2, y + (bubble.height / 2) + (lineHeight / 2));
   }
 
   const renderPrimary = (bubble, x, y) => {
