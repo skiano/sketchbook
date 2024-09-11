@@ -40,6 +40,10 @@ export default function createLandingSparrow(opt) {
       followX = false;
       followY = false;
     },
+    goToY(y) {
+      currentY = y;
+      followY = false;
+    },
     follow() {
       followX = true;
       followY = true;
@@ -47,16 +51,11 @@ export default function createLandingSparrow(opt) {
     followX() {
       followX = true;
     },
-    addBubblePerch(bubble) {
-      let borderR = 25;
-      bubble.perch = sparrow.addPerch(
-        bubble.x - bubble.rx + borderR,
-        bubble.y - bubble.ry,
-        bubble.width - (borderR * 2)
-      );
+    addPerch(...args) {
+      return sparrow.addPerch(...args);
     },
-    removeBubblePerch(bubble) {
-      sparrow.removePerch(bubble.perch);
+    removeBubblePerch(perch) {
+      sparrow.removePerch(perch);
     },
     draw(p5) {
       if (followX && p5.mouseX > 0) currentX = p5.lerp(currentX, p5.mouseX, 0.3);

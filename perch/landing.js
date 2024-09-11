@@ -58,6 +58,15 @@ const interleaveList = (list) => {
   return newList;
 }
 
+const smoothstep = (t) => {
+  t = Math.max(Math.min(t, 1), 0);
+  return t * t * (3.0 - 2.0 * t);
+}
+
+const easeOutExpo = (x) => {
+  return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+}
+
 const landingSparrow = createLandingSparrow({
   getStartingPosition() {
     return {
@@ -115,7 +124,7 @@ const fetchQueries = () => {
   
   queries.push({
     primary: true,
-    text: 'Ask us anything',
+    text: 'Ask    us    anything…',
   });
 
   return new Promise((resolve) => {
@@ -128,7 +137,12 @@ const fetchQueries = () => {
 new p5((p) => {
   let queries;
   let bubbleBlock;
+  let currentPerch;
   let hasMoved = false;
+  let boxRadius = 18;
+  let boxEnterTime = 70;
+  let boxesStartAt;
+  let hoverStartAt;
 
   // This promise should resolve at a certain frame
   // AFTER the hero text is read by user
@@ -223,7 +237,6 @@ new p5((p) => {
       let leftover = lineFraction * (mainBox.width - duductedWidth) - row.width;
       if (leftover > 0) {
         let extra = leftover / row.bubbles.length;
-        console.log('add', extra)
         row.bubbles.forEach((b) => {
           b.width += extra
         });
@@ -259,28 +272,85 @@ new p5((p) => {
     };
   }
 
-  const renderQuery = (bubble, x, y, t) => {
-    p.fill(bubble.primary ? '#b0f4df' : '#fff');
-    p.rect(x, y, bubble.width, bubble.height, 20);
-    p.fill('#696d6e');
+  const renderQuery = (bubble, x, y, t, ti) => {
+    let t1 = easeOutExpo(p.map(t, 0, 0.4, 0, 1));
+    let t2 = smoothstep(p.map(ti, 0.5, 1, 0, 1));
+    let w = p.lerp(0, bubble.width, t1);
+    let h = p.lerp(0, bubble.height, t1);
+    x = p.lerp(x - 40, x, t1);
+    y = p.lerp(y + 140, y, t1);
+
+    // icky... but mark ready...
+    if (t2 >= 0.8) bubble.ready = true;
+
+    let ca = p.color('rgba(255, 255, 255, 0)');
+    let cb = p.color('#696d6e');
+    let c1 = p.lerpColor(ca, cb, t2);
+
+    p.push();
+    p.rectMode(p.CENTER)
+    p.fill('#fff');
+
+    bubble.hoverColor = p.lerp(bubble.hoverColor || 0, bubble.hoverIntent || 0, 0.2);
+    let s1 = p.color('rgba(255, 255, 255, 0)');
+    let s2 = p.color('#ff654a');
+    let s = p.lerpColor(s1, s2, bubble.hoverColor);
+    p.stroke(s);
+
+    p.rect(x + bubble.width / 2, y + h / 2, w, h, boxRadius);
     p.textAlign(p.CENTER, p.CENTER);
     let lineHeight = 23; // TODO: lineheight here is a magic number... (23...)
+    p.fill(c1);
+    p.noStroke();
     p.text(bubble.lines[0], x + bubble.width / 2, y + (bubble.height / 2) - (lineHeight / 2));
     p.text(bubble.lines[1], x + bubble.width / 2, y + (bubble.height / 2) + (lineHeight / 2));
+    p.pop();
   }
 
   const renderPrimary = (bubble, x, y, t) => {
+    let t1 = easeOutExpo(p.map(t, 0, 0.4, 0, 1));
+    let t2 = smoothstep(p.map(t, 0.5, 0.9, 0, 1));
+    let w = p.lerp(0, bubble.width, t1);
+    let h = p.lerp(0, bubble.height, t1);
+    y = p.lerp(y + 160, y, t1);
+
+    // icky... but mark ready...
+    if (t2 >= 0.8) bubble.ready = true;
+
     p.push()
+    p.rectMode(p.CENTER)
     p.fill('#b0f4df');
-    p.rect(x, y, bubble.width, bubble.height, 20);
+
+    bubble.hoverColor = p.lerp(bubble.hoverColor || 0, bubble.hoverIntent || 0, 0.2);
+    let s1 = p.color('rgba(255, 255, 255, 0)');
+    let s2 = p.color('#00ae62');
+    let s = p.lerpColor(s1, s2, bubble.hoverColor);
+    p.stroke(s);
+
+    p.rect(x + bubble.width / 2, y + h / 2, w, h, boxRadius);
+    p.noStroke();
     p.fill('#263336');
     p.textFont('Albert Sans');
     p.textStyle(p.BOLD);
     p.textAlign(p.LEFT, p.CENTER);
     p.textSize(18);
     p.textLeading(18);
-    let textW = p.textWidth(bubble.text);
-    p.text(bubble.text, x + (bubble.width / 2) - (textW / 2), y + bubble.height / 2)
+
+    let text = bubble.text;
+    let textW = p.textWidth(text.replace(/\s\s+/g, ' '));
+    let len = Math.round(text.length * t2);
+    let typedText = text.substring(0, len).replace(/\s\s+/g, ' ');
+    let textX = x + (bubble.width / 2) - (textW / 2);
+
+    p.text(typedText, textX, y + bubble.height / 2)
+
+    if (t1 > 0.5 && ((p.frameCount / 18) >> 0) % 2) {
+      p.stroke('#696d6e');
+      p.strokeWeight(1.5);
+      let typedW = t2 < 1 ? p.textWidth(typedText) : textW;
+      let cursorX = textX + typedW + 4;
+      p.line(cursorX, y + bubble.height / 2 - 15, cursorX, y + bubble.height / 2 + 15);
+    }
     p.pop()
   }
 
@@ -296,6 +366,7 @@ new p5((p) => {
       fetchQueries().then((qs) => { queries = qs; }),
     ]).then(() => {
       bubbleBlock = setupBubbles(queries);
+      boxesStartAt = p.frameCount;
     });
   }
 
@@ -319,7 +390,7 @@ new p5((p) => {
       landingSparrow.start();
     }
 
-    if (p.frameCount === 120) {
+    if (p.frameCount === 100) {
       startTheShow();
     }
 
@@ -327,7 +398,9 @@ new p5((p) => {
 
     if (bubbleBlock) {
       p.push();
+      p.noStroke();
       setQueryFont();
+
       let y = mainBox.top;
       let x = mainBox.left + heroBox.width + bubbleBlock.gap;
       bubbleBlock.rows.forEach((row, i) => {
@@ -336,13 +409,52 @@ new p5((p) => {
           x = mainBox.left;
           y += row.height + bubbleBlock.gap;
         }
-        row.bubbles.forEach((bubble) => {
-          p.noStroke();
-          if (bubble.primary) {
-            renderPrimary(bubble, x, y);
+        row.bubbles.forEach((bubble, bidx) => {
+          if (
+            bubble.ready &&
+            p.mouseX > x &&
+            p.mouseX < x + bubble.width &&
+            p.mouseY > y &&
+            p.mouseY < y + bubble.height
+          ) {
+            if (!bubble.hover) {
+              hoverStartAt = p.frameCount;
+              bubble.hoverIntent = 1;
+            }
+
+            // really hovering
+            if (p.frameCount - hoverStartAt > 5) {
+              document.body.style.cursor = 'pointer';
+              landingSparrow.goToY(y);
+              currentPerch = landingSparrow.addPerch(x + boxRadius, y, bubble.width - boxRadius * 2);
+            }
+
+            bubble.hover = true;
           } else {
-            renderQuery(bubble, x, y);
+            if (bubble.hover) {
+              document.body.style.cursor = 'default';
+              bubble.hoverIntent = 0;
+              landingSparrow.follow();
+              if (currentPerch) {
+                landingSparrow.removeBubblePerch(currentPerch);
+                currentPerch = null;
+              }
+            }
+            bubble.hover = false;
           }
+
+          if (bubble.primary) {
+            let t = p.constrain((p.frameCount - boxesStartAt - 20) / boxEnterTime, 0, 1);
+            renderPrimary(bubble, x, y, t);
+          } else {
+            // Animation time for the bubble
+            let offsetTime = (i + bidx) * 4;
+            let inverseOffsetTime = 30 + ((bubbleBlock.rows.length - i) + (row.bubbles.length - bidx)) * 2;
+            let t = p.constrain((p.frameCount - boxesStartAt - offsetTime) / boxEnterTime, 0, 1);
+            let t2 = p.constrain((p.frameCount - boxesStartAt - inverseOffsetTime) / boxEnterTime, 0, 1);
+            renderQuery(bubble, x, y, t, t2);
+          }
+
           x += bubble.width + bubbleBlock.gap;
         });
         x = mainBox.left;
