@@ -51,7 +51,9 @@ const interleaveList = (list) => {
   const newList = [];
   const total = list.length;
   for (let i = 0; i < total; i += 1) {
-    newList.push(list[i % 2 ? 'pop' : 'shift']());
+    let v = list[i % 2 ? 'pop' : 'shift']();
+    v.isEven = i % 2 === 0;
+    newList.push(v);
   }
   return newList;
 }
@@ -65,57 +67,75 @@ const landingSparrow = createLandingSparrow({
   }
 });
 
-const queries = [
-  'What are the average home prices in this neighborhood?',
-  'How have property values changed in the last 5 years?',
-  'What is the crime rate in this area?',
-  'How are the local schools rated?',
-  'What is the average commute time to downtown?',
-  'What are the property tax rates in this area?',
-  'How does the cost of living here compare to other neighborhoods?',
-  'What percentage of homes in this area are owner-occupied?',
-  'What amenities are within walking distance?',
-  'What is the average rental income for properties in this area?',
-  'How competitive is the housing market here?',
-  'Are there any planned developments or zoning changes nearby?',
-  'What are the flood or natural disaster risks in this area?',
-  'How does this area’s air quality compare to other parts of the city?',
-  'What is the average household income in this neighborhood?',
-  'How much can I expect to spend on utilities here?',
-  'What public transportation options are available nearby?',
-  'How do home prices here compare to the citywide average?',
-  'What are the noise levels like in this area?',
-  'How long do homes typically stay on the market here?',
-  'What are the average home prices in this neighborhood?',
-  'How have property values changed in the last 5 years?',
-  'What is the crime rate in this area?',
-  'How are the local schools rated?',
-  'What is the average commute time to downtown?',
-  'What are the property tax rates in this area?',
-  'How does the cost of living here compare to other neighborhoods?',
-  'What percentage of homes in this area are owner-occupied?',
-  'What amenities are within walking distance?',
-  'What is the average rental income for properties in this area?',
-  'How competitive is the housing market here?',
-  'Are there any planned developments or zoning changes nearby?',
-  'What are the flood or natural disaster risks in this area?',
-  'How does this area’s air quality compare to other parts of the city?',
-  'What is the average household income in this neighborhood?',
-  'How much can I expect to spend on utilities here?',
-  'What public transportation options are available nearby?',
-  'How do home prices here compare to the citywide average?',
-  'What are the noise levels like in this area?',
-  'How long do homes typically stay on the market here?',
-].map(t => ({ text: t }));
+// TEMPORARY QUERIES....
 
-queries.push({
-  primary: true,
-  text: 'Ask us anything',
-});
+const fetchQueries = () => {
+  const queries = [
+    'What are the average home prices in this neighborhood?',
+    'How have property values changed in the last 5 years?',
+    'What is the crime rate in this area?',
+    'How are the local schools rated?',
+    'What is the average commute time to downtown?',
+    'What are the property tax rates in this area?',
+    'How does the cost of living here compare to other neighborhoods?',
+    'What percentage of homes in this area are owner-occupied?',
+    'What amenities are within walking distance?',
+    'What is the average rental income for properties in this area?',
+    'How competitive is the housing market here?',
+    'Are there any planned developments or zoning changes nearby?',
+    'What are the flood or natural disaster risks in this area?',
+    'How does this area’s air quality compare to other parts of the city?',
+    'What is the average household income in this neighborhood?',
+    'How much can I expect to spend on utilities here?',
+    'What public transportation options are available nearby?',
+    'How do home prices here compare to the citywide average?',
+    'What are the noise levels like in this area?',
+    'How long do homes typically stay on the market here?',
+    'What are the average home prices in this neighborhood?',
+    'How have property values changed in the last 5 years?',
+    'What is the crime rate in this area?',
+    'How are the local schools rated?',
+    'What is the average commute time to downtown?',
+    'What are the property tax rates in this area?',
+    'How does the cost of living here compare to other neighborhoods?',
+    'What percentage of homes in this area are owner-occupied?',
+    'What amenities are within walking distance?',
+    'What is the average rental income for properties in this area?',
+    'How competitive is the housing market here?',
+    'Are there any planned developments or zoning changes nearby?',
+    'What are the flood or natural disaster risks in this area?',
+    'How does this area’s air quality compare to other parts of the city?',
+    'What is the average household income in this neighborhood?',
+    'How much can I expect to spend on utilities here?',
+    'What public transportation options are available nearby?',
+    'How do home prices here compare to the citywide average?',
+    'What are the noise levels like in this area?',
+    'How long do homes typically stay on the market here?',
+  ].map(t => ({ text: t }));
+  
+  queries.push({
+    primary: true,
+    text: 'Ask us anything',
+  });
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(queries);
+    }, 500 + Math.random() * 2000);
+  });
+}
 
 new p5((p) => {
-  let hasMoved = false;
+  let queries;
   let bubbleBlock;
+  let hasMoved = false;
+
+  // This promise should resolve at a certain frame
+  // AFTER the hero text is read by user
+  let startTheShow;
+  let showPromise = new Promise((resolve) => {
+    startTheShow = resolve;
+  })
 
   const setQueryFont = () => {
     p.textFont('Literata');
@@ -124,8 +144,9 @@ new p5((p) => {
   }
 
   const setupBubbles = (texts) => {
+    if (!texts) return;
     let qHeight = heroBox.height;
-    let qMargin = 16;
+    let qMargin = 12;
     let qPadding = 20;
     let primaryWidth = 250;
 
@@ -228,31 +249,30 @@ new p5((p) => {
       gap: qMargin,
       rows: [
         topRow,
-        ...interleaveList(middleRows.sort((a, b) => a.width - b.width)),
+        ...interleaveList(middleRows.sort((a, b) => a.width - b.width)).map(r => {
+          // This just seems to make the gutters more attractive...
+          if (r.isEven) r.bubbles = [...r.bubbles.slice(1), r.bubbles[0]];
+          return r;
+        }),
         primaryRow,
       ].filter(v => !!v) // filter out any invalid (i.e. incomplete or empty)
     };
   }
 
-  const renderQuery = (bubble, x, y) => {
+  const renderQuery = (bubble, x, y, t) => {
     p.fill(bubble.primary ? '#b0f4df' : '#fff');
-    p.rect(x, y, bubble.width, bubble.height, 28);
+    p.rect(x, y, bubble.width, bubble.height, 20);
     p.fill('#696d6e');
-    // p.textAlign(p.LEFT, p.CENTER);
-    // let lineHeight = 23; // TODO: lineheight here is a magic number... (23...)
-    // p.text(bubble.lines[0], x + bubble.padding, y + (bubble.height / 2) - (lineHeight / 2));
-    // p.text(bubble.lines[1], x + bubble.padding, y + (bubble.height / 2) + (lineHeight / 2));
-
     p.textAlign(p.CENTER, p.CENTER);
     let lineHeight = 23; // TODO: lineheight here is a magic number... (23...)
     p.text(bubble.lines[0], x + bubble.width / 2, y + (bubble.height / 2) - (lineHeight / 2));
     p.text(bubble.lines[1], x + bubble.width / 2, y + (bubble.height / 2) + (lineHeight / 2));
   }
 
-  const renderPrimary = (bubble, x, y) => {
+  const renderPrimary = (bubble, x, y, t) => {
     p.push()
     p.fill('#b0f4df');
-    p.rect(x, y, bubble.width, bubble.height, 28);
+    p.rect(x, y, bubble.width, bubble.height, 20);
     p.fill('#263336');
     p.textFont('Albert Sans');
     p.textStyle(p.BOLD);
@@ -270,7 +290,13 @@ new p5((p) => {
     p.createCanvas(splashBox.width, splashBox.height);
     affixCanvas(splash, p.canvas);
     resizeObserver.observe(splash);
-    bubbleBlock = setupBubbles(queries);
+
+    Promise.all([
+      showPromise,
+      fetchQueries().then((qs) => { queries = qs; }),
+    ]).then(() => {
+      bubbleBlock = setupBubbles(queries);
+    });
   }
 
   p.draw = () => {
@@ -278,7 +304,9 @@ new p5((p) => {
     // and it's time to resize the canvas
     if (splashBox.width * DPR !== p.canvas.width || splashBox.height * DPR !== p.canvas.height) {
       p.resizeCanvas(splashBox.width, splashBox.height);
-      bubbleBlock = setupBubbles(queries);
+      if (bubbleBlock) { // do not let a screen resize kick it off early
+        bubbleBlock = setupBubbles(queries);
+      }
     }
     p.clear();
 
@@ -291,80 +319,37 @@ new p5((p) => {
       landingSparrow.start();
     }
 
-    // DRAW SOME BUBBLES...
+    if (p.frameCount === 120) {
+      startTheShow();
+    }
 
-    p.push();
-    setQueryFont();
+    // Draw the bubbles
 
-    let y = mainBox.top;
-    let x = mainBox.left + heroBox.width + bubbleBlock.gap;
-    bubbleBlock.rows.forEach((row, i) => {
-      // if there is no top row possible, skip this position
-      if (i === 0 && !row.isTop) {
+    if (bubbleBlock) {
+      p.push();
+      setQueryFont();
+      let y = mainBox.top;
+      let x = mainBox.left + heroBox.width + bubbleBlock.gap;
+      bubbleBlock.rows.forEach((row, i) => {
+        // if there is no top row possible, skip this position
+        if (i === 0 && !row.isTop) {
+          x = mainBox.left;
+          y += row.height + bubbleBlock.gap;
+        }
+        row.bubbles.forEach((bubble) => {
+          p.noStroke();
+          if (bubble.primary) {
+            renderPrimary(bubble, x, y);
+          } else {
+            renderQuery(bubble, x, y);
+          }
+          x += bubble.width + bubbleBlock.gap;
+        });
         x = mainBox.left;
         y += row.height + bubbleBlock.gap;
-      }
-      row.bubbles.forEach((bubble) => {
-        p.noStroke();
-        if (bubble.primary) {
-          renderPrimary(bubble, x, y);
-        } else {
-          renderQuery(bubble, x, y);
-        }
-        x += bubble.width + bubbleBlock.gap;
       });
-      x = mainBox.left;
-      y += row.height + bubbleBlock.gap;
-    });
-
-    // for (let q = 0; q < queries.length; q += 1) {
-    //   let query = queries[q];
-    //   const words = query.text.split(' ');
-    //   const lines = [ // super naive wrap into two lines...
-    //     words.slice(0, Math.ceil(words.length / 2)).join(' '),
-    //     words.slice(Math.ceil(words.length / 2)).join(' '),
-    //   ];
-    //   let textW = query.primary ? primaryWidth : Math.max(...lines.map(l => p.textWidth(l)));
-    //   let qWidth = textW + qPadding * 2;
-
-    //   if (x + qWidth > right) {
-    //     x = left;
-    //     y += qHeight + qMargin;
-    //     row += 1;
-    //   }
-
-    //   if (y + qHeight > bottom) {
-    //     break;
-    //   }
-
-    //   p.noStroke();
-    //   p.fill(query.primary ? '#b0f4df' : '#fff');
-    //   p.rect(x, y, qWidth, qHeight, 28);
-
-    //   if (!query.primary) {
-    //     p.fill('#696d6e');
-    //     p.textAlign(p.LEFT, p.CENTER);
-    //     p.text(lines[0], x + qPadding, y + (qHeight / 2) - (qLineHeight / 2));
-    //     p.text(lines[1], x + qPadding, y + (qHeight / 2) + (qLineHeight / 2));
-    //   } else {
-    //     p.push();
-    //     p.textFont('Albert Sans');
-    //     p.textStyle(p.BOLD);
-    //     p.textAlign(p.LEFT, p.CENTER);
-    //     p.textSize(18);
-    //     p.textLeading(qLineHeight);
-    //     p.fill('#263336');
-    //     let text = query.text;
-    //     let textW = p.textWidth(text);
-    //     let textX = x + (qWidth / 2) - (textW / 2);
-    //     p.text(text, textX, y + (qHeight / 2));
-    //     p.pop();
-
-    //   }
-
-    //   x += qWidth + qMargin;
-    // }
-    p.pop();
+      p.pop();
+    }
   }
 
   p.mouseMoved = () => {
