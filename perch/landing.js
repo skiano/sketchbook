@@ -442,10 +442,10 @@ new p5((p) => {
             if (!bubble.hover) {
               hoverStartAt = p.frameCount;
               bubble.hoverIntent = 1;
-              activeBubble = bubble;
             }
             // really hovering
             if (p.frameCount - hoverStartAt > 5) {
+              activeBubble = bubble;
               document.body.style.cursor = 'pointer';
               landingSparrow.goToY(y);
               currentPerch = landingSparrow.addPerch(x + boxRadius, y, bubble.width - boxRadius * 2);
