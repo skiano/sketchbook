@@ -13,13 +13,12 @@
     if (tasks) while (tasks.length) { fn(...tasks.pop()) }
   }
 
-  customElements.define('x-box', class XBox extends HTMLElement {
+  customElements.define('c-box', class CBox extends HTMLElement {
     constructor() {
       super();
       this.attachShadow({ mode: 'open' });
       this.shadowRoot.innerHTML = `<div><slot></slot></div>`;
     }
-
     connectedCallback() {
       const wrapper = this.shadowRoot.children[0];
       pushTask(this.getAttribute('kind'), wrapper, this.dataset);
@@ -40,6 +39,7 @@
           border: '1px solid orange',
         });
       }
+      // TODO: fixed height components...
     }
   });
 })();

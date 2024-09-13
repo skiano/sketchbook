@@ -7,35 +7,47 @@
     <title>Skiano | Islands</title>
     <link rel="stylesheet" href="../shared/reset.css">
     <link rel="stylesheet" href="../shared/base.css">
-    <script src="./components.js"></script>
     <style>
-      .my-thing {
-        background: yellow;
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: stretch;
+        color: #eee;
+      }
+      nav {
+        background: #111;
+        padding: 16px;
+      }
+      #demo {
+        flex-grow: 1;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        justify-content: stretch;
+      }
+      #editor,
+      #output {
+        flex-grow: 1;
+        flex-basis: 0;
+      }
+      #editor {
+        background: #333;
+        font-family: monospace;
+        font-size: 11px;
+        line-height: 1.5;
+        padding: 12px;
+      }
+      #output {
+        background: #555;
       }
     </style>
   </head>
   <body>
-    <x-box
-      kind="greeting"
-      class="my-thing"
-      ratio="16/9"
-      data-name="Joe">
-    </x-box>
-
-    <x-box
-      kind="greeting"
-      class="my-thing"
-      data-name="Greg"
-    />
-
-    <script type="importmap">
-      {
-        "imports": {
-          "react": "https://esm.run/react@18.3.1",
-          "react-dom": "https://esm.run/react-dom@18.3.1"
-        }
-      }
-    </script>
-    <script type="module" src="./example.js"></script>
+    <nav>hello</nav>
+    <main id="demo">
+    </main>
+    <script type="module" src="./demo.js"></script>
   </body>
 </html>
