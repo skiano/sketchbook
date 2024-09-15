@@ -46,3 +46,16 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
+
+/*************************************************************/
+/* BOX MODEL                                                 */
+/* https://www.paulirish.com/2012/box-sizing-border-box-ftw/ */
+/*************************************************************/
+
+html {
+  box-sizing: border-box;
+  font-family: 'Times New Roman', Times, serif;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}

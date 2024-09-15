@@ -5,4 +5,4 @@ const Greeting = ({ name }) => {
   return h('h1', { className: 'greeting' }, `Hello ${ name }`);
 }
 
-window.onXBox('greeting', (root, props) => createRoot(root).render(Greeting(props)));
+window.onGenZ('greeting', (root, props) => createRoot(root).render(Greeting(props)));

@@ -42,7 +42,7 @@ iframe.srcdoc = `
   </head>
   <body>
     <script type="importmap">
-      { "imports": { "genz": "https://esm.run/genz@0.9.7" } }
+      { "imports": { "genz": "https://cdn.jsdelivr.net/npm/genz@0.10.2" } }
     </script>
     <script type="module" src="${blobUrl}">
     </script>
