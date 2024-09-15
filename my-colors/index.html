@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="../images/sketchbook-favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Colors</title>
+    <link rel="stylesheet" href="../shared/reset.css">
+    <link rel="stylesheet" href="../shared/base.css">
+    <style>
+      body {
+        padding: 40px;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: monospace;
+        font-weight: bold;
+      }
+
+      #swatches {
+        width: 100%;
+        max-width: 800px;
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+      }
+
+      .swatch-group {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        gap: 0px;
+      }
+
+      .swatch {
+        flex-grow: 1;
+        flex-basis: 0;
+        min-height: 70px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="swatches"></div>
+    <script type="importmap">
+      {
+        "imports": {
+          "tinycolor2": "https://esm.run/tinycolor2@1.6.0"
+        }
+      }
+    </script>
+    <script type="module">
+      import color from 'tinycolor2';
+
+      function matchLuminance(input, targetLuminance = 0.5) {
+        const { h, s } = input.toHsl();
+        let l;
+        let c;
+        let lum;
+        let err;
+        let safety = 120;
+        let min = 0;
+        let max = 1;
+        while (safety-- > 0) {
+          l = (min + max) / 2;
+          c = color.fromRatio({ h, s, l });
+          lum = c.getLuminance();
+          err = Math.abs(lum - targetLuminance);
+
+          if (err < 0.001) break;
+
+          if (lum > targetLuminance) {
+            max = l;
+          } else {
+            min = l;
+          }
+        };
+        return c;
+      };
+
+      function addSwatches(swatches) {
+        const swatchGroup = document.createElement('div');
+        swatchGroup.classList.add('swatch-group');
+        swatches.forEach((s) => {
+          const swatch = document.createElement('div');
+          swatch.classList.add('swatch');
+          swatch.style.background = s.toHexString();
+          swatch.style.color = s.getLuminance() < 0.3 ? '#fff' : '#000';
+          swatch.innerHTML = `${s.toHexString()}`;
+          swatchGroup.appendChild(swatch);
+        });
+        document.getElementById('swatches').appendChild(swatchGroup);
+      }
+
+      const keyColor = color('magenta');
+      const complement = keyColor.complement();
+      const keyLuma = keyColor.getLuminance();
+      const secondary = [
+        ...[...Array(2)].map((_, i) => matchLuminance(keyColor.clone().spin((i + 1) * -60), keyLuma)).reverse(),
+        ...[...Array(2)].map((_, i) => matchLuminance(keyColor.clone().spin((i + 1) * 60), keyLuma)),
+      ];
+      const lights = secondary.map((c) => {
+        return [...Array(9)].map((_, i, arr) => {
+          const luma = keyLuma + ((i / (arr.length - 1)) * (1 - keyLuma));
+          return matchLuminance(c.clone().desaturate(35), luma)
+        }).slice(2, -1);
+      });
+
+      const grays = [
+        ...[...Array(4)].map((_, i, arr) => {
+          let max = 0.2;
+          let min = 0.001;
+          const luma = Math.max(min + (i / (arr.length - 1)) * (max - min), 0.025);
+          return matchLuminance(complement.clone().desaturate(96), luma);
+        }),
+        ...[...Array(4)].map((_, i, arr) => {
+          let max = 0.92;
+          let min = 0.5;
+          const luma = min + (i / (arr.length - 1)) * (max - min);
+          return matchLuminance(complement.clone().desaturate(90), luma);
+        })
+      ]
+
+      addSwatches(grays.reverse());
+      addSwatches([keyColor])
+      addSwatches(secondary);
+      lights.forEach(addSwatches);
+    </script>
+  </body>
+</html>
