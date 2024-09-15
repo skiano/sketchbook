@@ -102,7 +102,7 @@
         ...[...Array(2)].map((_, i) => matchLuminance(keyColor.clone().spin((i + 1) * -60), keyLuma)).reverse(),
         ...[...Array(2)].map((_, i) => matchLuminance(keyColor.clone().spin((i + 1) * 60), keyLuma)),
       ];
-      const lights = secondary.map((c) => {
+      const lights = [...secondary].map((c) => {
         return [...Array(9)].map((_, i, arr) => {
           const luma = keyLuma + ((i / (arr.length - 1)) * (1 - keyLuma));
           return matchLuminance(c.clone().desaturate(35), luma)
