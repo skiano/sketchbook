@@ -1,4 +1,5 @@
 import p5 from 'p5';
+import JSZip from 'JSZip';
 import config from './config.js';
 import addCanvas from './addCanvas.js';
 import createSparrow from './createSparrow.js';
@@ -6,6 +7,8 @@ import addAnimationLoops from './loadAnimationLoop.js';
 import addAwaitFonts from './awaitFonts.js';
 import palette from './palette.js';
 import './typography.js';
+
+console.log(JSZip)
 
 // install plugins
 addAnimationLoops(p5);
@@ -152,3 +155,198 @@ addCanvas((p) => {
   height: 455,
 });
 
+///////////////////
+// EMAIL IMAGE 1 //
+///////////////////
+
+addCanvas((p) => {
+  let loops;
+  let sparrow;
+  let ground;
+  let isSaving = false;
+
+  p.preload = () => {
+    // TODO: the await fonts function is interfering with the decrement logic
+    // p.awaitFonts([
+    //   ['Albert Sans', '100 900'],
+    // ]);
+    loops = p.loadAnimationLoopMap(config, {
+      fill: palette.primary[0],
+    });
+  }
+
+  p.setup = () => {
+    ground = p.height * 2.3 / 3;
+
+    sparrow = createSparrow({
+      render: loops,
+      x: 800,
+      y: -30,
+      scale: 0.43,
+    });
+
+    sparrow.addPerch(0, ground, 800);
+
+    p.updateFontVariables('Albert Sans', {
+      ital: 1,
+      wght: 800,
+    });
+  }
+
+  async function saveBase64ImagesAsZip(images, zipFilename) {
+    const zip = new JSZip();
+  
+    // Convert each Base64 image to a Blob and add it to the ZIP
+    for (let i = 0; i < images.length; i++) {
+      const { imageData, filename } = images[i];
+  
+      // Decode Base64 image data
+      const base64 = imageData.split(',')[1];
+      const byteCharacters = atob(base64);
+      const byteArray = new Uint8Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteArray[i] = byteCharacters.charCodeAt(i);
+      }
+  
+      // Create a Blob from the byte array
+      const blob = new Blob([byteArray], { type: "image/png" });
+      zip.file(filename + '.png', blob);
+    }
+  
+    // Generate the ZIP file and trigger download
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(zipBlob);
+    a.download = zipFilename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  // p.keyPressed = () => {
+  //   if (p.key === 's') {
+  //     if (isSaving) return;
+  //     isSaving = true;
+
+  //     p.saveFrames('_bird-frame', 'png', 8, 15, async (arr) => {
+  //       await saveBase64ImagesAsZip(arr, '_bird-frames');
+  //     });
+  //   }
+  // }
+
+  p.draw = () => {
+    p.background(palette.warm[0]);
+
+    p.push();
+    p.fill(palette.primary[0])
+    p.textSize(48)
+    p.text('perch', 32, ground)
+    p.pop();
+
+    sparrow.moveTo(p.mouseX, p.mouseY);
+    sparrow.render();
+  };
+}, {
+  width: 600,
+  height: 90,
+  fps: 15,
+});
+
+///////////////////
+// EMAIL IMAGE 2 //
+///////////////////
+
+addCanvas((p) => {
+  let loops;
+  let sparrow;
+  let ground;
+  let isSaving = false;
+
+  p.preload = () => {
+    // TODO: the await fonts function is interfering with the decrement logic
+    // p.awaitFonts([
+    //   ['Albert Sans', '100 900'],
+    // ]);
+    loops = p.loadAnimationLoopMap(config, {
+      fill: '#fff',
+    });
+  }
+
+  p.setup = () => {
+    ground = p.height * 2.3 / 3;
+
+    sparrow = createSparrow({
+      render: loops,
+      x: 800,
+      y: -30,
+      scale: 0.7,
+    });
+
+    // sparrow.addPerch(0, ground, 800);
+
+    p.updateFontVariables('Albert Sans', {
+      ital: 1,
+      wght: 800,
+    });
+  }
+
+  async function saveBase64ImagesAsZip(images, zipFilename) {
+    const zip = new JSZip();
+  
+    // Convert each Base64 image to a Blob and add it to the ZIP
+    for (let i = 0; i < images.length; i++) {
+      const { imageData, filename } = images[i];
+  
+      // Decode Base64 image data
+      const base64 = imageData.split(',')[1];
+      const byteCharacters = atob(base64);
+      const byteArray = new Uint8Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteArray[i] = byteCharacters.charCodeAt(i);
+      }
+  
+      // Create a Blob from the byte array
+      const blob = new Blob([byteArray], { type: "image/png" });
+      zip.file(filename + '.png', blob);
+    }
+  
+    // Generate the ZIP file and trigger download
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(zipBlob);
+    a.download = zipFilename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  p.keyPressed = () => {
+    if (p.key === 's') {
+      if (isSaving) return;
+      isSaving = true;
+
+      p.saveFrames('_bird-frame', 'png', 6, 15, async (arr) => {
+        await saveBase64ImagesAsZip(arr, '_bird-frames');
+      });
+    }
+  }
+
+  p.draw = () => {
+    p.background(palette.primary[0]);
+
+    // p.push();
+    // p.fill('white')
+    // p.textSize(48)
+    // p.text('perch', 32, ground)
+    // p.pop();
+
+    sparrow.moveTo(p.mouseX, p.mouseY);
+    sparrow.render();
+  };
+}, {
+  width: 300,
+  height: 300,
+  fps: 15,
+});

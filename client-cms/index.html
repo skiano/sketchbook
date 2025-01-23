@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="../images/sketchbook-favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skiano | Client CMS</title>
+    <link rel="stylesheet" href="../shared/reset.css">
+    <link rel="stylesheet" href="../shared/base.css">
+    <style>
+      body {
+        /* padding: 40px; */
+      }
+      #hello {
+        display: grid;
+        /* grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px; */
+        grid-template-columns: repeat(auto-fit, minmax(10vw, 1fr));
+        grid-auto-rows: minmax(10vw, 1fr); /* Rows stretch to fill available space */
+      }
+
+      #hello > p {
+        background: lightgreen;
+      }
+
+      #hello > p:nth-child(3n + 1) {
+        background: lightcoral;
+      }
+
+      #hello > p:nth-child(3n + 2) {
+        background: yellowgreen;
+      }
+
+
+      #hello > p:nth-child(11n + 1) {
+        grid-column: span 2;
+        grid-row: span 2;
+        background: lightblue;
+        border: 2px solid red;
+        z-index: 2;
+        position: relative;
+      }
+
+      /* #hello > p:nth-child(3n) {
+        grid-column: span 2;
+        grid-row: span 2;
+      }
+
+      #hello > p:nth-child(9n) {
+        grid-column: span 2;
+        grid-row: span 4;
+      } */
+    </style>
+  </head>
+  <body>
+    <div id="hello">
+    </div>
+    <script type="module">
+      const root = document.getElementById('hello')
+      const res = await fetch('./data.txt');
+      const decoder = new TextDecoder();
+      let total = 0;
+      let calls = 0;
+      let chunk = '';
+      for await (const value of res.body) {
+        chunk += decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+        for (let i = 0; i < lines.length - 1; i++) {
+          let n = document.createElement('p');
+          n.innerText = lines[i];
+          root.appendChild(n);
+        }
+        // Save the last incomplete line for the next chunk
+        chunk = lines[lines.length - 1];
+      }
+      if (chunk) {
+        console.log('trailing')
+        let n = document.createElement('p');
+        n.innerText = chunk;
+        root.appendChild(n);
+      }
+    </script>
+  </body>
+</html>

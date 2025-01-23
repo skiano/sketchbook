@@ -18,6 +18,23 @@ addCanvas((p) => {
 });
 
 addCanvas((p) => {
+  p.draw = () => {
+    p.rectMode(p.CENTER);
+    p.noStroke();
+    p.fill('magenta');
+    p.rect(p.width / 2, p.height / 2, 192, 192, 8);
+    p.textAlign(p.CENTER, p.CENTER);
+    p.textSize(128);
+    p.text('📓', p.width / 2 - 0.5, p.height / 2 + 8.5);
+    p.noLoop();
+  }
+}, {
+  width: 192,
+  height: 192,
+  background: 'transparent',
+});
+
+addCanvas((p) => {
 
   p.draw = () => {
 

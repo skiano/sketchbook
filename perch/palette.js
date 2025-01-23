@@ -50,7 +50,7 @@ function matchLuminance(input, targetLuminance = 0.5) {
   return c;
 };
 
-const splitAngle = 35;
+const splitAngle = 48;
 const keyLuminance = 0.31;
 const keyColor = matchLuminance(tinycolor('#ff8559').spin(-7), keyLuminance);
 const keyColorLight = matchLuminance(keyColor.clone().desaturate(25), ramp(keyLuminance, 1, 0.7));
@@ -65,21 +65,23 @@ previewPrimary(keyColor);
 const secondaryColors = [];
 const tertiaryColors = [];
 
+secondaryColors.push(matchLuminance(splitA.clone().spin(-4).desaturate(40), 0.08));
 secondaryColors.push(splitA)
-secondaryColors.push(matchLuminance(splitA.clone().spin(4).desaturate(20), ramp(keyLuminance, 1, 0.5)));
-secondaryColors.push(matchLuminance(splitA.clone().spin(8).desaturate(25), ramp(keyLuminance, 1, 0.7)));
+secondaryColors.push(matchLuminance(splitA.clone().spin(4).desaturate(30), ramp(keyLuminance, 1, 0.4)));
+secondaryColors.push(matchLuminance(splitA.clone().spin(8).desaturate(35), ramp(keyLuminance, 1, 0.6)));
 
+tertiaryColors.push(matchLuminance(splitB.clone().spin(-4).desaturate(75), 0.06));
 tertiaryColors.push(splitB);
-tertiaryColors.push(matchLuminance(splitB.clone().spin(-4).desaturate(20), ramp(keyLuminance, 1, 0.5)));
-tertiaryColors.push(matchLuminance(splitB.clone().spin(-8).desaturate(25), ramp(keyLuminance, 1, 0.7)));
+tertiaryColors.push(matchLuminance(splitB.clone().spin(-4).desaturate(30), ramp(keyLuminance, 1, 0.4)));
+tertiaryColors.push(matchLuminance(splitB.clone().spin(-8).desaturate(35), ramp(keyLuminance, 1, 0.6)));
 
 const previewSecondary = swatchGroup('Secondary & Tertiary');
 secondaryColors.forEach(previewSecondary);
 [...tertiaryColors].reverse().forEach(previewSecondary);
 
 function makeGrays(col, strength = 1) {
-  let lumPattern = [0.93, 0.88, 0.8, 0.65, 0.45, 0.35, 0.15, 0.075, 0.03, 0.012, 0.005];
-  let satPattern = [40, 55, 80, 85, 90, 93, 95, 85, 80, 70, 40];
+  let lumPattern = [0.95, 0.90, 0.81, 0.70, 0.50, 0.27, 0.15, 0.075, 0.03, 0.012];
+  let satPattern = [55, 75, 85, 90, 95, 97, 95, 90, 85, 75];
   return lumPattern.map((l, i) => matchLuminance(col.clone().desaturate(satPattern[i] * strength), l));
 }
 
